@@ -1,0 +1,32 @@
+# Local coding agent for Open WebUI.
+#   cp deploy/.env.example deploy/.env   # set AGENT_API / AGENT_MODEL to your model server
+#   docker compose -f deploy/compose.yaml up -d --build
+# Then in Open WebUI: Admin Settings -> Connections -> add  http://<this host>:8094/v1  (key: SERVER_API_KEY)
+services:
+  agent:
+    build: {context: .., dockerfile: deploy/Dockerfile.agent}
+    env_file: .env
+    environment:
+      SANDBOX_URL: http://sandbox:8700
+      WORKSPACE_ROOT: /workspaces
+    volumes: [workspaces:/workspaces]
+    ports: ["127.0.0.1:8094:8094"]      # change to "8094:8094" only if Open WebUI runs on another host
+    networks: [default, sandbox-net]
+    extra_hosts: ["host.docker.internal:host-gateway"]   # reach a model server running on the host
+    restart: unless-stopped
+  sandbox:
+    build: {context: .., dockerfile: deploy/Dockerfile.sandbox}
+    volumes: [workspaces:/workspaces]
+    networks: [sandbox-net]           # internal network only: commands the model runs cannot reach the internet
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 4g
+    pids_limit: 512
+    restart: unless-stopped
+volumes:
+  workspaces:
+networks:
+  sandbox-net:
+    internal: true

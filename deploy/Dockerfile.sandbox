@@ -1,0 +1,6 @@
+FROM docker.io/library/python:3.12-slim
+RUN useradd -m -u 1000 agent && mkdir -p /workspaces && chown agent:agent /workspaces
+COPY deploy/sandbox_server.py /srv/sandbox_server.py
+USER agent
+ENV WORKSPACE_ROOT=/workspaces PORT=8700
+CMD ["python3", "/srv/sandbox_server.py"]

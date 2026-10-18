@@ -3,18 +3,20 @@ a few tokens of output, probability from logprobs. Typical server time ~0.2 s.""
 import json, math, os, time, urllib.request
 
 API = os.environ.get("AGENT_API", "http://127.0.0.1:8085/v1/chat/completions")
+MODEL = os.environ.get("AGENT_MODEL", "local")
+HEADERS = {"Content-Type": "application/json", "Authorization": "Bearer " + os.environ.get("AGENT_API_KEY", "none")}
 
 
 def ask(question, key, max_tokens=24):
     """Returns (value: bool | None, p: float, ms: int). None when the output could not be read."""
-    body = {"messages": [{"role": "user", "content": question}], "temperature": 0, "max_tokens": max_tokens,
+    body = {"model": MODEL, "messages": [{"role": "user", "content": question}], "temperature": 0, "max_tokens": max_tokens,
             "logprobs": True, "top_logprobs": 3,
             "response_format": {"type": "json_schema", "json_schema": {"name": "j", "strict": True, "schema": {
                 "type": "object", "properties": {key: {"type": "boolean"}}, "required": [key]}}},
             "chat_template_kwargs": {"enable_thinking": False}}
     t0 = time.time()
     try:
-        req = urllib.request.Request(API, json.dumps(body).encode(), {"Content-Type": "application/json"})
+        req = urllib.request.Request(API, json.dumps(body).encode(), HEADERS)
         with urllib.request.urlopen(req, timeout=120) as r:
             ch = json.load(r)["choices"][0]
         val = json.loads(ch["message"]["content"]).get(key)
@@ -50,13 +52,13 @@ def ask_in_context(messages, tools, question, key, max_tokens=24):
     if msgs and msgs[-1]["role"] == "user":
         msgs = msgs + [{"role": "assistant", "content": "(noted)"}]
     msgs = msgs + [{"role": "user", "content": "[harness question, answer only in JSON] " + question}]
-    body = {"messages": msgs, "tools": tools, "temperature": 0, "max_tokens": max_tokens, "logprobs": True, "top_logprobs": 3,
+    body = {"model": MODEL, "messages": msgs, "tools": tools, "temperature": 0, "max_tokens": max_tokens, "logprobs": True, "top_logprobs": 3,
             "response_format": {"type": "json_schema", "json_schema": {"name": "j", "strict": True, "schema": {
                 "type": "object", "properties": {key: {"type": "boolean"}}, "required": [key]}}},
             "chat_template_kwargs": {"enable_thinking": False}}
     t0 = time.time()
     try:
-        req = urllib.request.Request(API, json.dumps(body).encode(), {"Content-Type": "application/json"})
+        req = urllib.request.Request(API, json.dumps(body).encode(), HEADERS)
         with urllib.request.urlopen(req, timeout=120) as r:
             ch = json.load(r)["choices"][0]
         val = json.loads(ch["message"]["content"]).get(key)
