@@ -19,6 +19,9 @@ KEEP_FULL = 5
 CTX_SOFT_LIMIT = 40000  # characters; above this, old outputs are masked in one batch
 MAX_STEPS = 30
 
+SYSTEM_THINK_RULE = ("\n8. When you need to reason (what the error means, what to check next, whether a requirement is met), "
+                     "call the think tool. Never write reasoning as comments inside bash commands or files; keep commands short.")
+
 SYSTEM = """You are an expert software engineer working as an autonomous agent in a Linux container (Python 3.12, bash, no network). The task files are in /work.
 
 How to work:
@@ -31,6 +34,9 @@ How to work:
 7. When all todo items are done and verified, call finish with a short summary.
 
 Tools: bash runs `bash -lc` in /work (60 s limit). read_file shows line numbers (do not copy them into edits)."""
+
+THINK_TOOL = {"type": "function", "function": {"name": "think", "description": "Write down your reasoning or plan. It does not change anything. Use it instead of putting reasoning in commands, comments or files.",
+    "parameters": {"type": "object", "properties": {"thought": {"type": "string"}}, "required": ["thought"]}}}
 
 TOOLS = [
     base.TOOLS[0],
@@ -89,6 +95,8 @@ class State:
 
 
 def run_tool(box, workdir, st, name, args):
+    if name == "think":
+        return "ok"
     if name == "todo":
         st.todo = [{"text": str(i.get("text", ""))[:200], "status": i.get("status", "pending")} for i in args.get("items", [])][:20]
         return "todo updated"
@@ -183,7 +191,7 @@ def harness_checks(box):
     return "\n".join(lines)
 
 
-def on_finish(box, st, task, messages, args, in_context=False, cf=False):
+def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=None):
     st.finish_tries += 1
     if st.finish_tries > 2:
         return None
@@ -199,7 +207,7 @@ def on_finish(box, st, task, messages, args, in_context=False, cf=False):
               + ("\nUnfinished checklist items: " + "; ".join(open_items) if open_items else "")
               + "\nIs every requirement of the original task met, with evidence in this conversation that the final result is correct? "
               "Answer done=true only if so.")
-        val, p, ms = judge.ask_in_context(view(messages, st, cf), TOOLS, q2, "done")
+        val, p, ms = judge.ask_in_context(view(messages, st, cf), tools or TOOLS, q2, "done")
     else:
         val, p, ms = judge.ask(q, "done")
     st.judge_log.append(("finish", val, round(p, 3), ms))
@@ -214,18 +222,20 @@ def run_task(task_text, workdir, profile, log):
     box = base.Sandbox(workdir)
     st = State()
     t0 = time.time()
-    messages = [{"role": "system", "content": SYSTEM}, {"role": "user", "content": task_text}]
+    think = profile.startswith("v5f")
+    tools = TOOLS + [THINK_TOOL] if think else TOOLS
+    messages = [{"role": "system", "content": SYSTEM + (SYSTEM_THINK_RULE if think else "")}, {"role": "user", "content": task_text}]
     finished, steps = False, 0
     try:
         for steps in range(1, MAX_STEPS + 1):
             temp = 0.9 if st.hot else 0.3
             st.hot = max(0, st.hot - 1)
-            v5d = profile.startswith(("v5d", "v5e"))
-            cf = profile.startswith("v5e")
+            v5d = profile.startswith(("v5d", "v5e", "v5f"))
+            cf = profile.startswith(("v5e", "v5f"))
             if v5d and st.broken:
                 temp = 0.9  # the same prefix at low temperature reproduces the same runaway call
             try:
-                ch = base.chat(view(messages, st, cf), TOOLS, max_tokens=(1536 if v5d and st.broken else 4096), temperature=temp)
+                ch = base.chat(view(messages, st, cf), tools, max_tokens=(1536 if v5d and st.broken else 4096), temperature=temp)
             except base.BrokenToolCall as e:
                 log({"broken_tool_call": str(e)[:300]})
                 st.broken += 1
@@ -255,10 +265,10 @@ def run_task(task_text, workdir, profile, log):
                 except ValueError:
                     a = None
                 name = c["function"]["name"]
-                if a is not None and name not in ("finish", "todo") and akey(name, a) in st.ran:
+                if a is not None and name not in ("finish", "todo", "think") and akey(name, a) in st.ran:
                     n, res = st.ran[akey(name, a)]
                     st.ran[akey(name, a)] = (n + 1, res)
-                    newer = profile.startswith(("v5c", "v5d", "v5e"))
+                    newer = profile.startswith(("v5c", "v5d", "v5e", "v5f"))
                     full = st.full.get(akey(name, a), res) if newer else res
                     if newer:
                         notes.append(f"{describe(name, a)} already ran {n} time(s) and nothing has changed since, so it was not run again. "
@@ -281,7 +291,7 @@ def run_task(task_text, workdir, profile, log):
                 if a is None:
                     obs = "error: arguments were not valid JSON. Call the tool again with valid JSON."
                 elif name == "finish":
-                    r = on_finish(box, st, task_text, messages, a, in_context=profile.startswith(("v5b", "v5e")), cf=profile.startswith("v5e"))
+                    r = on_finish(box, st, task_text, messages, a, in_context=profile.startswith(("v5b", "v5e", "v5f")), cf=profile.startswith(("v5e", "v5f")), tools=tools)
                     obs, done_now = ("finished", True) if r is None else (r, False)
                     if r:
                         log({"finish_rejected": r[:800]})
@@ -290,7 +300,7 @@ def run_task(task_text, workdir, profile, log):
                         obs = run_tool(box, workdir, st, name, a)
                     except Exception as e:
                         obs = f"error: {e}"
-                    if name not in ("todo",):
+                    if name not in ("todo", "think"):
                         st.ran[akey(name, a)] = (1, one_line(obs))
                         st.full[akey(name, a)] = obs
                         # a later change can make an earlier command worth re-running
