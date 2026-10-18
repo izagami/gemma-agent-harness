@@ -259,11 +259,13 @@ task("stats_cli", "data.txt に1行1つ数値が入っています（空行や�
      "
      """))
 
-import tasks_hard
+import tasks_hard, tasks_xhard
 tasks_hard.add(task)
+tasks_xhard.add(task)
 
 if __name__ == "__main__":
-    root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tasks")
+    final = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tasks")
+    root = final + ".new"   # build next to the live suite, then swap (runs in progress read tasks/)
     shutil.rmtree(root, ignore_errors=True)
     for tid, (ins, files, check, hidden) in T.items():
         base = os.path.join(root, tid)
@@ -277,4 +279,8 @@ if __name__ == "__main__":
         for rel, content in hidden.items():
             content = files[rel] if content is None else files.get(content, content)
             open(os.path.join(base, "check", rel), "w").write(content.lstrip("\n"))
+    if os.path.isdir(final):
+        os.rename(final, final + ".old")
+    os.rename(root, final)
+    shutil.rmtree(final + ".old", ignore_errors=True)
     print(len(T), "tasks")

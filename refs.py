@@ -27,8 +27,9 @@ R["merge_csv"] = {"!": "python3 -c \"import csv\nc={r['customer_id']:r['name'] f
 R["unused"] = {"unused.txt": "backup\nlegacy_clean\nnormalize\n"}
 R["stats_cli"] = {"!": "python3 -c \"import json,statistics as s\nxs=[float(l) for l in open('data.txt') if l.strip() and not l.startswith('#')]\njson.dump({'mean':round(s.mean(xs),3),'min':round(min(xs),3),'max':round(max(xs),3),'std':round(s.pstdev(xs),3)},open('stats.json','w'))\""}
 
-import refs_hard
+import refs_hard, refs_xhard
 R.update(refs_hard.R)
+R.update(refs_xhard.R)
 
 if __name__ == "__main__":
     import sys
