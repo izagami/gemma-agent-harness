@@ -19,6 +19,10 @@ KEEP_FULL = 5
 CTX_SOFT_LIMIT = 40000  # characters; above this, old outputs are masked in one batch
 MAX_STEPS = 30
 
+SYSTEM_V6B_RULES = ("\n9. Never overwrite or edit the provided input/data files to test your code; put test data in /tmp. "
+                    "Change only the files the task asks you to change or create.\n"
+                    "10. If you notice a problem (a wrong count, a failing case), fix it and re-check before calling finish.")
+
 SYSTEM_THINK_RULE = ("\n8. When you need to reason (what the error means, what to check next, whether a requirement is met), "
                      "call the think tool. Never write reasoning as comments inside bash commands or files; keep commands short.")
 
@@ -89,6 +93,7 @@ FEATURES = {
     "v5e": {"repeat_result", "storm", "cache", "incontext"},
     "v5f": {"repeat_result", "storm", "cache", "incontext", "think"},
     "v6": {"repeat_result", "storm", "cache", "incontext", "think"},
+    "v6b": {"repeat_result", "storm", "cache", "incontext", "think", "v6b"},
 }
 
 
@@ -102,12 +107,28 @@ class State:
         self.full = {}           # action key -> full observation
         self.broken = 0          # consecutive cut-off tool calls
         self.changed = False     # did the last write/edit change a file?
-        self.masked = set()      # message indexes whose output is shown elided (cache-friendly mode)
+        self.masked = set()
+        self.v6b = False
+        self.workdir = ""
+        self.seed = {}      # message indexes whose output is shown elided (cache-friendly mode)
         self.todo = []
         self.edit_fail = {}
         self.finish_tries = 0
         self.judge_log = []
         self.hot = 0
+
+
+def missing_args(tools, name, args):
+    for t in tools:
+        f = t["function"]
+        if f["name"] == name:
+            req = f["parameters"].get("required", [])
+            miss = [r for r in req if r not in args or args[r] in (None, "")]
+            if miss:
+                props = f["parameters"]["properties"]
+                return (f"error: {name} needs " + ", ".join(f"'{m}' ({props[m].get('type')})" for m in miss)
+                        + f". Call {name} again with all of: {', '.join(req)}.")
+    return None
 
 
 def run_tool(box, workdir, st, name, args):
@@ -122,7 +143,8 @@ def run_tool(box, workdir, st, name, args):
             lines = f.read().split("\n")
         a, b = max(1, int(args.get("start") or 1)), min(len(lines), int(args.get("end") or len(lines)))
         body = "\n".join(f"{i:4d}| {lines[i - 1]}" for i in range(a, b + 1))
-        return base.clip(body or "(empty file)") + (f"\n[{len(lines)} lines total]" if b - a + 1 < len(lines) else "")
+        head = "[line numbers and '| ' are added by the tool; they are not in the file]\n" if st.v6b else ""
+        return head + base.clip(body or "(empty file)") + (f"\n[{len(lines)} lines total]" if b - a + 1 < len(lines) else "")
     if name == "write_file":
         rel = base.safe_path(args["path"])
         p = os.path.join(workdir, rel)
@@ -200,6 +222,25 @@ def view(messages, st, cache_friendly=False):
     return out
 
 
+def snapshot(workdir):
+    out = {}
+    for root, _, files in os.walk(workdir):
+        for f in files:
+            p = os.path.join(root, f)
+            try:
+                out[os.path.relpath(p, workdir)] = hashlib.sha1(open(p, "rb").read()).hexdigest()
+            except OSError:
+                pass
+    return out
+
+
+def changed_inputs(workdir, seed, task):
+    now = snapshot(workdir)
+    changed = [p for p, h in seed.items() if now.get(p) != h]
+    # files the task names are expected to change; others that changed are suspicious
+    return [p for p in changed if os.path.basename(p) not in task and p not in task]
+
+
 def harness_checks(box):
     """Run what the harness can verify by itself: compile all .py files, run unittest/test files if present."""
     lines = []
@@ -218,6 +259,14 @@ def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=N
         return None
     open_items = [i["text"] for i in st.todo if i["status"] not in ("done", "dropped")]
     checks = harness_checks(box)
+    if st.v6b:
+        sus = changed_inputs(st.workdir, st.seed, task)
+        if sus:
+            checks += "\nWARNING: these provided files were modified although the task does not mention them: " + ", ".join(sus)
+        thoughts = [m for m in messages if m["role"] == "assistant" for c in (m.get("tool_calls") or []) if c["function"]["name"] == "think"]
+        notes = [json.loads(c["function"]["arguments"]).get("thought", "")[:300] for m in thoughts[-3:] for c in m["tool_calls"] if c["function"]["name"] == "think"]
+        if notes:
+            checks += "\nThe agent's own recent notes (check that every problem it noticed was fixed): " + " | ".join(notes)
     q = ("You check an AI agent's work. Task:\n<task>\n" + task[:2500] + "\n</task>\nRecent actions and results:\n<log>\n"
          + judge.evidence(messages) + "\n</log>\nAutomatic checks run by the harness just now:\n" + checks
          + ("\nUnfinished checklist items: " + "; ".join(open_items) if open_items else "")
@@ -242,11 +291,14 @@ def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=N
 def run_task(task_text, workdir, profile, log):
     box = base.Sandbox(workdir)
     st = State()
+    st.v6b = "v6b" in feats(profile)
+    st.workdir, st.seed = workdir, snapshot(workdir)
     t0 = time.time()
     F = feats(profile)
     think = "think" in F
     tools = TOOLS + [THINK_TOOL] if think else TOOLS
-    messages = [{"role": "system", "content": SYSTEM + (SYSTEM_THINK_RULE if think else "")}, {"role": "user", "content": task_text}]
+    messages = [{"role": "system", "content": SYSTEM + (SYSTEM_THINK_RULE if think else "") + (SYSTEM_V6B_RULES if "v6b" in F else "")},
+                {"role": "user", "content": task_text}]
     finished, steps = False, 0
     try:
         for steps in range(1, MAX_STEPS + 1):
@@ -325,10 +377,12 @@ def run_task(task_text, workdir, profile, log):
                     if r:
                         log({"finish_rejected": r[:800]})
                 else:
-                    try:
-                        obs = run_tool(box, workdir, st, name, a)
-                    except Exception as e:
-                        obs = f"error: {e}"
+                    obs = missing_args(tools, name, a) if st.v6b else None
+                    if obs is None:
+                        try:
+                            obs = run_tool(box, workdir, st, name, a)
+                        except Exception as e:
+                            obs = f"error: {type(e).__name__}: {e}"
                     if name not in ("todo", "think"):
                         st.ran[akey(name, a)] = (1, one_line(obs))
                         st.full[akey(name, a)] = obs
