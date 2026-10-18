@@ -78,6 +78,7 @@ class State:
     def __init__(self):
         self.ran = {}            # action key -> (count, one-line result)
         self.full = {}           # action key -> full observation
+        self.broken = 0          # consecutive cut-off tool calls
         self.todo = []
         self.edit_fail = {}
         self.finish_tries = 0
@@ -204,13 +205,25 @@ def run_task(task_text, workdir, profile, log):
         for steps in range(1, MAX_STEPS + 1):
             temp = 0.9 if st.hot else 0.3
             st.hot = max(0, st.hot - 1)
+            v5d = profile.startswith("v5d")
+            if v5d and st.broken:
+                temp = 0.9  # the same prefix at low temperature reproduces the same runaway call
             try:
-                ch = base.chat(view(messages, st), TOOLS, max_tokens=4096, temperature=temp)
+                ch = base.chat(view(messages, st), TOOLS, max_tokens=(1536 if v5d and st.broken else 4096), temperature=temp)
             except base.BrokenToolCall as e:
                 log({"broken_tool_call": str(e)[:300]})
-                messages.append({"role": "user", "content": "[harness] Your last tool call was cut off or invalid JSON, so nothing ran. "
-                                 "Write big files in parts (write_file, then mode=\"append\") and keep each call short."})
+                st.broken += 1
+                msg = ("[harness] Your last tool call was cut off or invalid JSON, so nothing ran. "
+                       "Write big files in parts (write_file, then mode=\"append\") and keep each call short.")
+                if v5d:
+                    msg = ("[harness] Your last tool call was cut off (it grew past the length limit), so nothing ran. "
+                           "Do not write your reasoning as comments inside code or commands. Make the call short: "
+                           "at most about 60 lines of content per write_file; continue with mode=\"append\".")
+                    if messages[-1]["role"] == "user" and messages[-1]["content"].startswith("[harness] Your last tool call was cut off"):
+                        continue  # do not stack the same warning
+                messages.append({"role": "user", "content": msg})
                 continue
+            st.broken = 0
             m = ch["message"]
             calls = m.get("tool_calls") or []
             log({"step": steps, "content": (m.get("content") or "")[:2000], "calls": [(c["function"]["name"], c["function"]["arguments"][:1500]) for c in calls]})
@@ -229,8 +242,9 @@ def run_task(task_text, workdir, profile, log):
                 if a is not None and name not in ("finish", "todo") and akey(name, a) in st.ran:
                     n, res = st.ran[akey(name, a)]
                     st.ran[akey(name, a)] = (n + 1, res)
-                    full = st.full.get(akey(name, a), res) if profile.startswith("v5c") else res
-                    if profile.startswith("v5c"):
+                    newer = profile.startswith(("v5c", "v5d"))
+                    full = st.full.get(akey(name, a), res) if newer else res
+                    if newer:
                         notes.append(f"{describe(name, a)} already ran {n} time(s) and nothing has changed since, so it was not run again. "
                                      f"Its result was:\n{base.clip(full, 2500)}")
                     else:

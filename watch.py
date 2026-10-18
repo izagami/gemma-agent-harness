@@ -4,9 +4,11 @@ anomaly (repeat storms, broken tool calls, errors, long no-progress streaks). Me
 import glob, json, os, time
 
 seen, state = {}, {}
+T0 = time.time()
+STARTED_FRESH = lambda f: os.path.getctime(f) >= T0 - 5   # only follow logs created after the watcher started
 while True:
     for f in glob.glob(os.path.expanduser("~/llm/local-agent/runs/*/*/log.jsonl")):
-        if time.time() - os.path.getmtime(f) > 3600 and f not in seen:
+        if f not in seen and not STARTED_FRESH(f):
             seen[f] = os.path.getsize(f); continue
         pos = seen.get(f, 0)
         if os.path.getsize(f) <= pos:
