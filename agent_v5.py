@@ -86,6 +86,7 @@ class State:
         self.ran = {}            # action key -> (count, one-line result)
         self.full = {}           # action key -> full observation
         self.broken = 0          # consecutive cut-off tool calls
+        self.changed = False     # did the last write/edit change a file?
         self.masked = set()      # message indexes whose output is shown elided (cache-friendly mode)
         self.todo = []
         self.edit_fail = {}
@@ -112,6 +113,8 @@ def run_tool(box, workdir, st, name, args):
         p = os.path.join(workdir, rel)
         os.makedirs(os.path.dirname(p) or workdir, exist_ok=True)
         mode = "a" if args.get("mode") == "append" else "w"
+        prev = open(p, encoding="utf-8", errors="replace").read() if os.path.exists(p) else None
+        st.changed = mode == "a" or prev != args["content"]
         with open(p, mode, encoding="utf-8") as f:
             f.write(args["content"])
         msg = f"{'appended' if mode == 'a' else 'wrote'} {len(args['content'])} chars to {rel}"
@@ -123,6 +126,8 @@ def run_tool(box, workdir, st, name, args):
         with open(p, encoding="utf-8") as f:
             before = f.read()
         old, new = args["old_text"], args["new_text"]
+        if old == new:
+            return "error: old_text and new_text are identical, so nothing changed. Decide what the code should become and put that in new_text."
         n = before.count(old)
         after = before.replace(old, new) if n == 1 else (base.fuzzy_replace(before, old, new) if n == 0 else None)
         if after is None:
@@ -132,6 +137,7 @@ def run_tool(box, workdir, st, name, args):
             if st.edit_fail[rel] >= 2:
                 hint += f"\n[harness] Editing {rel} failed {st.edit_fail[rel]} times. Rewrite the whole file with write_file instead."
             return hint
+        st.changed = after != before
         with open(p, "w", encoding="utf-8") as f:
             f.write(after)
         err = py_check(box, rel)
@@ -304,7 +310,7 @@ def run_task(task_text, workdir, profile, log):
                         st.ran[akey(name, a)] = (1, one_line(obs))
                         st.full[akey(name, a)] = obs
                         # a later change can make an earlier command worth re-running
-                        if name in ("write_file", "edit_file") and not obs.startswith("error"):
+                        if name in ("write_file", "edit_file") and not obs.startswith("error") and st.changed:
                             st.ran, st.full = {}, {}  # files changed: every earlier command may give a new result
                 if notes:
                     obs += "\n[harness] " + " ".join(notes)
