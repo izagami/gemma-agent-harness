@@ -97,6 +97,21 @@ def run_agent(task, workdir, emit):
     return info, summary.get("text", ""), changed
 
 
+def previews(workdir, changed, n=3, limit=1500):
+    """Contents of the first few small text outputs (data files before scripts), so a calling chat model can report results."""
+    out = []
+    for p in sorted(changed, key=lambda p: p.endswith((".py", ".sh"))):
+        try:
+            with open(os.path.join(workdir, p), encoding="utf-8") as f:
+                t = f.read(limit + 1)
+        except (OSError, UnicodeDecodeError):
+            continue
+        out.append(f"\n`{p}`:\n```\n{t[:limit]}{'\n…（以下省略）' if len(t) > limit else ''}\n```\n")
+        if len(out) == n:
+            break
+    return ("\n<details><summary>ファイルの中身</summary>\n" + "".join(out) + "\n</details>\n") if out else ""
+
+
 class H(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
 
@@ -153,7 +168,8 @@ class H(BaseHTTPRequestHandler):
             info, summ, changed = result["v"]
             files = "\n".join(f"- `{p}`" for p in changed[:50]) or "（なし）"
             status = "完了" if info.get("finished") else f"ステップ上限（{info.get('steps')}）で停止"
-            return (f"\n</details>\n\n**{status}**（{info.get('seconds')} 秒）\n\n{summ}\n\n**変更したファイル**（作業フォルダ `{workdir}`）\n{files}\n")
+            return (f"\n</details>\n\n**{status}**（{info.get('seconds')} 秒）\n\n{summ}\n\n**変更したファイル**（作業フォルダ `{workdir}`）\n{files}\n"
+                    + previews(workdir, changed))
 
         if not req.get("stream"):
             buf = []
