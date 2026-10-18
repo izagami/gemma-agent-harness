@@ -122,6 +122,8 @@ FEATURES = {
             "semantic_repeat", "v7b_rules"},
     "v7d": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps80",
             "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs"},
+    "v7e": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps80",
+            "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs", "hard_tests"},
     "v7c": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps80",
             "semantic_repeat", "v7b_rules", "stagnation"},
 }
@@ -150,6 +152,8 @@ class State:
         self.judge_inputs = False
         self.allowed = set()
         self.protected = set()
+        self.hard_tests = False
+        self.test_gate_tries = 0
         self.workdir = ""
         self.seed = {}      # message indexes whose output is shown elided (cache-friendly mode)
         self.todo = []
@@ -327,7 +331,30 @@ def harness_checks(box):
     return "\n".join(lines)
 
 
+def failing_tests(box):
+    """Run the project's tests; return the failure report, or None when everything passes (or there are no tests)."""
+    code, out, _ = box.sh("ls tests/test_*.py test_*.py 2>/dev/null | head -20")
+    if not out.strip():
+        return None
+    reports = []
+    if "tests/" in out:
+        c, o, e = box.sh("python3 -m unittest discover -s tests 2>&1 | tail -40", timeout=120)
+        if "FAILED" in o or ("Error" in o and not o.rstrip().endswith("OK")):
+            reports.append(o.strip()[-2500:])
+    for f in [x for x in out.split() if "/" not in x]:
+        c, o, e = box.sh(f"python3 -m unittest {f[:-3]} 2>&1 | tail -30", timeout=120)
+        if "FAILED" in o:
+            reports.append(o.strip()[-1500:])
+    return "\n\n".join(reports) or None
+
+
 def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=None):
+    if st.hard_tests and st.test_gate_tries < 4:
+        rep = failing_tests(box)
+        if rep:
+            st.test_gate_tries += 1
+            return ("[harness] Not accepted: the project's tests fail. Fix the code (do not edit existing tests unless the task "
+                    "asks), re-run them, then call finish.\n" + rep)
     st.finish_tries += 1
     if st.finish_tries > 2:
         return None
@@ -410,6 +437,7 @@ def run_task(task_text, workdir, profile, log):
     st.workdir = workdir
     st.seed = snapshot(workdir, st.seed_bytes)
     st.restore = "restore_inputs" in feats(profile)
+    st.hard_tests = "hard_tests" in feats(profile)
     if "protect_inputs" in feats(profile):
         protect_inputs(st, task_text, log)
     st.judge_inputs = "judge_inputs" in feats(profile)
