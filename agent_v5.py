@@ -166,7 +166,7 @@ def harness_checks(box):
     return "\n".join(lines)
 
 
-def on_finish(box, st, task, messages, args):
+def on_finish(box, st, task, messages, args, in_context=False):
     st.finish_tries += 1
     if st.finish_tries > 2:
         return None
@@ -177,7 +177,14 @@ def on_finish(box, st, task, messages, args):
          + ("\nUnfinished checklist items: " + "; ".join(open_items) if open_items else "")
          + "\nAgent's summary: " + str(args.get("summary", ""))[:400]
          + "\n\nIs every requirement of the task met, with evidence that the final result is correct? Answer done=true only if so.")
-    val, p, ms = judge.ask(q, "done")
+    if in_context:
+        q2 = ("Automatic checks run by the harness just now:\n" + checks
+              + ("\nUnfinished checklist items: " + "; ".join(open_items) if open_items else "")
+              + "\nIs every requirement of the original task met, with evidence in this conversation that the final result is correct? "
+              "Answer done=true only if so.")
+        val, p, ms = judge.ask_in_context(messages, TOOLS, q2, "done")
+    else:
+        val, p, ms = judge.ask(q, "done")
     st.judge_log.append(("finish", val, round(p, 3), ms))
     if val is False and p >= 0.6:
         return ("[harness] Not accepted yet. Automatic checks:\n" + checks
@@ -238,7 +245,7 @@ def run_task(task_text, workdir, profile, log):
                 if a is None:
                     obs = "error: arguments were not valid JSON. Call the tool again with valid JSON."
                 elif name == "finish":
-                    r = on_finish(box, st, task_text, messages, a)
+                    r = on_finish(box, st, task_text, messages, a, in_context=profile.startswith("v5b"))
                     obs, done_now = ("finished", True) if r is None else (r, False)
                     if r:
                         log({"finish_rejected": r[:800]})

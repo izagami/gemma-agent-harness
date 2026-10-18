@@ -39,3 +39,31 @@ def evidence(messages, n=14, width=700):
         elif m["role"] == "tool":
             out.append("RESULT: " + m["content"][:width])
     return "\n".join(out)
+
+
+def ask_in_context(messages, tools, question, key, max_tokens=24):
+    """Same judgment, but asked as a continuation of the agent's own conversation (same tools, same prefix),
+    so llama-server reuses the cached prompt and only the question is processed."""
+    msgs = list(messages)
+    if msgs and msgs[-1].get("tool_calls"):
+        msgs = msgs + [{"role": "tool", "tool_call_id": c.get("id", ""), "content": "(awaiting review)"} for c in msgs[-1]["tool_calls"]]
+    if msgs and msgs[-1]["role"] == "user":
+        msgs = msgs + [{"role": "assistant", "content": "(noted)"}]
+    msgs = msgs + [{"role": "user", "content": "[harness question, answer only in JSON] " + question}]
+    body = {"messages": msgs, "tools": tools, "temperature": 0, "max_tokens": max_tokens, "logprobs": True, "top_logprobs": 3,
+            "response_format": {"type": "json_schema", "json_schema": {"name": "j", "strict": True, "schema": {
+                "type": "object", "properties": {key: {"type": "boolean"}}, "required": [key]}}},
+            "chat_template_kwargs": {"enable_thinking": False}}
+    t0 = time.time()
+    try:
+        req = urllib.request.Request(API, json.dumps(body).encode(), {"Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=120) as r:
+            ch = json.load(r)["choices"][0]
+        val = json.loads(ch["message"]["content"]).get(key)
+    except Exception:
+        return None, 0.0, int((time.time() - t0) * 1000)
+    p = 1.0
+    for tok in (ch.get("logprobs") or {}).get("content") or []:
+        if tok["token"].strip()[:1] in ("t", "f"):
+            p = math.exp(tok["logprob"]); break
+    return val, p, int((time.time() - t0) * 1000)
