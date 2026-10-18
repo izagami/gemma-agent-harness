@@ -123,7 +123,7 @@ FEATURES = {
     "v7d": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps80",
             "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs"},
     "v7e": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps80",
-            "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs", "hard_tests", "read_window"},
+            "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs", "hard_tests", "read_window", "force_act"},
     "v7c": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps80",
             "semantic_repeat", "v7b_rules", "stagnation"},
 }
@@ -473,7 +473,7 @@ def run_task(task_text, workdir, profile, log):
             if v5d and st.broken:
                 temp = 0.9  # the same prefix at low temperature reproduces the same runaway call
             try:
-                ch = base.chat(view(messages, st, cf), tools, max_tokens=(1536 if v5d and st.broken else 4096), temperature=temp)
+                ch = base.chat(view(messages, st, cf), [t for t in tools if t["function"]["name"] != "think"] if ("force_act" in F and st.thinks >= 2) else tools, max_tokens=(1536 if v5d and st.broken else 4096), temperature=temp)
             except base.BrokenToolCall as e:
                 log({"broken_tool_call": str(e)[:300]})
                 st.broken += 1
@@ -506,7 +506,8 @@ def run_task(task_text, workdir, profile, log):
                     a = None
                 name = c["function"]["name"]
                 sem = "semantic_repeat" in F
-                if a is not None and name not in ("finish", "todo", "think") and akey(name, a, sem) in st.ran:
+                skip = ("finish", "todo") if "force_act" in F else ("finish", "todo", "think")
+                if a is not None and name not in skip and akey(name, a, sem) in st.ran:
                     n, res = st.ran[akey(name, a, sem)]
                     st.ran[akey(name, a, sem)] = (n + 1, res)
                     newer = "repeat_result" in F
@@ -557,7 +558,7 @@ def run_task(task_text, workdir, profile, log):
                             obs = run_tool(box, workdir, st, name, a)
                         except Exception as e:
                             obs = f"error: {type(e).__name__}: {e}"
-                    if name not in ("todo", "think"):
+                    if name not in ("todo",) if "force_act" in F else name not in ("todo", "think"):
                         st.ran[akey(name, a, "semantic_repeat" in F)] = (1, one_line(obs))
                         st.full[akey(name, a, "semantic_repeat" in F)] = obs
                         # a later change can make an earlier command worth re-running
