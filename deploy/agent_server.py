@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""OpenAI-compatible server that exposes the local coding agent (harness v6f) as a model for Open WebUI.
+"""OpenAI-compatible server that exposes the local coding agent (harness v7e) as a model for Open WebUI.
 
 Each conversation gets its own workspace directory. The latest user message is the task; earlier turns are
 passed along as context. While the agent works, its steps stream as a collapsible "details" block; the final
@@ -9,9 +9,10 @@ Environment:
   AGENT_API      model server chat endpoint (OpenAI-compatible), e.g. http://llama:8080/v1/chat/completions
   AGENT_MODEL    model name sent to that server
   AGENT_API_KEY  optional key for that server
-  AGENT_PROFILE  harness profile (default v6f)
+  AGENT_PROFILE  harness profile (default v7e)
   SANDBOX_URL    command runner (deploy/sandbox_server.py); unset = local podman sandbox
   WORKSPACE_ROOT where workspaces live (default /workspaces)
+  HOST           listen address (default 0.0.0.0; 127.0.0.1 when running on a shared host)
   SERVER_API_KEY optional: require "Authorization: Bearer <key>" from clients
 """
 import hashlib, json, os, queue, sys, threading, time, uuid
@@ -21,7 +22,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 import agent_v5
 
 ROOT = os.environ.get("WORKSPACE_ROOT", "/workspaces")
-PROFILE = os.environ.get("AGENT_PROFILE", "v6f")
+PROFILE = os.environ.get("AGENT_PROFILE", "v7e")
 KEY = os.environ.get("SERVER_API_KEY", "")
 MODEL_ID = "local-agent"
 LOCK = threading.Lock()  # one task at a time: small local servers slow down sharply with parallel requests
@@ -117,7 +118,7 @@ class H(BaseHTTPRequestHandler):
             return self._json({"error": "unauthorized"}, 401)
         if self.path.rstrip("/").endswith("/models"):
             return self._json({"object": "list", "data": [{"id": MODEL_ID, "object": "model", "owned_by": "local",
-                                                            "name": "Local coding agent"}]})
+                                                            "name": "ローカル作業エージェント (12B)"}]})
         self._json({"error": "not found"}, 404)
 
     def do_POST(self):
@@ -131,6 +132,7 @@ class H(BaseHTTPRequestHandler):
         prior = [f"{m['role']}: {text_of(m.get('content'))[:1500]}" for m in msgs[:-1] if m.get("role") in ("user", "assistant")][-6:]
         if prior:
             task = "Earlier conversation (for context):\n" + "\n".join(prior) + "\n\nCurrent request:\n" + task
+        task += "\n\n(Write the finish summary in the same language as the request.)"
         workdir = workspace_for(req, msgs)
         cid, created = "chatcmpl-" + uuid.uuid4().hex[:12], int(time.time())
         q = queue.Queue()
@@ -184,4 +186,4 @@ class H(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     os.makedirs(ROOT, exist_ok=True)
-    ThreadingHTTPServer(("0.0.0.0", int(os.environ.get("PORT", "8094"))), H).serve_forever()
+    ThreadingHTTPServer((os.environ.get("HOST", "0.0.0.0"), int(os.environ.get("PORT", "8094"))), H).serve_forever()
