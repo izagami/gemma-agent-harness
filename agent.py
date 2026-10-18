@@ -162,7 +162,7 @@ def run_task(task_text, workdir, profile, log):
         for steps in range(1, prof["max_steps"] + 1):
             msgs = hp.view(messages, prof)
             try:
-                ch = chat(msgs, TOOLS, max_tokens=prof.get("max_tokens", 2048), temperature=prof["temperature"])
+                ch = chat(msgs, TOOLS, max_tokens=prof.get("max_tokens", 2048), temperature=hp.temperature(state, prof))
             except BrokenToolCall as e:
                 if not prof.get("robust_api"):
                     raise
@@ -176,6 +176,19 @@ def run_task(task_text, workdir, profile, log):
             entry = {"role": "assistant", "content": m.get("content") or ""}
             if calls:
                 entry["tool_calls"] = calls
+            if prof.get("break_loops") and len(calls) == 1:
+                c0 = calls[0]["function"]
+                try:
+                    a0 = json.loads(c0["arguments"] or "{}")
+                except ValueError:
+                    a0 = None
+                if c0["name"] != "finish" and hp.is_repeat(state, c0["name"], a0):
+                    # keep the loop out of the context: drop this repeated step entirely, cool it with a hot step
+                    log({"step": steps, "dropped_repeat": c0["name"], "streak": state.streak})
+                    state.hot = 1
+                    if state.streak >= 2 and not (messages[-1]["role"] == "user" and messages[-1]["content"] == hp.BREAK_MSG):
+                        messages.append({"role": "user", "content": hp.BREAK_MSG})
+                    continue
             messages.append(entry)
             log({"step": steps, "content": entry["content"][:2000], "calls": [(c["function"]["name"], c["function"]["arguments"][:1500]) for c in calls]})
             if not calls:

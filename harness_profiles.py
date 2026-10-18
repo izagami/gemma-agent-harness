@@ -23,6 +23,8 @@ class LoopState:
         self.no_call = 0
         self.finish_tries = 0
         self.recent = []
+        self.streak = 0          # consecutive repeats of the same action
+        self.hot = 0             # steps left with raised temperature
 
 
 def view(messages, prof):
@@ -76,6 +78,28 @@ def on_observation(state, prof, name, args, obs):
 PROFILES = {
     "v2": {"system": V1_SYSTEM, "max_steps": 40, "temperature": 0.3, "max_tokens": 4096, "nudge": True, "verify_finish": True,
            "loop_guard": True, "skip_repeats": True, "robust_api": True, "smart_edit": True},
+    "v3": {"system": V1_SYSTEM, "max_steps": 40, "temperature": 0.3, "max_tokens": 4096, "nudge": True, "verify_finish": True,
+           "loop_guard": True, "skip_repeats": True, "robust_api": True, "smart_edit": True, "break_loops": True},
     "v0": {"system": V0_SYSTEM, "max_steps": 30, "temperature": 0.3},
     "v1": {"system": V1_SYSTEM, "max_steps": 40, "temperature": 0.3, "nudge": True, "verify_finish": True, "loop_guard": True},
 }
+
+
+def temperature(state, prof):
+    if state.hot > 0:
+        state.hot -= 1
+        return 0.9
+    return prof["temperature"]
+
+
+def is_repeat(state, name, args):
+    """True if this call equals the previous call (the attractor that makes small models loop)."""
+    key = name + json.dumps(args, sort_keys=True) if args is not None else name
+    rep = bool(state.recent) and state.recent[-1] == key
+    state.streak = state.streak + 1 if rep else 0
+    return rep
+
+
+BREAK_MSG = ("[harness] You are stuck repeating the same action. Stop and decide now: "
+             "(a) if the task's requirements are already met, call finish; "
+             "(b) otherwise take ONE different action that makes progress (edit a file, run a different check).")
