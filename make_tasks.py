@@ -259,6 +259,9 @@ task("stats_cli", "data.txt に1行1つ数値が入っています（空行や�
      "
      """))
 
+import tasks_hard
+tasks_hard.add(task)
+
 if __name__ == "__main__":
     root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tasks")
     shutil.rmtree(root, ignore_errors=True)
@@ -272,6 +275,6 @@ if __name__ == "__main__":
         open(os.path.join(base, "task.md"), "w").write(ins + "\n")
         open(os.path.join(base, "check", "check.sh"), "w").write("#!/bin/bash\n" + check.lstrip("\n"))
         for rel, content in hidden.items():
-            content = files[rel] if content is None else content
+            content = files[rel] if content is None else files.get(content, content)
             open(os.path.join(base, "check", rel), "w").write(content.lstrip("\n"))
     print(len(T), "tasks")
