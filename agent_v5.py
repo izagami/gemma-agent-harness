@@ -16,6 +16,7 @@ import agent as base
 import judge
 
 KEEP_FULL = 5
+CTX_SOFT_LIMIT = 40000  # characters; above this, old outputs are masked in one batch
 MAX_STEPS = 30
 
 SYSTEM = """You are an expert software engineer working as an autonomous agent in a Linux container (Python 3.12, bash, no network). The task files are in /work.
@@ -79,6 +80,7 @@ class State:
         self.ran = {}            # action key -> (count, one-line result)
         self.full = {}           # action key -> full observation
         self.broken = 0          # consecutive cut-off tool calls
+        self.masked = set()      # message indexes whose output is shown elided (cache-friendly mode)
         self.todo = []
         self.edit_fail = {}
         self.finish_tries = 0
@@ -141,13 +143,26 @@ def todo_view(st):
     return "[harness] Current checklist:\n" + "\n".join(f"{mark.get(i['status'], '[ ]')} {i['text']}" for i in st.todo)
 
 
-def view(messages, st):
-    """Mask old observations; append the checklist as a transient last message."""
+def view(messages, st, cache_friendly=False):
+    """Mask old observations; append the checklist as a transient last message.
+    cache_friendly: never change what was already sent unless the context gets large; then mask a batch at once,
+    so llama-server can keep reusing the cached prompt prefix between steps."""
     tool_idx = [i for i, m in enumerate(messages) if m["role"] == "tool"]
-    keep = set(tool_idx[-KEEP_FULL:])
+    if cache_friendly:
+        total = sum(len(m.get("content") or "") for m in messages)
+        if total > CTX_SOFT_LIMIT:
+            for i in tool_idx[:-KEEP_FULL]:
+                if total <= CTX_SOFT_LIMIT // 2:
+                    break
+                if i not in st.masked and len(messages[i]["content"]) > 200:
+                    st.masked.add(i)
+                    total -= len(messages[i]["content"])
+        hide = st.masked
+    else:
+        hide = set(tool_idx[:-KEEP_FULL])
     out = []
     for i, m in enumerate(messages):
-        if m["role"] == "tool" and i not in keep and len(m["content"]) > 200:
+        if m["role"] == "tool" and i in hide and len(m["content"]) > 200:
             m = dict(m, content=f"[older output elided: {one_line(m['content'])}; {m['content'].count(chr(10)) + 1} lines]")
         out.append(m)
     tv = todo_view(st)
@@ -168,7 +183,7 @@ def harness_checks(box):
     return "\n".join(lines)
 
 
-def on_finish(box, st, task, messages, args, in_context=False):
+def on_finish(box, st, task, messages, args, in_context=False, cf=False):
     st.finish_tries += 1
     if st.finish_tries > 2:
         return None
@@ -184,7 +199,7 @@ def on_finish(box, st, task, messages, args, in_context=False):
               + ("\nUnfinished checklist items: " + "; ".join(open_items) if open_items else "")
               + "\nIs every requirement of the original task met, with evidence in this conversation that the final result is correct? "
               "Answer done=true only if so.")
-        val, p, ms = judge.ask_in_context(messages, TOOLS, q2, "done")
+        val, p, ms = judge.ask_in_context(view(messages, st, cf), TOOLS, q2, "done")
     else:
         val, p, ms = judge.ask(q, "done")
     st.judge_log.append(("finish", val, round(p, 3), ms))
@@ -205,11 +220,12 @@ def run_task(task_text, workdir, profile, log):
         for steps in range(1, MAX_STEPS + 1):
             temp = 0.9 if st.hot else 0.3
             st.hot = max(0, st.hot - 1)
-            v5d = profile.startswith("v5d")
+            v5d = profile.startswith(("v5d", "v5e"))
+            cf = profile.startswith("v5e")
             if v5d and st.broken:
                 temp = 0.9  # the same prefix at low temperature reproduces the same runaway call
             try:
-                ch = base.chat(view(messages, st), TOOLS, max_tokens=(1536 if v5d and st.broken else 4096), temperature=temp)
+                ch = base.chat(view(messages, st, cf), TOOLS, max_tokens=(1536 if v5d and st.broken else 4096), temperature=temp)
             except base.BrokenToolCall as e:
                 log({"broken_tool_call": str(e)[:300]})
                 st.broken += 1
@@ -242,7 +258,7 @@ def run_task(task_text, workdir, profile, log):
                 if a is not None and name not in ("finish", "todo") and akey(name, a) in st.ran:
                     n, res = st.ran[akey(name, a)]
                     st.ran[akey(name, a)] = (n + 1, res)
-                    newer = profile.startswith(("v5c", "v5d"))
+                    newer = profile.startswith(("v5c", "v5d", "v5e"))
                     full = st.full.get(akey(name, a), res) if newer else res
                     if newer:
                         notes.append(f"{describe(name, a)} already ran {n} time(s) and nothing has changed since, so it was not run again. "
@@ -265,7 +281,7 @@ def run_task(task_text, workdir, profile, log):
                 if a is None:
                     obs = "error: arguments were not valid JSON. Call the tool again with valid JSON."
                 elif name == "finish":
-                    r = on_finish(box, st, task_text, messages, a, in_context=profile.startswith("v5b"))
+                    r = on_finish(box, st, task_text, messages, a, in_context=profile.startswith(("v5b", "v5e")), cf=profile.startswith("v5e"))
                     obs, done_now = ("finished", True) if r is None else (r, False)
                     if r:
                         log({"finish_rejected": r[:800]})
