@@ -355,7 +355,7 @@ def add(task):
          "
          """))
 
-    task("h_dupes", "dupes.py の find_duplicates(items) は、2回以上出てくる要素を、最初に出てきた順で返します。正しく動きますが、20万件で何分もかかります。結果を変えずに速くして、`python3 bench.py` が2秒以内に終わるようにしてください。bench.py は変更しないでください。",
+    task("h_dupes", "dupes.py の find_duplicates(items) は、2回以上出てくる要素を、2回目が出てきた順で（重複なしで）返します。正しく動きますが、20万件で何分もかかります。結果を変えずに速くして、`python3 bench.py` が2秒以内に終わるようにしてください。bench.py は変更しないでください。",
          {"dupes.py": "def find_duplicates(items):\n    out = []\n    for i, x in enumerate(items):\n        if x in items[:i] and x not in out:\n            out.append(x)\n    return out\n",
           "bench.py": "import random, time\nfrom dupes import find_duplicates\nrandom.seed(1)\nitems = [random.randint(0, 150000) for _ in range(200000)]\nt = time.time()\nr = find_duplicates(items)\nprint(len(r), round(time.time() - t, 2))\n"},
          d("""
