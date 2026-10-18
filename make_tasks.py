@@ -56,7 +56,7 @@ task("avg_bug", "calc.py のテストが失敗しています。原因を調べ�
      python3 -c "from calc import average,median; assert average([1,2])==1.5; assert median([1,2,3,10])==2.5; assert median([5])==5"
      """), {"test_calc.py": None})
 
-task("csv_sum", "sales.csv のカテゴリごとの売上合計（quantity×price）を計算して、summary.json に {カテゴリ名: 合計} の形のJSONで保存してください。合計は小数第2位で四捨五入してください。",
+task("csv_sum", "sales.csv のカテゴリごとの売上合計（quantity×price）を計算して、summary.json に {カテゴリ名: 合計} の形のJSONで保存してください。合計は小数第3位で四捨五入して小数第2位までにしてください。",
      {"sales.csv": "date,category,item,quantity,price\n2026-10-01,食品,りんご,3,120.5\n2026-10-01,文具,ペン,10,80\n2026-10-02,食品,みかん,5,60\n2026-10-02,家電,電池,2,398.9\n2026-10-03,文具,ノート,4,150.25\n2026-10-03,食品,パン,1,210\n"},
      d("""
      python3 -c "
@@ -89,7 +89,7 @@ for name in ["api", "worker", "db", "cache", "auth"]:
     counts[name] = c
     logs[f"logs/{name}.log"] = "\n".join(lines) + "\n"
 exp_report = "".join(f"{n}.log {c}\n" for n, c in sorted(counts.items(), key=lambda x: (-x[1], x[0])))
-task("log_errors", "logs/ にある各ログファイルの ERROR 行の数を数えて、report.txt に「ファイル名 件数」の形で1行ずつ、件数の多い順（同数ならファイル名順）に書いてください。",
+task("log_errors", "logs/ にある各ログファイルの ERROR 行の数を数えて、report.txt に「ファイル名 件数」の形で1行ずつ、件数の多い順（同数ならファイル名順）に書いてください。最後の行も改行で終えてください。",
      logs, "diff <(cat /work/report.txt) /check/expected.txt\n", {"expected.txt": exp_report})
 
 task("duration", "utils.py に関数 parse_duration(s) を実装してください。'1h30m' や '45s' や '2h5s' のような文字列を秒数（int）に変換します。単位は h, m, s で、どの単位も省略できます。不正な文字列（空文字、未知の単位、数字のない単位など）には ValueError を出してください。",
@@ -140,7 +140,7 @@ task("config_edit", "config.json の server.port を 8443 に変更し、server 
      "
      """))
 
-task("wordcount", "コマンドラインツール wc.py を作ってください。`python3 wc.py ファイル名` で、そのファイルの行数・単語数（空白区切り）・文字数を `lines=3 words=7 chars=40` の形で1行出力します。`--top N` を付けたら、続けて出現回数の多い単語を上位N個、`単語 回数` の形で1行ずつ出力します（同数なら単語の辞書順）。ファイルがない場合は `error: file not found` を標準エラーに出して終了コード1で終わってください。",
+task("wordcount", "コマンドラインツール wc.py を作ってください。`python3 wc.py ファイル名` で、そのファイルの行数・単語数（空白区切り）・文字数を `lines=3 words=7 chars=40` の形で1行出力します。`--top N` を付けたら、続けて出現回数の多い単語を上位N個、`単語 回数` の形で1行ずつ出力します（同数なら単語の辞書順）。文字数は改行文字も含めて数えます（wc -m と同じ）。ファイルがない場合は `error: file not found` を標準エラーに出して終了コード1で終わってください。",
      {"sample.txt": "the cat sat on the mat\nthe dog sat\n\n"},
      d("""
      set -e
@@ -195,7 +195,7 @@ task("emails", "users.json のユーザーのうち、メールアドレスの�
      {"users.json": '[{"id": 7, "email": "a@example.com"}, {"id": 3, "email": "bad.example.com"}, {"id": 12, "email": "x@y"}, {"id": 5, "email": "two@@example.com"}, {"id": 9, "email": "ok.name+tag@mail.co.jp"}, {"id": 1, "email": "sp ace@example.com"}, {"id": 4, "email": "@example.com"}]\n'},
      'test "$(cat /work/invalid.txt)" = "$(printf \'1\\n3\\n4\\n5\\n12\')"\n')
 
-task("robust", "total.py を実行すると KeyError で止まります。amount が欠けている行は飛ばして、残りの合計を出力するように直してください。ほかの動作は変えないでください。",
+task("robust", "total.py を実行すると KeyError で止まります。amount が無い行や null の行は飛ばして、残りの合計を出力するように直してください。ほかの動作は変えないでください。",
      {"total.py": "import json\nrows = json.load(open('orders.json'))\ntotal = 0\nfor r in rows:\n    total += r['amount']\nprint(f'total={total}')\n",
       "orders.json": '[{"id":1,"amount":100},{"id":2},{"id":3,"amount":250},{"id":4,"amount":null},{"id":5,"amount":50}]\n'},
      d("""
@@ -247,7 +247,7 @@ task("unused", "lib/ フォルダの Python ファイルで定義されている
       "lib/b.py": "def clean(d):\n    return [strip(x) for x in d]\n\ndef strip(x):\n    return x.strip()\n\ndef normalize(x):\n    return x.lower()\n\ndef legacy_clean(d):\n    return d\n"},
      'test "$(cat /work/unused.txt)" = "$(printf \'backup\\nlegacy_clean\\nnormalize\')"\n')
 
-task("stats_cli", "data.txt に1行1つ数値が入っています（空行やコメント行 # は無視）。平均・最小・最大・標準偏差（母標準偏差）を計算して、stats.json に {\"mean\":..., \"min\":..., \"max\":..., \"std\":...} の形で、どれも小数第3位で四捨五入して保存してください。",
+task("stats_cli", "data.txt に1行1つ数値が入っています（空行やコメント行 # は無視）。平均・最小・最大・標準偏差（母標準偏差）を計算して、stats.json に {\"mean\":..., \"min\":..., \"max\":..., \"std\":...} の形で、どれも小数第4位で四捨五入して小数第3位までの値にして保存してください。",
      {"data.txt": "# measurements\n12.5\n7\n\n9.25\n# outlier removed\n15\n10.1\n"},
      d("""
      python3 -c "

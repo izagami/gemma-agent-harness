@@ -28,6 +28,8 @@ SYSTEM_V6C_RULES = ("\n11. Test first: before implementing, write /tmp/spec_test
                     "Call the real functions/programs, not a wrapper that hides exceptions. Run it after each change. "
                     "The harness runs it again before accepting finish.")
 
+SYSTEM_THINK_SHORT = " Keep each thought short (under about 100 words) and follow it with an action."
+
 SYSTEM_THINK_RULE = ("\n8. When you need to reason (what the error means, what to check next, whether a requirement is met), "
                      "call the think tool. Never write reasoning as comments inside bash commands or files; keep commands short.")
 
@@ -100,6 +102,7 @@ FEATURES = {
     "v6": {"repeat_result", "storm", "cache", "incontext", "think"},
     "v6b": {"repeat_result", "storm", "cache", "incontext", "think", "v6b"},
     "v6c": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec"},
+    "v6d": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit"},
 }
 
 
@@ -116,6 +119,8 @@ class State:
         self.masked = set()
         self.v6b = False
         self.spec = False
+        self.thinks = 0          # consecutive think calls
+        self.think_limit = False
         self.workdir = ""
         self.seed = {}      # message indexes whose output is shown elided (cache-friendly mode)
         self.todo = []
@@ -140,6 +145,9 @@ def missing_args(tools, name, args):
 
 def run_tool(box, workdir, st, name, args):
     if name == "think":
+        st.thinks += 1
+        if st.think_limit and st.thinks >= 2:
+            return "ok. [harness] You have thought twice in a row; now act (edit, run, or check something)."
         return "ok"
     if name == "todo":
         st.todo = [{"text": str(i.get("text", ""))[:200], "status": i.get("status", "pending")} for i in args.get("items", [])][:20]
@@ -311,12 +319,13 @@ def run_task(task_text, workdir, profile, log):
     st = State()
     st.v6b = "v6b" in feats(profile)
     st.spec = "spec" in feats(profile)
+    st.think_limit = "think_limit" in feats(profile)
     st.workdir, st.seed = workdir, snapshot(workdir)
     t0 = time.time()
     F = feats(profile)
     think = "think" in F
     tools = TOOLS + [THINK_TOOL] if think else TOOLS
-    messages = [{"role": "system", "content": SYSTEM + (SYSTEM_THINK_RULE if think else "") + (SYSTEM_V6B_RULES if "v6b" in F else "") + (SYSTEM_V6C_RULES if "spec" in F else "")},
+    messages = [{"role": "system", "content": SYSTEM + (SYSTEM_THINK_RULE + (SYSTEM_THINK_SHORT if "think_limit" in F else "") if think else "") + (SYSTEM_V6B_RULES if "v6b" in F else "") + (SYSTEM_V6C_RULES if "spec" in F else "")},
                 {"role": "user", "content": task_text}]
     finished, steps = False, 0
     try:
@@ -388,6 +397,8 @@ def run_task(task_text, workdir, profile, log):
             messages.append(entry)
             done_now = False
             for c, name, a in fresh:
+                if name != "think":
+                    st.thinks = 0
                 if a is None:
                     obs = "error: arguments were not valid JSON. Call the tool again with valid JSON."
                 elif name == "finish":

@@ -197,14 +197,14 @@ def add(task):
           "docs/FORMAT.md": "# report.txt\nチームごとに1行、チーム名の辞書順。\n`チーム: n=件数 avg=平均ms max=最大ms`（avg は小数第1位、ms は整数）。\nユーザー名は大文字小文字・前後の空白を区別しない。チームが分からないユーザーは none。\n"},
          'cd /work && python3 run.py data/events.log && test "$(cat report.txt)" = "$(printf \'blue: n=1 avg=95.0ms max=95ms\\nnone: n=1 avg=40.0ms max=40ms\\nred: n=3 avg=500.0ms max=1300ms\')"\n')
 
-    task("x_write_tests", "slugify.py の slugify(text) にはテストがありません。tests/test_slugify.py に unittest でテストを書いてください（最低6ケース。空文字、記号、連続する空白・ハイフン、前後の空白、大文字、数字を含めること）。テストが通ることを確認してください。slugify.py は変更しないでください。",
+    task("x_write_tests", "slugify.py の slugify(text) にはテストがありません。tests/test_slugify.py に unittest でテストを書いてください（最低6ケース。空文字、記号、連続する空白・ハイフン、前後の空白、大文字、数字を含めること）。各ケースは assertEqual などで1行ずつ書いてください（assert の行が6つ以上）。テストが通ることを確認してください。slugify.py は変更しないでください。",
          {"slugify.py": "import re\n\ndef slugify(text):\n    text = text.strip().lower()\n    text = re.sub(r'[^a-z0-9\\s-]', '', text)\n    text = re.sub(r'[\\s-]+', '-', text)\n    return text.strip('-')\n",
           "tests/__init__.py": ""},
          d("""
          set -e
          cd /work
          cmp -s slugify.py /check/slugify.py
-         python3 -m unittest discover -s tests -q 2>&1 | tail -3
+         python3 -m unittest discover -s tests -q
          n=$(python3 -c "
          import unittest,sys
          s=unittest.defaultTestLoader.discover('tests');
@@ -219,7 +219,7 @@ def add(task):
          cp /tmp/good.py slugify.py
          """), {"slugify.py": "slugify.py"})
 
-    task("x_cache_bug", "fetcher.py の CachedFetcher は、同じURLの結果をttl秒だけキャッシュするはずですが、テスト（python3 -m unittest test_fetcher）がときどき失敗します。原因を特定して直してください。テストファイルは変更しないでください。",
+    task("x_cache_bug", "fetcher.py の CachedFetcher は、同じURLの結果をttl秒だけキャッシュするはずですが、テスト（python3 -m unittest test_fetcher）がときどき失敗します。原因を特定して直してください。呼び出し側が渡した params の辞書を書き換えないようにもしてください。テストファイルは変更しないでください。",
          {"fetcher.py": d("""
           import time
 
