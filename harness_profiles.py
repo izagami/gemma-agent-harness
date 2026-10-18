@@ -93,14 +93,14 @@ def on_observation(state, prof, name, args, obs):
 
 
 PROFILES = {
-    "v2": {"system": V1_SYSTEM, "max_steps": 40, "temperature": 0.3, "max_tokens": 4096, "nudge": True, "verify_finish": True,
+    "v2": {"system": V1_SYSTEM, "max_steps": 30, "temperature": 0.3, "max_tokens": 4096, "nudge": True, "verify_finish": True,
            "loop_guard": True, "skip_repeats": True, "robust_api": True, "smart_edit": True},
-    "v3": {"system": V1_SYSTEM, "max_steps": 40, "temperature": 0.3, "max_tokens": 4096, "nudge": True, "verify_finish": True,
+    "v3": {"system": V1_SYSTEM, "max_steps": 30, "temperature": 0.3, "max_tokens": 4096, "nudge": True, "verify_finish": True,
            "loop_guard": True, "skip_repeats": True, "robust_api": True, "smart_edit": True, "break_loops": True},
-    "v4": {"system": V1_SYSTEM, "max_steps": 40, "temperature": 0.3, "max_tokens": 4096, "nudge": True, "judge_finish": True,
+    "v4": {"system": V1_SYSTEM, "max_steps": 30, "temperature": 0.3, "max_tokens": 4096, "nudge": True, "judge_finish": True,
            "loop_guard": True, "skip_repeats": True, "robust_api": True, "smart_edit": True, "break_loops": True, "progress_every": 8},
     "v0": {"system": V0_SYSTEM, "max_steps": 30, "temperature": 0.3},
-    "v1": {"system": V1_SYSTEM, "max_steps": 40, "temperature": 0.3, "nudge": True, "verify_finish": True, "loop_guard": True},
+    "v1": {"system": V1_SYSTEM, "max_steps": 30, "temperature": 0.3, "nudge": True, "verify_finish": True, "loop_guard": True},
 }
 
 
