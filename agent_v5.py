@@ -120,6 +120,8 @@ FEATURES = {
     "v7": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps80"},
     "v7b": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps80",
             "semantic_repeat", "v7b_rules"},
+    "v7d": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps80",
+            "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs"},
     "v7c": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps80",
             "semantic_repeat", "v7b_rules", "stagnation"},
 }
@@ -147,6 +149,7 @@ class State:
         self.seed_bytes = {}
         self.judge_inputs = False
         self.allowed = set()
+        self.protected = set()
         self.workdir = ""
         self.seed = {}      # message indexes whose output is shown elided (cache-friendly mode)
         self.todo = []
@@ -186,6 +189,9 @@ def run_tool(box, workdir, st, name, args):
         body = "\n".join(f"{i:4d}| {lines[i - 1]}" for i in range(a, b + 1))
         head = "[line numbers and '| ' are added by the tool; they are not in the file]\n" if st.v6b else ""
         return head + base.clip(body or "(empty file)") + (f"\n[{len(lines)} lines total]" if b - a + 1 < len(lines) else "")
+    if name in ("write_file", "edit_file") and base.safe_path(args.get("path", "")) in getattr(st, "protected", set()):
+        return (f"error: {args['path']} is a provided input file and the task does not ask you to change it, so it is read-only. "
+                "Put test data in /tmp (e.g. /tmp/test_input) and point your program at it while testing.")
     if name == "write_file":
         rel = base.safe_path(args["path"])
         p = os.path.join(workdir, rel)
@@ -287,6 +293,28 @@ def changed_inputs(workdir, seed, task):
     return [p for p in changed if os.path.basename(p) not in task and p not in task]
 
 
+def protect_inputs(st, task, log):
+    """Before the agent starts: provided non-code files the task does not ask to change become read-only."""
+    st.protected = set()
+    for p in sorted(st.seed_bytes):
+        if p.endswith(".py") or p.startswith(".agent/"):
+            continue
+        q = ("Task given to an AI agent:\n<task>\n" + task[:2500] + "\n</task>\n"
+             f"The file `{p}` is provided with the task. Does the task ask the agent to change, overwrite or fix "
+             f"the content of `{p}` itself (not just read it as input)? Answer modify=true only if so.")
+        val, pr, ms = judge.ask(q, "modify")
+        st.judge_log.append(("protect:" + p, val, round(pr, 3), ms))
+        if val is False:
+            full = os.path.join(st.workdir, p)
+            try:
+                os.chmod(full, 0o444)
+                st.protected.add(p)
+            except OSError:
+                pass
+    if st.protected:
+        log({"protected": sorted(st.protected)})
+
+
 def harness_checks(box):
     """Run what the harness can verify by itself: compile all .py files, run unittest/test files if present."""
     lines = []
@@ -382,6 +410,8 @@ def run_task(task_text, workdir, profile, log):
     st.workdir = workdir
     st.seed = snapshot(workdir, st.seed_bytes)
     st.restore = "restore_inputs" in feats(profile)
+    if "protect_inputs" in feats(profile):
+        protect_inputs(st, task_text, log)
     st.judge_inputs = "judge_inputs" in feats(profile)
     t0 = time.time()
     F = feats(profile)
