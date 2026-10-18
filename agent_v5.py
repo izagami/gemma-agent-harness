@@ -105,6 +105,7 @@ FEATURES = {
     "v6d": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit"},
     "v6e": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs"},
     "v6f": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs"},
+    "v7": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps80"},
 }
 
 
@@ -372,7 +373,8 @@ def run_task(task_text, workdir, profile, log):
                 {"role": "user", "content": task_text}]
     finished, steps = False, 0
     try:
-        for steps in range(1, MAX_STEPS + 1):
+        max_steps = 80 if "steps80" in F else MAX_STEPS
+        for steps in range(1, max_steps + 1):
             temp = 0.9 if st.hot else 0.3
             st.hot = max(0, st.hot - 1)
             v5d = "storm" in F
