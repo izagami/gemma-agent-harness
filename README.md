@@ -4,7 +4,7 @@ A Claude-Code-style coding agent for **local models**, usable from **Open WebUI*
 control, verification, fast typed judgments) lets a ~12B open model work reliably on multi-step coding tasks.
 Everything runs on your own machine: no paid APIs, and the commands the model runs cannot reach the internet.
 
-> Status: private preview. License: **TBD** (not yet chosen; do not redistribute).
+> Status: private preview. License: **Apache-2.0** (see LICENSE and NOTICE).
 
 ## What you get
 
@@ -57,3 +57,7 @@ seed and passes with the reference solution (`refs.py`). Run: `python3 eval.py v
 - Treat the model as untrusted: it only runs commands inside the sandbox container, which has no network.
 - Set `SERVER_API_KEY` unless the server is reachable only by you. Bind to `127.0.0.1` by default (compose does).
 - Workspaces persist in the `workspaces` volume; delete them when you no longer need the files.
+
+## License
+
+Apache License 2.0. Copyright 2026 eaither-game. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
