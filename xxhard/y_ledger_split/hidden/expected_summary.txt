@@ -1,0 +1,68 @@
+[asset]
+  Assets:Bank                      1,439,412 JPY
+  total                            1,439,412 JPY
+[liability]
+  Liabilities:Card                     5,961 JPY
+  total                                5,961 JPY
+[equity]
+  Equity:Opening                     500,000 JPY
+  total                              500,000 JPY
+[income]
+  Income:Freelance                   189,212 JPY
+  Income:Salary                      960,000 JPY
+  total                            1,149,212 JPY
+[expense]
+  Expenses:Books                       3,995 JPY
+  Expenses:Food                        8,420 JPY
+  Expenses:Housing:Rent              190,000 JPY
+  Expenses:Housing:Utilities          11,380 JPY
+  Expenses:Software                    1,966 JPY
+  total                              215,761 JPY
+
+[asset]
+  Assets:Bank                        725,000 JPY
+  total                              725,000 JPY
+[liability]
+  Liabilities:Card                     1,966 JPY
+  total                                1,966 JPY
+[equity]
+  Equity:Opening                     500,000 JPY
+  total                              500,000 JPY
+[income]
+  Income:Salary                      320,000 JPY
+  total                              320,000 JPY
+[expense]
+  Expenses:Housing:Rent               95,000 JPY
+  Expenses:Software                    1,966 JPY
+  total                               96,966 JPY
+
+Expenses 2026 (JPY)
+2026-01         96,966 JPY
+2026-02        107,415 JPY
+2026-03         11,380 JPY
+2026-04              0 JPY
+2026-05              0 JPY
+2026-06              0 JPY
+2026-07              0 JPY
+2026-08              0 JPY
+2026-09              0 JPY
+2026-10              0 JPY
+2026-11              0 JPY
+2026-12              0 JPY
+
+Income 2026 (USD)
+2026-01      -2,114.03 USD
+2026-02      -2,114.03 USD
+2026-03      -3,364.03 USD
+2026-04           0.00 USD
+2026-05           0.00 USD
+2026-06           0.00 USD
+2026-07           0.00 USD
+2026-08           0.00 USD
+2026-09           0.00 USD
+2026-10           0.00 USD
+2026-11           0.00 USD
+2026-12           0.00 USD
+
+1 216,241 JPY
+13,2026-03-20,coffee,Assets:Bank,-480 JPY

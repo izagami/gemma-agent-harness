@@ -259,9 +259,10 @@ task("stats_cli", "data.txt に1行1つ数値が入っています（空行や�
      "
      """))
 
-import tasks_hard, tasks_xhard
+import tasks_hard, tasks_xhard, tasks_xxhard
 tasks_hard.add(task)
 tasks_xhard.add(task)
+tasks_xxhard.add(task)
 
 if __name__ == "__main__":
     final = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tasks")
