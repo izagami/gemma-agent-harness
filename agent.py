@@ -225,6 +225,9 @@ def run_task(task_text, workdir, profile, log):
             if done_now:
                 finished = True
                 break
+            nudge = hp.progress_check(state, prof, task_text, messages, steps)
+            if nudge:
+                messages.append({"role": "user", "content": nudge}); log({"progress_nudge": True})
     finally:
         box.close()
-    return {"steps": steps, "finished": finished, "seconds": round(time.time() - t0, 1)}
+    return {"steps": steps, "finished": finished, "seconds": round(time.time() - t0, 1), "judge": state.judge_log}
