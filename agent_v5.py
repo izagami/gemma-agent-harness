@@ -126,6 +126,12 @@ FEATURES = {
             "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs"},
     "v7e": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps80",
             "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs", "hard_tests", "read_window", "force_act"},
+    # v7f: empty, withheld or near-duplicate thoughts are not accepted; the model is shown its own plan and told to act
+    "v7f": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps80",
+            "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs", "hard_tests", "read_window", "force_act", "plan_lock"},
+    # v7g: v7e with a 120-step budget
+    "v7g": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps120",
+            "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs", "hard_tests", "read_window", "force_act"},
     "v7c": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps80",
             "semantic_repeat", "v7b_rules", "stagnation"},
 }
@@ -147,6 +153,7 @@ class State:
         self.v6b = False
         self.spec = False
         self.thinks = 0          # consecutive think calls
+        self.thoughts = []       # accepted thoughts (v7f)
         self.think_limit = False
         self.restore = False
         self.restores = 0
@@ -177,6 +184,24 @@ def missing_args(tools, name, args):
                 return (f"error: {name} needs " + ", ".join(f"'{m}' ({props[m].get('type')})" for m in miss)
                         + f". Call {name} again with all of: {', '.join(req)}.")
     return None
+
+
+def plan_lock(st, args, withheld):
+    """v7f: refuse a thought that is empty, comes while think is withheld, or repeats an earlier one; return the
+    refusal (None = accept). The model sees the plan it already made and is told to carry out its first step."""
+    import difflib
+    t = " ".join(str(args.get("thought", "")).split())
+    prev = st.thoughts[-6:]
+    dup = next((p for p in prev if t and difflib.SequenceMatcher(None, t[:400], p[:400]).ratio() > 0.75), None)
+    if t and not withheld and dup is None:
+        st.thoughts.append(t)
+        return None
+    st.thinks += 1
+    plan = dup or (prev[-1] if prev else "")
+    why = ("That thought is empty." if not t else "You already made this plan." if dup else "You have just thought twice in a row.")
+    return (f"[harness] Not accepted: {why} Your plan so far: \"{plan[:500]}\" "
+            "Do its first concrete step now with write_file, edit_file or bash (for example write the new function or "
+            "section into the file). Do not plan again until you have changed a file and run a check.")
 
 
 def run_tool(box, workdir, st, name, args):
@@ -466,7 +491,7 @@ def run_task(task_text, workdir, profile, log):
                 {"role": "user", "content": task_text}]
     finished, steps = False, 0
     try:
-        max_steps = 80 if "steps80" in F else MAX_STEPS
+        max_steps = 120 if "steps120" in F else 80 if "steps80" in F else MAX_STEPS
         for steps in range(1, max_steps + 1):
             temp = 0.9 if st.hot else 0.3
             st.hot = max(0, st.hot - 1)
@@ -555,6 +580,10 @@ def run_task(task_text, workdir, profile, log):
                         log({"finish_rejected": r[:800]})
                 else:
                     obs = missing_args(tools, name, a) if st.v6b else None
+                    if obs is None and name == "think" and "plan_lock" in F:
+                        obs = plan_lock(st, a, withheld=st.thinks >= 2)
+                        if obs:
+                            log({"plan_lock": obs[:200]})
                     if obs is None:
                         try:
                             obs = run_tool(box, workdir, st, name, a)
