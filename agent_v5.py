@@ -33,7 +33,9 @@ SYSTEM_THINK_SHORT = " Keep each thought short (under about 100 words) and follo
 SYSTEM_V7B_RULES = ("\n12. To move or split existing code, copy exact line ranges with a script (sed -n 'A,Bp' or Python slicing) "
                     "instead of retyping it from memory; then fix imports.\n"
                     "13. If the task says the output or behaviour must not change, first run the original version and save its output "
-                    "under .agent/ (e.g. .agent/before.txt), and after every change compare with diff before going on.")
+                    "under .agent/ (e.g. .agent/before.txt), and after every change compare with diff before going on.\n"
+                    "14. After testing with test data, run the program again on the real input files of the task and show (cat) the final "
+                    "output files to check them before calling finish. Final outputs must come from the real inputs.")
 
 SYSTEM_THINK_RULE = ("\n8. When you need to reason (what the error means, what to check next, whether a requirement is met), "
                      "call the think tool. Never write reasoning as comments inside bash commands or files; keep commands short.")
