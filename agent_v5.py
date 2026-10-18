@@ -103,6 +103,7 @@ FEATURES = {
     "v6b": {"repeat_result", "storm", "cache", "incontext", "think", "v6b"},
     "v6c": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec"},
     "v6d": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit"},
+    "v6e": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs"},
 }
 
 
@@ -121,6 +122,9 @@ class State:
         self.spec = False
         self.thinks = 0          # consecutive think calls
         self.think_limit = False
+        self.restore = False
+        self.restores = 0
+        self.seed_bytes = {}
         self.workdir = ""
         self.seed = {}      # message indexes whose output is shown elided (cache-friendly mode)
         self.todo = []
@@ -237,15 +241,20 @@ def view(messages, st, cache_friendly=False):
     return out
 
 
-def snapshot(workdir):
+def snapshot(workdir, keep=None):
+    """sha1 of every file; with keep={} also stores the bytes of files up to 2 MB (for restoring inputs)."""
     out = {}
     for root, _, files in os.walk(workdir):
         for f in files:
             p = os.path.join(root, f)
             try:
-                out[os.path.relpath(p, workdir)] = hashlib.sha1(open(p, "rb").read()).hexdigest()
+                b = open(p, "rb").read()
             except OSError:
-                pass
+                continue
+            rel = os.path.relpath(p, workdir)
+            out[rel] = hashlib.sha1(b).hexdigest()
+            if keep is not None and len(b) <= 2_000_000:
+                keep[rel] = b
     return out
 
 
@@ -274,6 +283,16 @@ def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=N
         return None
     open_items = [i["text"] for i in st.todo if i["status"] not in ("done", "dropped")]
     checks = harness_checks(box)
+    if st.restore:
+        sus = [p for p in changed_inputs(st.workdir, st.seed, task) if p in st.seed_bytes and not p.endswith(".py")]
+        if sus and st.restores < 2:
+            st.restores += 1
+            for p in sus:
+                with open(os.path.join(st.workdir, p), "wb") as f:
+                    f.write(st.seed_bytes[p])
+            return ("[harness] Not accepted: you modified provided input files the task did not ask you to change: " + ", ".join(sus)
+                    + ". They have been restored to their original content. Never write test data into them (use /tmp). "
+                    "Run your program again on the real files, check the output, then call finish.")
     if st.spec:
         code, out, err = box.sh("test -f /tmp/spec_test.py || exit 99; cd /work && python3 /tmp/spec_test.py", timeout=60)
         if code == 99:
@@ -320,7 +339,9 @@ def run_task(task_text, workdir, profile, log):
     st.v6b = "v6b" in feats(profile)
     st.spec = "spec" in feats(profile)
     st.think_limit = "think_limit" in feats(profile)
-    st.workdir, st.seed = workdir, snapshot(workdir)
+    st.workdir = workdir
+    st.seed = snapshot(workdir, st.seed_bytes)
+    st.restore = "restore_inputs" in feats(profile)
     t0 = time.time()
     F = feats(profile)
     think = "think" in F
