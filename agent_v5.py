@@ -364,6 +364,8 @@ def run_task(task_text, workdir, profile, log):
             for c in calls:
                 try:
                     a = json.loads(c["function"]["arguments"] or "{}")
+                    if not isinstance(a, dict):
+                        a = None  # e.g. the model passed a bare number or string
                 except ValueError:
                     a = None
                 name = c["function"]["name"]
@@ -402,7 +404,12 @@ def run_task(task_text, workdir, profile, log):
                 if a is None:
                     obs = "error: arguments were not valid JSON. Call the tool again with valid JSON."
                 elif name == "finish":
-                    r = on_finish(box, st, task_text, messages, a, in_context="incontext" in F, cf="cache" in F, tools=tools)
+                    try:
+                        r = on_finish(box, st, task_text, messages, a, in_context="incontext" in F, cf="cache" in F, tools=tools)
+                    except Exception as e:  # a broken check must not kill the run; log it and accept
+                        import traceback
+                        log({"finish_check_error": traceback.format_exc()[-1200:]})
+                        r = None
                     obs, done_now = ("finished", True) if r is None else (r, False)
                     if r:
                         log({"finish_rejected": r[:800]})

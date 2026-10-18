@@ -46,7 +46,8 @@ def main():
             else:
                 info = agent.run_task(task_text, work, prof, log)
         except Exception as e:
-            info = {"error": repr(e)}
+            import traceback
+            info = {"error": repr(e), "trace": traceback.format_exc()[-1500:]}
         ok, out = check(work, os.path.join(src, "check"))
         res = {"task": tid, "pass": ok, **info, "check_out": out[-300:]}
         log({"result": res}); logf.close()
