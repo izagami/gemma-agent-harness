@@ -126,7 +126,8 @@ FEATURES = {
             "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs"},
     "v7e": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps80",
             "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs", "hard_tests", "read_window", "force_act"},
-    # v7f: empty, withheld or near-duplicate thoughts are not accepted; the model is shown its own plan and told to act
+    # v7f: empty, withheld or near-duplicate thoughts are not accepted (the model is shown its own plan and told to act);
+    #      after 3+ steps of only refused repeats, the open todo items and a re-read of the task are pointed out
     "v7f": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps80",
             "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs", "hard_tests", "read_window", "force_act", "plan_lock"},
     # v7g: v7e with a 120-step budget
@@ -154,6 +155,7 @@ class State:
         self.spec = False
         self.thinks = 0          # consecutive think calls
         self.thoughts = []       # accepted thoughts (v7f)
+        self.refused = 0         # consecutive steps whose calls were all refused repeats
         self.think_limit = False
         self.restore = False
         self.restores = 0
@@ -550,9 +552,20 @@ def run_task(task_text, workdir, profile, log):
                 st.hot = 1
                 log({"repeat_described": notes})
             if not fresh:
+                st.refused += 1
+                extra = ""
+                if "plan_lock" in F and st.refused >= 3:
+                    # v7f: a streak of refused repeats (e.g. writing the same file 40 times): point at the next open item
+                    open_items = [i["text"] for i in st.todo if i.get("status") != "done"]
+                    extra = (f" You have repeated finished actions {st.refused} times in a row. The files already contain what you wrote. "
+                             + (f"Your unfinished todo items: {'; '.join(open_items[:5])}. Do the first one with a NEW action. " if open_items else "")
+                             + "Re-read the task for anything not yet done (files to remove, outputs to produce, checks to run), "
+                             "then do it; if all is done, run the checks once and call finish.")
                 messages.append({"role": "user", "content": "[harness] " + " ".join(notes)
-                                 + " Choose a different action that makes progress, or call finish if the task is done."})
+                                 + " Choose a different action that makes progress, or call finish if the task is done." + extra})
                 continue
+            if any(n not in ("todo", "think") for _, n, _ in fresh):
+                st.refused = 0
             # never put unparsable arguments into the history: llama-server re-parses every past tool call and
             # one broken call there makes every later request fail with the same HTTP 500
             safe = []
