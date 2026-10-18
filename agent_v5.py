@@ -30,6 +30,11 @@ SYSTEM_V6C_RULES = ("\n11. Test first: before implementing, write /tmp/spec_test
 
 SYSTEM_THINK_SHORT = " Keep each thought short (under about 100 words) and follow it with an action."
 
+SYSTEM_V7B_RULES = ("\n12. To move or split existing code, copy exact line ranges with a script (sed -n 'A,Bp' or Python slicing) "
+                    "instead of retyping it from memory; then fix imports.\n"
+                    "13. If the task says the output or behaviour must not change, first run the original version and save its output "
+                    "under .agent/ (e.g. .agent/before.txt), and after every change compare with diff before going on.")
+
 SYSTEM_THINK_RULE = ("\n8. When you need to reason (what the error means, what to check next, whether a requirement is met), "
                      "call the think tool. Never write reasoning as comments inside bash commands or files; keep commands short.")
 
@@ -64,7 +69,14 @@ TOOLS = [
 ]
 
 
-def akey(name, args):
+def _strip_comments(cmd):
+    lines = [l for l in cmd.split("\n") if not l.strip().startswith("#")]
+    return " ".join(" ".join(lines).split())
+
+
+def akey(name, args, semantic=False):
+    if semantic and name == "bash" and isinstance(args.get("command"), str):
+        args = dict(args, command=_strip_comments(args["command"]))  # same command with different '# thoughts' = repeat
     return hashlib.sha1((name + json.dumps(args, sort_keys=True, ensure_ascii=False)).encode()).hexdigest()
 
 
@@ -106,6 +118,8 @@ FEATURES = {
     "v6e": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs"},
     "v6f": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs"},
     "v7": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps80"},
+    "v7b": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps80",
+            "semantic_repeat", "v7b_rules"},
 }
 
 
@@ -369,7 +383,7 @@ def run_task(task_text, workdir, profile, log):
     F = feats(profile)
     think = "think" in F
     tools = TOOLS + [THINK_TOOL] if think else TOOLS
-    messages = [{"role": "system", "content": SYSTEM + (SYSTEM_THINK_RULE + (SYSTEM_THINK_SHORT if "think_limit" in F else "") if think else "") + (SYSTEM_V6B_RULES if "v6b" in F else "") + (SYSTEM_V6C_RULES if "spec" in F else "")},
+    messages = [{"role": "system", "content": SYSTEM + (SYSTEM_THINK_RULE + (SYSTEM_THINK_SHORT if "think_limit" in F else "") if think else "") + (SYSTEM_V6B_RULES if "v6b" in F else "") + (SYSTEM_V6C_RULES if "spec" in F else "") + (SYSTEM_V7B_RULES if "v7b_rules" in F else "")},
                 {"role": "user", "content": task_text}]
     finished, steps = False, 0
     try:
@@ -414,11 +428,12 @@ def run_task(task_text, workdir, profile, log):
                 except ValueError:
                     a = None
                 name = c["function"]["name"]
-                if a is not None and name not in ("finish", "todo", "think") and akey(name, a) in st.ran:
-                    n, res = st.ran[akey(name, a)]
-                    st.ran[akey(name, a)] = (n + 1, res)
+                sem = "semantic_repeat" in F
+                if a is not None and name not in ("finish", "todo", "think") and akey(name, a, sem) in st.ran:
+                    n, res = st.ran[akey(name, a, sem)]
+                    st.ran[akey(name, a, sem)] = (n + 1, res)
                     newer = "repeat_result" in F
-                    full = st.full.get(akey(name, a), res) if newer else res
+                    full = st.full.get(akey(name, a, sem), res) if newer else res
                     if newer:
                         notes.append(f"{describe(name, a)} already ran {n} time(s) and nothing has changed since, so it was not run again. "
                                      f"Its result was:\n{base.clip(full, 2500)}")
@@ -466,8 +481,8 @@ def run_task(task_text, workdir, profile, log):
                         except Exception as e:
                             obs = f"error: {type(e).__name__}: {e}"
                     if name not in ("todo", "think"):
-                        st.ran[akey(name, a)] = (1, one_line(obs))
-                        st.full[akey(name, a)] = obs
+                        st.ran[akey(name, a, "semantic_repeat" in F)] = (1, one_line(obs))
+                        st.full[akey(name, a, "semantic_repeat" in F)] = obs
                         # a later change can make an earlier command worth re-running
                         if name in ("write_file", "edit_file") and not obs.startswith("error") and st.changed:
                             st.ran, st.full = {}, {}  # files changed: every earlier command may give a new result
