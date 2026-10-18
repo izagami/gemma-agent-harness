@@ -21,7 +21,7 @@ def main():
         jobs = int(argv.pop(0)[2:])
     prof = argv[0]
     tasks = argv[1:] or sorted(os.listdir(os.path.join(HERE, "tasks")))
-    run = os.path.join(HERE, "runs", f"{prof}-{time.strftime('%m%d-%H%M%S')}")
+    run = os.path.join(HERE, "runs", f"{prof}-{time.strftime('%m%d-%H%M%S')}-{os.getpid()}")
     os.makedirs(run)
     import threading
     from concurrent.futures import ThreadPoolExecutor
@@ -40,7 +40,7 @@ def main():
         def log(d):
             logf.write(json.dumps(d, ensure_ascii=False) + "\n"); logf.flush()
         try:
-            if prof.startswith(("v5", "v6")):
+            if prof.startswith(("v5", "v6", "v7", "v8", "v9")):
                 import agent_v5
                 info = agent_v5.run_task(task_text, work, prof, log)
             else:
