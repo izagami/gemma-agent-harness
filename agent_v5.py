@@ -81,6 +81,21 @@ def py_check(box, path):
     return None if code == 0 else (err or out).strip()[-800:]
 
 
+FEATURES = {
+    "v5": set(),
+    "v5b": {"incontext"},
+    "v5c": {"repeat_result"},
+    "v5d": {"repeat_result", "storm"},
+    "v5e": {"repeat_result", "storm", "cache", "incontext"},
+    "v5f": {"repeat_result", "storm", "cache", "incontext", "think"},
+    "v6": {"repeat_result", "storm", "cache", "incontext", "think"},
+}
+
+
+def feats(profile):
+    return FEATURES.get(profile, FEATURES.get(profile.rstrip("abcdefghijklmnopqrstuvwxyz-0123456789"), set()))
+
+
 class State:
     def __init__(self):
         self.ran = {}            # action key -> (count, one-line result)
@@ -228,7 +243,8 @@ def run_task(task_text, workdir, profile, log):
     box = base.Sandbox(workdir)
     st = State()
     t0 = time.time()
-    think = profile.startswith("v5f")
+    F = feats(profile)
+    think = "think" in F
     tools = TOOLS + [THINK_TOOL] if think else TOOLS
     messages = [{"role": "system", "content": SYSTEM + (SYSTEM_THINK_RULE if think else "")}, {"role": "user", "content": task_text}]
     finished, steps = False, 0
@@ -236,8 +252,8 @@ def run_task(task_text, workdir, profile, log):
         for steps in range(1, MAX_STEPS + 1):
             temp = 0.9 if st.hot else 0.3
             st.hot = max(0, st.hot - 1)
-            v5d = profile.startswith(("v5d", "v5e", "v5f"))
-            cf = profile.startswith(("v5e", "v5f"))
+            v5d = "storm" in F
+            cf = "cache" in F
             if v5d and st.broken:
                 temp = 0.9  # the same prefix at low temperature reproduces the same runaway call
             try:
@@ -274,7 +290,7 @@ def run_task(task_text, workdir, profile, log):
                 if a is not None and name not in ("finish", "todo", "think") and akey(name, a) in st.ran:
                     n, res = st.ran[akey(name, a)]
                     st.ran[akey(name, a)] = (n + 1, res)
-                    newer = profile.startswith(("v5c", "v5d", "v5e", "v5f"))
+                    newer = "repeat_result" in F
                     full = st.full.get(akey(name, a), res) if newer else res
                     if newer:
                         notes.append(f"{describe(name, a)} already ran {n} time(s) and nothing has changed since, so it was not run again. "
@@ -297,7 +313,7 @@ def run_task(task_text, workdir, profile, log):
                 if a is None:
                     obs = "error: arguments were not valid JSON. Call the tool again with valid JSON."
                 elif name == "finish":
-                    r = on_finish(box, st, task_text, messages, a, in_context=profile.startswith(("v5b", "v5e", "v5f")), cf=profile.startswith(("v5e", "v5f")), tools=tools)
+                    r = on_finish(box, st, task_text, messages, a, in_context="incontext" in F, cf="cache" in F, tools=tools)
                     obs, done_now = ("finished", True) if r is None else (r, False)
                     if r:
                         log({"finish_rejected": r[:800]})

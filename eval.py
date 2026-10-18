@@ -40,7 +40,7 @@ def main():
         def log(d):
             logf.write(json.dumps(d, ensure_ascii=False) + "\n"); logf.flush()
         try:
-            if prof.startswith("v5"):
+            if prof.startswith(("v5", "v6")):
                 import agent_v5
                 info = agent_v5.run_task(task_text, work, prof, log)
             else:
