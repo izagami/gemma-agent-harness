@@ -120,6 +120,8 @@ FEATURES = {
     "v7": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps80"},
     "v7b": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps80",
             "semantic_repeat", "v7b_rules"},
+    "v7c": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps80",
+            "semantic_repeat", "v7b_rules", "stagnation"},
 }
 
 
@@ -133,6 +135,8 @@ class State:
         self.full = {}           # action key -> full observation
         self.broken = 0          # consecutive cut-off tool calls
         self.changed = False     # did the last write/edit change a file?
+        self.last_snap = None
+        self.still = 0           # steps without any file change
         self.masked = set()
         self.v6b = False
         self.spec = False
@@ -494,6 +498,21 @@ def run_task(task_text, workdir, profile, log):
             if done_now:
                 finished = True
                 break
+            if "stagnation" in F:
+                snap = snapshot(workdir)
+                if snap != st.last_snap:
+                    st.last_snap, st.still = snap, 0
+                else:
+                    st.still += 1
+                recent = " ".join(m["content"][-600:] for m in messages[-6:] if m["role"] == "tool")
+                failing = any(w in recent for w in ("FAILED", "Traceback", "AssertionError", "Error:", "exit code: 1"))
+                if st.still >= 10 and failing:
+                    st.still = 0
+                    st.hot = 1
+                    messages.append({"role": "user", "content": "[harness] For 10 steps no file has changed while a check still fails. "
+                                     "Stop probing with variations of the same command. Open the source code that the failing check "
+                                     "exercises (read_file), find the actual cause, edit it, then re-run the check."})
+                    log({"stagnation_nudge": True})
     finally:
         box.close()
     return {"steps": steps, "finished": finished, "seconds": round(time.time() - t0, 1), "judge": st.judge_log}
