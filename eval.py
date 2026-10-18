@@ -15,12 +15,20 @@ def check(workdir, checkdir):
 
 
 def main():
-    prof = sys.argv[1]
-    tasks = sys.argv[2:] or sorted(os.listdir(os.path.join(HERE, "tasks")))
+    argv = sys.argv[1:]
+    jobs = 1
+    if argv and argv[0].startswith("-j"):
+        jobs = int(argv.pop(0)[2:])
+    prof = argv[0]
+    tasks = argv[1:] or sorted(os.listdir(os.path.join(HERE, "tasks")))
     run = os.path.join(HERE, "runs", f"{prof}-{time.strftime('%m%d-%H%M%S')}")
     os.makedirs(run)
-    passed = 0
-    for tid in tasks:
+    import threading
+    from concurrent.futures import ThreadPoolExecutor
+    lock = threading.Lock()
+    passed = [0]
+
+    def one(tid):
         src = os.path.join(HERE, "tasks", tid)
         work = os.path.join(run, tid, "work")
         if os.path.isdir(os.path.join(src, "files")):
@@ -32,17 +40,27 @@ def main():
         def log(d):
             logf.write(json.dumps(d, ensure_ascii=False) + "\n"); logf.flush()
         try:
-            info = agent.run_task(task_text, work, prof, log)
+            if prof.startswith(("v5", "v6")):
+                import agent_v5
+                info = agent_v5.run_task(task_text, work, prof, log)
+            else:
+                info = agent.run_task(task_text, work, prof, log)
         except Exception as e:
-            info = {"error": repr(e)}
+            import traceback
+            info = {"error": repr(e), "trace": traceback.format_exc()[-1500:]}
         ok, out = check(work, os.path.join(src, "check"))
-        passed += ok
         res = {"task": tid, "pass": ok, **info, "check_out": out[-300:]}
         log({"result": res}); logf.close()
-        with open(os.path.join(run, "results.jsonl"), "a") as f:
-            f.write(json.dumps(res, ensure_ascii=False) + "\n")
-        print(f"{tid:12s} {'PASS' if ok else 'fail'} steps={info.get('steps')} t={info.get('seconds')} {info.get('error', '')}", flush=True)
-    print(f"== {prof}: {passed}/{len(tasks)} passed  ({run})", flush=True)
+        with lock:
+            passed[0] += ok
+            with open(os.path.join(run, "results.jsonl"), "a") as f:
+                f.write(json.dumps(res, ensure_ascii=False) + "\n")
+            print(f"{tid:12s} {'PASS' if ok else 'fail'} steps={info.get('steps')} t={info.get('seconds')} {info.get('error', '')}", flush=True)
+
+    t0 = time.time()
+    with ThreadPoolExecutor(jobs) as ex:
+        list(ex.map(one, tasks))
+    print(f"== {prof}: {passed[0]}/{len(tasks)} passed in {round(time.time() - t0)} s  ({run})", flush=True)
 
 
 if __name__ == "__main__":

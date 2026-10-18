@@ -1,0 +1,4 @@
+2026-01: Expenses:Software +466 JPY
+2026-02: Expenses:Books +995 JPY
+2026-03: ok
+error: no rate GBP->JPY

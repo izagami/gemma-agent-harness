@@ -1,0 +1,25 @@
+txn,date,description,account,amount
+1,2026-01-05,opening balance,Assets:Bank,"500,000 JPY"
+1,2026-01-05,opening balance,Equity:Opening,"-500,000 JPY"
+2,2026-01-10,salary,Assets:Bank,"320,000 JPY"
+2,2026-01-10,salary,Income:Salary,"-320,000 JPY"
+3,2026-01-12,rent,Expenses:Housing:Rent,"95,000 JPY"
+3,2026-01-12,rent,Assets:Bank,"-95,000 JPY"
+4,2026-01-20,cloud bill,Expenses:Software,12.99 USD
+4,2026-01-20,cloud bill,Liabilities:Card,-12.99 USD
+5,2026-02-01,groceries,Expenses:Food,"8,420 JPY"
+5,2026-02-01,groceries,Liabilities:Card,"-8,420 JPY"
+6,2026-02-10,salary,Assets:Bank,"320,000 JPY"
+6,2026-02-10,salary,Income:Salary,"-320,000 JPY"
+7,2026-02-12,rent,Expenses:Housing:Rent,"95,000 JPY"
+7,2026-02-12,rent,Assets:Bank,"-95,000 JPY"
+8,2026-02-15,book from abroad,Expenses:Books,24.50 EUR
+8,2026-02-15,book from abroad,Liabilities:Card,-24.50 EUR
+9,2026-02-27,card payment,Liabilities:Card,"8,420 JPY"
+9,2026-02-27,card payment,Assets:Bank,"-8,420 JPY"
+10,2026-03-03,utilities,Expenses:Housing:Utilities,"11,380 JPY"
+10,2026-03-03,utilities,Assets:Bank,"-11,380 JPY"
+11,2026-03-10,salary,Assets:Bank,"320,000 JPY"
+11,2026-03-10,salary,Income:Salary,"-320,000 JPY"
+12,2026-03-15,freelance,Assets:Bank,"1,250.00 USD"
+12,2026-03-15,freelance,Income:Freelance,"-1,250.00 USD"

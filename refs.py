@@ -27,9 +27,17 @@ R["merge_csv"] = {"!": "python3 -c \"import csv\nc={r['customer_id']:r['name'] f
 R["unused"] = {"unused.txt": "backup\nlegacy_clean\nnormalize\n"}
 R["stats_cli"] = {"!": "python3 -c \"import json,statistics as s\nxs=[float(l) for l in open('data.txt') if l.strip() and not l.startswith('#')]\njson.dump({'mean':round(s.mean(xs),3),'min':round(min(xs),3),'max':round(max(xs),3),'std':round(s.pstdev(xs),3)},open('stats.json','w'))\""}
 
+import refs_hard, refs_xhard, refs_xxhard
+R.update(refs_hard.R)
+R.update(refs_xhard.R)
+R.update(refs_xxhard.R)
+
 if __name__ == "__main__":
+    import sys
+    only = sys.argv[1:]
     fails = []
     for t, sol in R.items():
+        if only and t not in only: continue
         w = tempfile.mkdtemp(dir="/tmp/claude-1000/-home-izagami/b7c81ef9-c842-4623-b699-d4513c80a0c7/scratchpad"); os.rmdir(w)
         src = f"tasks/{t}/files"
         shutil.copytree(src, w) if os.path.isdir(src) else os.makedirs(w)

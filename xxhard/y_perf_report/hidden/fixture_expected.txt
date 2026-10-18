@@ -1,0 +1,30 @@
+SALES REPORT
+rows: 12  rejected: 2  unique: 8  billable: 7
+
+[store x month]
+store       2025-04      2025-05      2025-06          total
+S01           4,200          250          700          5,150
+S02           5,577       -8,069            -         -2,492
+S03               -          145            -            145
+
+[categories]
+drink               3           5,577
+pets                2           3,000
+unknown             4           1,200
+kitchen             1             700
+food                1             250
+stationery          2             145
+books               1          -8,069
+
+[top skus]
+ 1. P0002          5,577
+ 2. P0001          3,000
+ 3. P2040          1,200
+ 4. P0006            700
+ 5. P0003            250
+ 6. P0005            145
+ 7. P0004         -8,069
+
+[orders]
+count 6  median 475  mean 467
+best day 2025-04-30 5,577

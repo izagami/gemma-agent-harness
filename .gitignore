@@ -2,3 +2,6 @@ __pycache__/
 runs/
 tasks/
 *.out
+*.log
+tasks.new/
+tasks.old/
