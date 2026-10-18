@@ -175,6 +175,11 @@ def run_task(task_text, workdir, profile, log):
             calls = m.get("tool_calls") or []
             entry = {"role": "assistant", "content": m.get("content") or ""}
             if calls:
+                for c in calls:  # keep only parsable arguments in the history (see agent_v5)
+                    try:
+                        json.loads(c["function"]["arguments"] or "{}")
+                    except ValueError:
+                        c["function"]["arguments"] = json.dumps({"_harness": "call was cut off or invalid JSON"})
                 entry["tool_calls"] = calls
             if prof.get("break_loops") and len(calls) == 1:
                 c0 = calls[0]["function"]

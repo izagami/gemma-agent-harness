@@ -306,7 +306,14 @@ def run_task(task_text, workdir, profile, log):
                 messages.append({"role": "user", "content": "[harness] " + " ".join(notes)
                                  + " Choose a different action that makes progress, or call finish if the task is done."})
                 continue
-            entry = {"role": "assistant", "content": m.get("content") or "", "tool_calls": [c for c, _, _ in fresh]}
+            # never put unparsable arguments into the history: llama-server re-parses every past tool call and
+            # one broken call there makes every later request fail with the same HTTP 500
+            safe = []
+            for c, _, a in fresh:
+                if a is None:
+                    c = dict(c, function=dict(c["function"], arguments=json.dumps({"_harness": "call was cut off or invalid JSON"})))
+                safe.append(c)
+            entry = {"role": "assistant", "content": m.get("content") or "", "tool_calls": safe}
             messages.append(entry)
             done_now = False
             for c, name, a in fresh:
