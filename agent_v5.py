@@ -104,6 +104,7 @@ FEATURES = {
     "v6c": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec"},
     "v6d": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit"},
     "v6e": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs"},
+    "v6f": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs"},
 }
 
 
@@ -125,6 +126,8 @@ class State:
         self.restore = False
         self.restores = 0
         self.seed_bytes = {}
+        self.judge_inputs = False
+        self.allowed = set()
         self.workdir = ""
         self.seed = {}      # message indexes whose output is shown elided (cache-friendly mode)
         self.todo = []
@@ -284,7 +287,25 @@ def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=N
     open_items = [i["text"] for i in st.todo if i["status"] not in ("done", "dropped")]
     checks = harness_checks(box)
     if st.restore:
-        sus = [p for p in changed_inputs(st.workdir, st.seed, task) if p in st.seed_bytes and not p.endswith(".py")]
+        if st.judge_inputs:
+            # decide per changed provided file with a fast boolean judgment instead of a filename heuristic
+            now = snapshot(st.workdir)
+            changed = [p for p, h in st.seed.items() if now.get(p) != h and p in st.seed_bytes and not p.endswith(".py")]
+            sus = []
+            for p in changed:
+                if p in st.allowed:
+                    continue
+                q = ("Task given to an AI agent:\n<task>\n" + task[:2500] + "\n</task>\n"
+                     f"The file `{p}` was provided with the task. Does the task ask the agent to change, overwrite or fix "
+                     f"the content of `{p}` itself (not just read it as input)? Answer modify=true only if so.")
+                val, pr, ms = judge.ask(q, "modify")
+                st.judge_log.append(("modify:" + p, val, round(pr, 3), ms))
+                if val is False:
+                    sus.append(p)
+                else:
+                    st.allowed.add(p)
+        else:
+            sus = [p for p in changed_inputs(st.workdir, st.seed, task) if p in st.seed_bytes and not p.endswith(".py")]
         if sus and st.restores < 2:
             st.restores += 1
             for p in sus:
@@ -342,6 +363,7 @@ def run_task(task_text, workdir, profile, log):
     st.workdir = workdir
     st.seed = snapshot(workdir, st.seed_bytes)
     st.restore = "restore_inputs" in feats(profile)
+    st.judge_inputs = "judge_inputs" in feats(profile)
     t0 = time.time()
     F = feats(profile)
     think = "think" in F
