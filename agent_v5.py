@@ -23,6 +23,11 @@ SYSTEM_V6B_RULES = ("\n9. Never overwrite or edit the provided input/data files 
                     "Change only the files the task asks you to change or create.\n"
                     "10. If you notice a problem (a wrong count, a failing case), fix it and re-check before calling finish.")
 
+SYSTEM_V6C_RULES = ("\n11. Test first: before implementing, write /tmp/spec_test.py - a plain Python script with an assert for every "
+                    "example, rule and edge case in the task (exact expected outputs, error types, exit codes, file contents). "
+                    "Call the real functions/programs, not a wrapper that hides exceptions. Run it after each change. "
+                    "The harness runs it again before accepting finish.")
+
 SYSTEM_THINK_RULE = ("\n8. When you need to reason (what the error means, what to check next, whether a requirement is met), "
                      "call the think tool. Never write reasoning as comments inside bash commands or files; keep commands short.")
 
@@ -94,6 +99,7 @@ FEATURES = {
     "v5f": {"repeat_result", "storm", "cache", "incontext", "think"},
     "v6": {"repeat_result", "storm", "cache", "incontext", "think"},
     "v6b": {"repeat_result", "storm", "cache", "incontext", "think", "v6b"},
+    "v6c": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec"},
 }
 
 
@@ -109,6 +115,7 @@ class State:
         self.changed = False     # did the last write/edit change a file?
         self.masked = set()
         self.v6b = False
+        self.spec = False
         self.workdir = ""
         self.seed = {}      # message indexes whose output is shown elided (cache-friendly mode)
         self.todo = []
@@ -259,6 +266,17 @@ def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=N
         return None
     open_items = [i["text"] for i in st.todo if i["status"] not in ("done", "dropped")]
     checks = harness_checks(box)
+    if st.spec:
+        code, out, err = box.sh("test -f /tmp/spec_test.py || exit 99; cd /work && python3 /tmp/spec_test.py", timeout=60)
+        if code == 99:
+            if st.finish_tries == 1:
+                return ("[harness] Not accepted yet: /tmp/spec_test.py does not exist. Write it with an assert for every example, "
+                        "rule and edge case in the task, run it, fix what fails, then call finish.")
+        elif code != 0:
+            return ("[harness] Not accepted: /tmp/spec_test.py fails:\n" + base.clip((out + err).strip(), 1500)
+                    + "\nFix the code (or the test if the test contradicts the task), run it again, then call finish.")
+        else:
+            checks += "\n/tmp/spec_test.py: passed"
     if st.v6b:
         sus = changed_inputs(st.workdir, st.seed, task)
         if sus:
@@ -292,12 +310,13 @@ def run_task(task_text, workdir, profile, log):
     box = base.Sandbox(workdir)
     st = State()
     st.v6b = "v6b" in feats(profile)
+    st.spec = "spec" in feats(profile)
     st.workdir, st.seed = workdir, snapshot(workdir)
     t0 = time.time()
     F = feats(profile)
     think = "think" in F
     tools = TOOLS + [THINK_TOOL] if think else TOOLS
-    messages = [{"role": "system", "content": SYSTEM + (SYSTEM_THINK_RULE if think else "") + (SYSTEM_V6B_RULES if "v6b" in F else "")},
+    messages = [{"role": "system", "content": SYSTEM + (SYSTEM_THINK_RULE if think else "") + (SYSTEM_V6B_RULES if "v6b" in F else "") + (SYSTEM_V6C_RULES if "spec" in F else "")},
                 {"role": "user", "content": task_text}]
     finished, steps = False, 0
     try:
