@@ -40,7 +40,11 @@ def main():
         def log(d):
             logf.write(json.dumps(d, ensure_ascii=False) + "\n"); logf.flush()
         try:
-            info = agent.run_task(task_text, work, prof, log)
+            if prof.startswith("v5"):
+                import agent_v5
+                info = agent_v5.run_task(task_text, work, prof, log)
+            else:
+                info = agent.run_task(task_text, work, prof, log)
         except Exception as e:
             info = {"error": repr(e)}
         ok, out = check(work, os.path.join(src, "check"))
