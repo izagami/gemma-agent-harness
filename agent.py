@@ -25,6 +25,29 @@ TOOLS = [
 ]
 
 
+class HttpSandbox:
+    """Sandbox reached over HTTP (docker compose: a separate container on an internal-only network that shares the
+    workspace volume). Same interface as Sandbox."""
+    def __init__(self, workdir):
+        self.url = os.environ["SANDBOX_URL"].rstrip("/")
+        self.root = os.environ.get("WORKSPACE_ROOT", "/workspaces")
+        self.rel = os.path.relpath(workdir, self.root)
+
+    def sh(self, cmd, timeout=60):
+        body = json.dumps({"cmd": cmd, "cwd": self.rel, "timeout": timeout}).encode()
+        req = urllib.request.Request(self.url + "/exec", body, {"Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=timeout + 30) as r:
+            d = json.load(r)
+        return d["code"], d["stdout"], d["stderr"]
+
+    def close(self):
+        pass
+
+
+def make_sandbox(workdir):
+    return HttpSandbox(workdir) if os.environ.get("SANDBOX_URL") else Sandbox(workdir)
+
+
 class Sandbox:
     def __init__(self, workdir):
         self.name = "agent-" + uuid.uuid4().hex[:8]
@@ -133,10 +156,14 @@ class BrokenToolCall(Exception):
     """The server could not parse the model's tool call (usually cut off at max_tokens)."""
 
 
+MODEL = os.environ.get("AGENT_MODEL", "local")
+API_KEY = os.environ.get("AGENT_API_KEY", "none")
+
+
 def chat(messages, tools, max_tokens=2048, temperature=0.3):
-    body = {"messages": messages, "tools": tools, "max_tokens": max_tokens, "temperature": temperature,
+    body = {"model": MODEL, "messages": messages, "tools": tools, "max_tokens": max_tokens, "temperature": temperature,
             "chat_template_kwargs": {"enable_thinking": False}}
-    req = urllib.request.Request(API, json.dumps(body).encode(), {"Content-Type": "application/json"})
+    req = urllib.request.Request(API, json.dumps(body).encode(), {"Content-Type": "application/json", "Authorization": "Bearer " + API_KEY})
     try:
         with urllib.request.urlopen(req, timeout=900) as r:
             return json.load(r)["choices"][0]

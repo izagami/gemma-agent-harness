@@ -23,10 +23,10 @@ SYSTEM_V6B_RULES = ("\n9. Never overwrite or edit the provided input/data files 
                     "Change only the files the task asks you to change or create.\n"
                     "10. If you notice a problem (a wrong count, a failing case), fix it and re-check before calling finish.")
 
-SYSTEM_V6C_RULES = ("\n11. Test first: before implementing, write /tmp/spec_test.py - a plain Python script with an assert for every "
+SYSTEM_V6C_RULES = ("\n11. Test first: before implementing, write .agent/spec_test.py - a plain Python script with an assert for every "
                     "example, rule and edge case in the task (exact expected outputs, error types, exit codes, file contents). "
                     "Call the real functions/programs, not a wrapper that hides exceptions. Run it after each change. "
-                    "The harness runs it again before accepting finish.")
+                    "The harness runs it again before accepting finish. Keep it there, not in the project files.")
 
 SYSTEM_THINK_SHORT = " Keep each thought short (under about 100 words) and follow it with an action."
 
@@ -315,16 +315,16 @@ def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=N
                     + ". They have been restored to their original content. Never write test data into them (use /tmp). "
                     "Run your program again on the real files, check the output, then call finish.")
     if st.spec:
-        code, out, err = box.sh("test -f /tmp/spec_test.py || exit 99; cd /work && python3 /tmp/spec_test.py", timeout=60)
+        code, out, err = box.sh("test -f .agent/spec_test.py || exit 99; python3 .agent/spec_test.py", timeout=60)
         if code == 99:
             if st.finish_tries == 1:
-                return ("[harness] Not accepted yet: /tmp/spec_test.py does not exist. Write it with an assert for every example, "
+                return ("[harness] Not accepted yet: .agent/spec_test.py does not exist. Write it with an assert for every example, "
                         "rule and edge case in the task, run it, fix what fails, then call finish.")
         elif code != 0:
-            return ("[harness] Not accepted: /tmp/spec_test.py fails:\n" + base.clip((out + err).strip(), 1500)
+            return ("[harness] Not accepted: .agent/spec_test.py fails:\n" + base.clip((out + err).strip(), 1500)
                     + "\nFix the code (or the test if the test contradicts the task), run it again, then call finish.")
         else:
-            checks += "\n/tmp/spec_test.py: passed"
+            checks += "\n.agent/spec_test.py: passed"
     if st.v6b:
         sus = changed_inputs(st.workdir, st.seed, task)
         if sus:
@@ -355,7 +355,7 @@ def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=N
 
 
 def run_task(task_text, workdir, profile, log):
-    box = base.Sandbox(workdir)
+    box = base.make_sandbox(workdir)
     st = State()
     st.v6b = "v6b" in feats(profile)
     st.spec = "spec" in feats(profile)
