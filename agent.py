@@ -4,11 +4,12 @@
 Every command runs inside a network-less podman container that only sees the task workspace.
 The harness (prompt, loop control, verification) is configured by a profile so variants can be compared.
 """
-import json, os, re, subprocess, time, urllib.request, uuid
+import json, os, re, subprocess, time, urllib.error, urllib.request, uuid
 
 API = os.environ.get("AGENT_API", "http://127.0.0.1:8085/v1/chat/completions")
 IMAGE = "docker.io/library/python:3.12-slim"
 OBS_LIMIT = 6000
+SMART_EDIT = False  # set per run from the profile
 
 TOOLS = [
     {"type": "function", "function": {"name": "bash", "description": "Run a shell command in /work (bash -lc). Returns exit code, stdout and stderr. 60 s timeout. No network.",
@@ -59,6 +60,37 @@ def safe_path(p):
     return p
 
 
+def _norm(line):
+    return " ".join(line.split())
+
+
+def fuzzy_replace(s, old, new):
+    """Replace a block whose lines match old_text after whitespace normalisation; keep the file's indentation."""
+    lines, olds = s.split("\n"), [l for l in old.strip("\n").split("\n")]
+    key = [_norm(l) for l in olds]
+    hits = [i for i in range(len(lines) - len(olds) + 1) if [_norm(l) for l in lines[i:i + len(olds)]] == key]
+    if len(hits) != 1:
+        return None
+    i = hits[0]
+    indent = lines[i][: len(lines[i]) - len(lines[i].lstrip())]
+    o_indent = olds[0][: len(olds[0]) - len(olds[0].lstrip())]
+    new_lines = [indent + l[len(o_indent):] if l.startswith(o_indent) else l for l in new.strip("\n").split("\n")]
+    return "\n".join(lines[:i] + new_lines + lines[i + len(olds):])
+
+
+def closest_lines(s, old):
+    import difflib
+    lines = s.split("\n")
+    first = old.strip("\n").split("\n")[0]
+    best = difflib.get_close_matches(first, lines, n=1, cutoff=0.3)
+    if not best:
+        return "Read the file again and copy the text exactly (without the line-number prefix)."
+    i = lines.index(best[0])
+    snippet = "\n".join(lines[max(0, i - 2): i + 4])
+    return ("The closest text in the file is shown below between the markers. Copy old_text exactly from it "
+            "(do not include line numbers):\n<<<\n" + snippet + "\n>>>")
+
+
 def run_tool(box, workdir, name, args):
     if name == "bash":
         code, out, err = box.sh(args["command"])
@@ -78,27 +110,49 @@ def run_tool(box, workdir, name, args):
         p = os.path.join(workdir, safe_path(args["path"]))
         with open(p, encoding="utf-8") as f:
             s = f.read()
-        n = s.count(args["old_text"])
-        if n != 1:
-            return f"error: old_text found {n} times (must be exactly 1). Read the file and copy the text exactly."
-        with open(p, "w", encoding="utf-8") as f:
-            f.write(s.replace(args["old_text"], args["new_text"]))
-        return "edited"
+        old, new = args["old_text"], args["new_text"]
+        n = s.count(old)
+        if n == 1:
+            with open(p, "w", encoding="utf-8") as f:
+                f.write(s.replace(old, new))
+            return "edited"
+        if n > 1:
+            return f"error: old_text found {n} times (must be exactly 1). Include more surrounding lines to make it unique."
+        fixed = fuzzy_replace(s, old, new) if SMART_EDIT else None
+        if fixed is not None:
+            with open(p, "w", encoding="utf-8") as f:
+                f.write(fixed)
+            return "edited (matched ignoring differences in indentation/whitespace; re-read the file if exact layout matters)"
+        if not SMART_EDIT:
+            return "error: old_text found 0 times (must be exactly 1). Read the file and copy the text exactly."
+        return "error: old_text not found. " + closest_lines(s, old)
     return f"error: unknown tool {name}"
+
+
+class BrokenToolCall(Exception):
+    """The server could not parse the model's tool call (usually cut off at max_tokens)."""
 
 
 def chat(messages, tools, max_tokens=2048, temperature=0.3):
     body = {"messages": messages, "tools": tools, "max_tokens": max_tokens, "temperature": temperature,
             "chat_template_kwargs": {"enable_thinking": False}}
     req = urllib.request.Request(API, json.dumps(body).encode(), {"Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=900) as r:
-        return json.load(r)["choices"][0]
+    try:
+        with urllib.request.urlopen(req, timeout=900) as r:
+            return json.load(r)["choices"][0]
+    except urllib.error.HTTPError as e:
+        msg = e.read().decode(errors="replace")
+        if e.code == 500 and "tool call" in msg:
+            raise BrokenToolCall(msg[:300])
+        raise
 
 
 def run_task(task_text, workdir, profile, log):
     """Returns dict(steps, finished, seconds)."""
     import harness_profiles as hp
     prof = hp.PROFILES[profile]
+    global SMART_EDIT
+    SMART_EDIT = bool(prof.get("smart_edit"))
     box = Sandbox(workdir)
     t0 = time.time()
     messages = [{"role": "system", "content": prof["system"]}, {"role": "user", "content": task_text}]
@@ -107,7 +161,16 @@ def run_task(task_text, workdir, profile, log):
     try:
         for steps in range(1, prof["max_steps"] + 1):
             msgs = hp.view(messages, prof)
-            ch = chat(msgs, TOOLS, temperature=prof["temperature"])
+            try:
+                ch = chat(msgs, TOOLS, max_tokens=prof.get("max_tokens", 2048), temperature=prof["temperature"])
+            except BrokenToolCall as e:
+                if not prof.get("robust_api"):
+                    raise
+                log({"broken_tool_call": str(e)[:300]})
+                messages.append({"role": "user", "content": "[harness] Your last tool call was cut off or was not valid JSON, so nothing ran. "
+                                 "Keep each tool call short: write big files in several smaller steps (write_file a first part, then edit_file/append with bash), "
+                                 "and avoid huge heredocs."})
+                continue
             m = ch["message"]
             calls = m.get("tool_calls") or []
             entry = {"role": "assistant", "content": m.get("content") or ""}
@@ -137,10 +200,12 @@ def run_task(task_text, workdir, profile, log):
                         else:
                             obs = check; log({"finish_rejected": check[:1000]})
                     else:
-                        try:
-                            obs = run_tool(box, workdir, name, args)
-                        except Exception as e:
-                            obs = f"error: {e}"
+                        obs = hp.before_tool(state, prof, name, args)
+                        if obs is None:
+                            try:
+                                obs = run_tool(box, workdir, name, args)
+                            except Exception as e:
+                                obs = f"error: {e}"
                 obs = hp.on_observation(state, prof, name, args, obs)
                 messages.append({"role": "tool", "tool_call_id": c.get("id", ""), "content": obs})
                 log({"obs": obs[:1500]})

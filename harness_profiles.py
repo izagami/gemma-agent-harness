@@ -51,17 +51,31 @@ def on_finish(state, prof, box, task, messages, args):
             "with a command (run the program/tests, cat the output files). Fix anything that is off, then call finish again.")
 
 
+def before_tool(state, prof, name, args):
+    """Return an observation to skip running the tool (e.g. an exact repeat), or None to run it."""
+    if not prof.get("skip_repeats") or args is None:
+        return None
+    key = name + json.dumps(args, sort_keys=True)
+    if name != "bash" or not state.recent or state.recent[-1] != key:
+        return None
+    state.repeats = getattr(state, "repeats", 0) + 1
+    return ("[harness] This is exactly the same action as your previous step, so it was not run again (the result would be the same). "
+            "Look at the previous result and decide a different next step. If the task is done, verify it once and call finish.")
+
+
 def on_observation(state, prof, name, args, obs):
     if not prof.get("loop_guard") or args is None:
         return obs
-    key = name + json.dumps(args, sort_keys=True)[:500]
+    key = name + json.dumps(args, sort_keys=True)
     state.recent.append(key)
-    if state.recent[-3:].count(key) >= 3:
+    if state.recent[-8:].count(key) >= 3:
         obs += "\n[harness] You have run this exact action 3 times. It will not give a different result; try a different approach."
     return obs
 
 
 PROFILES = {
+    "v2": {"system": V1_SYSTEM, "max_steps": 40, "temperature": 0.3, "max_tokens": 4096, "nudge": True, "verify_finish": True,
+           "loop_guard": True, "skip_repeats": True, "robust_api": True, "smart_edit": True},
     "v0": {"system": V0_SYSTEM, "max_steps": 30, "temperature": 0.3},
     "v1": {"system": V1_SYSTEM, "max_steps": 40, "temperature": 0.3, "nudge": True, "verify_finish": True, "loop_guard": True},
 }
