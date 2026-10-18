@@ -48,7 +48,8 @@ class Sandbox:
 def clip(s, n=OBS_LIMIT):
     if len(s) <= n:
         return s
-    return s[: n // 2] + f"\n... [{len(s) - n} chars cut] ...\n" + s[-n // 2:]
+    return (s[: n // 2] + f"\n... [{len(s) - n} characters of this output were cut here; to see a file completely use "
+            "read_file with start/end line numbers, or print a smaller part, e.g. sed -n '100,200p' file] ...\n" + s[-n // 2:])
 
 
 def safe_path(p):

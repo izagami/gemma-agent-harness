@@ -123,7 +123,7 @@ FEATURES = {
     "v7d": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps80",
             "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs"},
     "v7e": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps80",
-            "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs", "hard_tests"},
+            "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs", "hard_tests", "read_window"},
     "v7c": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps80",
             "semantic_repeat", "v7b_rules", "stagnation"},
 }
@@ -154,6 +154,7 @@ class State:
         self.protected = set()
         self.hard_tests = False
         self.test_gate_tries = 0
+        self.read_window = False
         self.workdir = ""
         self.seed = {}      # message indexes whose output is shown elided (cache-friendly mode)
         self.todo = []
@@ -190,6 +191,19 @@ def run_tool(box, workdir, st, name, args):
         with open(p, encoding="utf-8", errors="replace") as f:
             lines = f.read().split("\n")
         a, b = max(1, int(args.get("start") or 1)), min(len(lines), int(args.get("end") or len(lines)))
+        if getattr(st, "read_window", False):
+            # never cut the middle of a file: show a window that fits and say exactly how to read the rest
+            shown, size = [], 0
+            for i in range(a, b + 1):
+                row = f"{i:4d}| {lines[i - 1]}"
+                if size + len(row) > 20000 and shown:
+                    return ("[line numbers and '| ' are added by the tool; they are not in the file]\n" + "\n".join(shown)
+                            + f"\n[harness] Showing lines {a}-{i - 1} of {len(lines)}. Read the rest with read_file "
+                            f"path={args['path']} start={i} end={min(len(lines), i + 300)}.")
+                shown.append(row)
+                size += len(row) + 1
+            return ("[line numbers and '| ' are added by the tool; they are not in the file]\n" + ("\n".join(shown) or "(empty file)")
+                    + (f"\n[lines {a}-{b} of {len(lines)}]" if b - a + 1 < len(lines) else ""))
         body = "\n".join(f"{i:4d}| {lines[i - 1]}" for i in range(a, b + 1))
         head = "[line numbers and '| ' are added by the tool; they are not in the file]\n" if st.v6b else ""
         return head + base.clip(body or "(empty file)") + (f"\n[{len(lines)} lines total]" if b - a + 1 < len(lines) else "")
@@ -438,6 +452,7 @@ def run_task(task_text, workdir, profile, log):
     st.seed = snapshot(workdir, st.seed_bytes)
     st.restore = "restore_inputs" in feats(profile)
     st.hard_tests = "hard_tests" in feats(profile)
+    st.read_window = "read_window" in feats(profile)
     if "protect_inputs" in feats(profile):
         protect_inputs(st, task_text, log)
     st.judge_inputs = "judge_inputs" in feats(profile)
