@@ -11,7 +11,8 @@ failure that motivated it and the evidence that it helped. Executor: Gemma 4 12B
 | v6f | 20 | 14 | 4 | 0 | 39 | 30-step cap |
 | v7 | 19 | 13 | 5 | 1 | 38 | 80 steps alone did not help |
 | v7d | 19 | 14 | 5 | 1 | 39 | |
-| v7e | 20 | 15 | 5 | 3 | 43 | one run; variance not yet measured |
+| v7e | 20 | 15 | 5 | 3 | 43 | run 1 |
+| v7e | 20 | 13 | 5 | 2 | 40 | run 2 (2 lanes): h_sync, h_md, y_ledger_split flipped to fail -> spread ~3 tasks |
 
 ## Principles (each confirmed more than once)
 
@@ -63,7 +64,10 @@ failure that motivated it and the evidence that it helped. Executor: Gemma 4 12B
 
 - Repo-scale tasks that need more than ~80 steps of real work (y_timesheet: four features from a spec;
   y_tzreport: bug in the interaction of two layers).
-- Variance: single runs only so far; a 1-2 task difference may be noise.
+- Variance: v7e scored 43 and 40 on the same suite. Differences of 1-3 tasks between single full runs are noise;
+  judge a change on the tasks it targets (probe, 2+ runs) and on the mean of full runs.
+- Refused-repeat loops bypass the stagnation nudge (refused steps `continue` before it): v7e run 2 h_md
+  (44 refused, 3 commands cycling, no edit) and y_ledger_split (48 identical writes). Targeted by v7f.
 
 ## How to add an entry
 
