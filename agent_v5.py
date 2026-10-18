@@ -60,11 +60,11 @@ def describe(name, args):
 
 
 def one_line(obs):
-    first = obs.strip().split("\n")
+    lines = [l for l in obs.strip().split("\n") if l.strip() and not l.startswith("---") and not l.startswith("exit code")]
     code = re.search(r"exit code: (\d+)", obs)
-    out = [l for l in first if l and not l.startswith("---") and not l.startswith("exit code")]
-    s = (out[0] if out else "(no output)")[:100]
-    return (f"exit {code.group(1)}, " if code else "") + s
+    # for failures the useful line is the last one (the exception), not "Traceback (most recent call last):"
+    pick = lines[-1] if (code and code.group(1) != "0" and lines) else (lines[0] if lines else "(no output)")
+    return (f"exit {code.group(1)}, " if code else "") + pick.strip()[:160]
 
 
 def py_check(box, path):
@@ -77,6 +77,7 @@ def py_check(box, path):
 class State:
     def __init__(self):
         self.ran = {}            # action key -> (count, one-line result)
+        self.full = {}           # action key -> full observation
         self.todo = []
         self.edit_fail = {}
         self.finish_tries = 0
@@ -228,7 +229,12 @@ def run_task(task_text, workdir, profile, log):
                 if a is not None and name not in ("finish", "todo") and akey(name, a) in st.ran:
                     n, res = st.ran[akey(name, a)]
                     st.ran[akey(name, a)] = (n + 1, res)
-                    notes.append(f"{describe(name, a)} was already run {n} time(s) with result: {res}. It was not run again.")
+                    full = st.full.get(akey(name, a), res) if profile.startswith("v5c") else res
+                    if profile.startswith("v5c"):
+                        notes.append(f"{describe(name, a)} already ran {n} time(s) and nothing has changed since, so it was not run again. "
+                                     f"Its result was:\n{base.clip(full, 2500)}")
+                    else:
+                        notes.append(f"{describe(name, a)} was already run {n} time(s) with result: {res}. It was not run again.")
                 else:
                     fresh.append((c, name, a))
             if notes:
@@ -256,9 +262,10 @@ def run_task(task_text, workdir, profile, log):
                         obs = f"error: {e}"
                     if name not in ("todo",):
                         st.ran[akey(name, a)] = (1, one_line(obs))
+                        st.full[akey(name, a)] = obs
                         # a later change can make an earlier command worth re-running
                         if name in ("write_file", "edit_file") and not obs.startswith("error"):
-                            st.ran = {}  # files changed: every earlier command may give a new result
+                            st.ran, st.full = {}, {}  # files changed: every earlier command may give a new result
                 if notes:
                     obs += "\n[harness] " + " ".join(notes)
                     notes = []
