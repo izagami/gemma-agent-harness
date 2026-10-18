@@ -332,7 +332,7 @@ def add(task):
          test -z "$(python3 /work/sync.py s d)"
          """))
 
-    task("h_access", "access.log（Apache形式）を解析して、result.json に次の内容を保存してください: \"top_ips\": アクセス数の多いIP上位3件 [[ip, 回数], ...]（同数ならIPの文字列順）、\"status\": ステータスコードごとの件数 {\"200\": n, ...}、\"bytes\": 送信バイト数の合計（\"-\" は0）、\"bad_lines\": 形式に合わない行の数。",
+    task("h_access", "access.log（Apache形式）を解析して、result.json に次の内容を保存してください: \"top_ips\": アクセス数の多いIP上位3件 [[ip, 回数], ...]（同数ならIPの文字列順）、\"status\": ステータスコードごとの件数 {\"200\": n, ...}、\"bytes\": 送信バイト数の合計（\"-\" は0）、\"bad_lines\": 形式に合わない行の数（空行は数えない）。",
          {"access.log": "\n".join([
              '10.0.0.1 - - [17/Oct/2026:10:00:00 +0900] "GET / HTTP/1.1" 200 512',
              '10.0.0.2 - - [17/Oct/2026:10:00:01 +0900] "GET /a HTTP/1.1" 404 -',
