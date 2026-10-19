@@ -156,6 +156,7 @@ class State:
         self.thinks = 0          # consecutive think calls
         self.thoughts = []       # accepted thoughts (v7f)
         self.refused = 0         # consecutive steps whose calls were all refused repeats
+        self.compact = False     # the server reported a full context: keep the prompt at half the usual size
         self.think_limit = False
         self.restore = False
         self.restores = 0
@@ -288,20 +289,42 @@ def todo_view(st):
     return "[harness] Current checklist:\n" + "\n".join(f"{mark.get(i['status'], '[ ]')} {i['text']}" for i in st.todo)
 
 
+def elide_args(c):
+    """Shorten an old call's long string arguments (file contents, edits), keeping valid JSON."""
+    try:
+        a = json.loads(c["function"]["arguments"] or "{}")
+    except ValueError:
+        return c
+    if not isinstance(a, dict):
+        return c
+    a = {k: (f"[{len(v)} chars, elided; the file now holds the current version]" if isinstance(v, str) and len(v) > 300 else v)
+         for k, v in a.items()}
+    return dict(c, function=dict(c["function"], arguments=json.dumps(a, ensure_ascii=False)))
+
+
 def view(messages, st, cache_friendly=False):
     """Mask old observations; append the checklist as a transient last message.
     cache_friendly: never change what was already sent unless the context gets large; then mask a batch at once,
     so llama-server can keep reusing the cached prompt prefix between steps."""
     tool_idx = [i for i, m in enumerate(messages) if m["role"] == "tool"]
     if cache_friendly:
-        total = sum(len(m.get("content") or "") for m in messages)
-        if total > CTX_SOFT_LIMIT:
-            for i in tool_idx[:-KEEP_FULL]:
-                if total <= CTX_SOFT_LIMIT // 2:
+        # written file contents count too: long runs overflowed the context through write_file arguments alone
+        total = sum(len(m.get("content") or "") + sum(len(c["function"]["arguments"]) for c in m.get("tool_calls") or [])
+                    for m in messages)
+        limit = CTX_SOFT_LIMIT // (2 if st.compact else 1)
+        if total > limit:
+            calls_idx = [i for i, m in enumerate(messages) if m.get("tool_calls")]
+            old_calls = set(calls_idx[:-KEEP_FULL])
+            for i in sorted(set(tool_idx[:-KEEP_FULL]) | old_calls):
+                if total <= limit // 2:
                     break
-                if i not in st.masked and len(messages[i]["content"]) > 200:
+                if i in st.masked:
+                    continue
+                m = messages[i]
+                size = len(m.get("content") or "") if m["role"] == "tool" else sum(len(c["function"]["arguments"]) for c in m["tool_calls"])
+                if size > 200:
                     st.masked.add(i)
-                    total -= len(messages[i]["content"])
+                    total -= size
         hide = st.masked
     else:
         hide = set(tool_idx[:-KEEP_FULL])
@@ -309,6 +332,8 @@ def view(messages, st, cache_friendly=False):
     for i, m in enumerate(messages):
         if m["role"] == "tool" and i in hide and len(m["content"]) > 200:
             m = dict(m, content=f"[older output elided: {one_line(m['content'])}; {m['content'].count(chr(10)) + 1} lines]")
+        elif m.get("tool_calls") and i in hide:
+            m = dict(m, tool_calls=[elide_args(c) for c in m["tool_calls"]])
         out.append(m)
     tv = todo_view(st)
     if tv and out[-1]["role"] == "tool":
@@ -503,6 +528,12 @@ def run_task(task_text, workdir, profile, log):
                 temp = 0.9  # the same prefix at low temperature reproduces the same runaway call
             try:
                 ch = base.chat(view(messages, st, cf), [t for t in tools if t["function"]["name"] != "think"] if ("force_act" in F and st.thinks >= 2) else tools, max_tokens=(1536 if v5d and st.broken else 4096), temperature=temp)
+            except base.ContextFull as e:
+                log({"context_full": str(e)[:200]})
+                if st.compact:
+                    raise
+                st.compact = True  # mask older calls and outputs down to half the soft limit, then retry this step
+                continue
             except base.BrokenToolCall as e:
                 log({"broken_tool_call": str(e)[:300]})
                 st.broken += 1

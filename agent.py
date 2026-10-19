@@ -153,6 +153,10 @@ def run_tool(box, workdir, name, args):
     return f"error: unknown tool {name}"
 
 
+class ContextFull(Exception):
+    """The prompt no longer fits the server's context window."""
+
+
 class BrokenToolCall(Exception):
     """The server could not parse the model's tool call (usually cut off at max_tokens)."""
 
@@ -172,6 +176,8 @@ def chat(messages, tools, max_tokens=2048, temperature=0.3):
         msg = e.read().decode(errors="replace")
         if e.code == 500 and "tool call" in msg:
             raise BrokenToolCall(msg[:300])
+        if e.code == 400 and "context" in msg:
+            raise ContextFull(msg[:300])
         raise
 
 
