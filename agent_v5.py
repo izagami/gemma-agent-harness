@@ -156,6 +156,7 @@ class State:
         self.thinks = 0          # consecutive think calls
         self.thoughts = []       # accepted thoughts (v7f)
         self.refused = 0         # consecutive steps whose calls were all refused repeats
+        self.recent = []         # last 8 steps: True = every call was a refused repeat
         self.compact = False     # the server reported a full context: keep the prompt at half the usual size
         self.think_limit = False
         self.restore = False
@@ -597,13 +598,15 @@ def run_task(task_text, workdir, profile, log):
             if notes:
                 st.hot = 1
                 log({"repeat_described": notes})
+            st.recent = (st.recent + [not fresh])[-8:]
             if not fresh:
                 st.refused += 1
                 extra = ""
-                if "plan_lock" in F and st.refused >= 3:
+                if "plan_lock" in F and (st.refused >= 3 or sum(st.recent) >= 5):
+                    # consecutive, or interleaved with other commands (v7f h_md: 29 refused, never 3 in a row)
                     # v7f: a streak of refused repeats (e.g. writing the same file 40 times): point at the next open item
                     open_items = [i["text"] for i in st.todo if i.get("status") != "done"]
-                    extra = (f" You have repeated finished actions {st.refused} times in a row. The files already contain what you wrote. "
+                    extra = (f" You keep repeating actions that already ran ({sum(st.recent)} of your last {len(st.recent)} steps). The files already contain what you wrote. "
                              + (f"Your unfinished todo items: {'; '.join(open_items[:5])}. Do the first one with a NEW action. " if open_items else "")
                              + "Re-read the task for anything not yet done (files to remove, outputs to produce, checks to run), "
                              "then do it; if all is done, run the checks once and call finish.")
@@ -664,6 +667,8 @@ def run_task(task_text, workdir, profile, log):
                 break
             if "stagnation" in F:
                 snap = snapshot(workdir)
+                if "plan_lock" in F:  # rewriting its own spec test is not progress on the code (v7f h_md)
+                    snap = {k: v for k, v in snap.items() if not k.startswith(".agent/")}
                 if snap != st.last_snap:
                     st.last_snap, st.still = snap, 0
                 else:
