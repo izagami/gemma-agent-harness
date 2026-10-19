@@ -147,11 +147,11 @@ FEATURES = {
     # v7h: v7f with a 120-step budget
     "v7h": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps120",
             "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs", "hard_tests", "read_window", "force_act", "plan_lock"},
-    # v7i: v7f with a debugging playbook (rules 15-18); v7j: the same with 120 steps
+    # v7i: v7f with a debugging playbook (rules 15-18) and read-only originals in .agent/orig/; v7j: the same with 120 steps
     "v7i": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps80",
-            "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs", "hard_tests", "read_window", "force_act", "plan_lock", "debug_rules"},
+            "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs", "hard_tests", "read_window", "force_act", "plan_lock", "debug_rules", "keep_orig"},
     "v7j": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps120",
-            "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs", "hard_tests", "read_window", "force_act", "plan_lock", "debug_rules"},
+            "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs", "hard_tests", "read_window", "force_act", "plan_lock", "debug_rules", "keep_orig"},
     # v7g: v7e with a 120-step budget
     "v7g": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps120",
             "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs", "hard_tests", "read_window", "force_act"},
@@ -425,6 +425,22 @@ def protect_inputs(st, task, log):
         log({"protected": sorted(st.protected)})
 
 
+def keep_originals(st, log):
+    """v7i: read-only copies of every provided file under .agent/orig/ (v7h y_ledger_split lost the original module
+    after rewriting it and spent its last steps looking for the old content)."""
+    n = 0
+    for p, b in st.seed_bytes.items():
+        if p.startswith(".agent/"):
+            continue
+        dst = os.path.join(st.workdir, ".agent", "orig", p)
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        with open(dst, "wb") as f:
+            f.write(b)
+        os.chmod(dst, 0o444)
+        n += 1
+    log({"kept_originals": n})
+
+
 def harness_checks(box):
     """Run what the harness can verify by itself: compile all .py files, run unittest/test files if present."""
     lines = []
@@ -548,6 +564,10 @@ def run_task(task_text, workdir, profile, log):
     if "protect_inputs" in feats(profile):
         protect_inputs(st, task_text, log)
     st.judge_inputs = "judge_inputs" in feats(profile)
+    if "keep_orig" in feats(profile):
+        keep_originals(st, log)
+        task_text += ("\n\n[harness] Read-only copies of the files as they were given are in .agent/orig/ "
+                      "(for example .agent/orig/" + (sorted(st.seed_bytes) or ["file"])[0] + "). Use them whenever you need the original code or data again.")
     t0 = time.time()
     F = feats(profile)
     think = "think" in F
