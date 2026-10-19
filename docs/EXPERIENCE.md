@@ -13,6 +13,7 @@ failure that motivated it and the evidence that it helped. Executor: Gemma 4 12B
 | v7d | 19 | 14 | 5 | 1 | 39 | |
 | v7e | 20 | 15 | 5 | 3 | 43 | run 1 |
 | v7e | 20 | 13 | 5 | 2 | 40 | run 2 (2 lanes): h_sync, h_md, y_ledger_split flipped to fail -> spread ~3 tasks |
+| v7i | 19 | 13 | 5 | 1 | 38 | run 2 (todo cap in): duration = 80 todo calls (reasoning inside todo items) |
 | v7i | 18 | 14 | 5 | 2 | 39 | all harness-bug fixes + plan_lock + debug rules + .agent/orig; within v7e's spread. New: todo storm (duration, context full), test run overwrote the real output (log_errors) |
 
 ## Principles (each confirmed more than once)
@@ -65,6 +66,11 @@ failure that motivated it and the evidence that it helped. Executor: Gemma 4 12B
 - BFCL as the target metric: did not reflect multi-step agent work.
 
 ## Open problems
+
+- The model reasons in whatever free-text field it has: bash comments (v5), todo item texts (v7i duration, 80 todo
+  calls). Text refusals are ignored; withholding the tool and length limits are the working levers.
+- v7i (38, 39) is below v7e (43, 40): its additions (plan/todo refusals, rules 15-18, .agent/orig note) may hurt.
+  Next: v7e with only the generic bug fixes, to separate the two.
 
 - Repo-scale tasks that need more than ~80 steps of real work (y_timesheet: four features from a spec;
   y_tzreport: bug in the interaction of two layers).
