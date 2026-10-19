@@ -13,6 +13,8 @@ failure that motivated it and the evidence that it helped. Executor: Gemma 4 12B
 | v7d | 19 | 14 | 5 | 1 | 39 | |
 | v7e | 20 | 15 | 5 | 3 | 43 | run 1 |
 | v7e | 20 | 13 | 5 | 2 | 40 | run 2 (2 lanes): h_sync, h_md, y_ledger_split flipped to fail -> spread ~3 tasks |
+| v7e+fixes | 19 | 13 | 5 | 1 | 38 | generic fixes, soft limit 40k incl. arguments: masking started too early |
+| v7e+fixes | 20 | 13 | 5 | 2 | 40 | soft limit 90k: back to v7e's level (dedupe fixed by isolated checks) |
 | v7i | 19 | 13 | 5 | 1 | 38 | run 2 (todo cap in): duration = 80 todo calls (reasoning inside todo items) |
 | v7i | 18 | 14 | 5 | 2 | 39 | all harness-bug fixes + plan_lock + debug rules + .agent/orig; within v7e's spread. New: todo storm (duration, context full), test run overwrote the real output (log_errors) |
 
@@ -70,10 +72,14 @@ failure that motivated it and the evidence that it helped. Executor: Gemma 4 12B
 - The model reasons in whatever free-text field it has: bash comments (v5), todo item texts (v7i duration, 80 todo
   calls). Text refusals are ignored; withholding the tool and length limits are the working levers.
 - v7i (38, 39) is below v7e (43, 40): its additions (plan/todo refusals, rules 15-18, .agent/orig note) may hurt.
-  Next: v7e with only the generic bug fixes, to separate the two.
+  v7e with only the generic fixes scored 38 (40k limit) and 40 (90k): the v7i additions are not clearly worse.
+- Plateau: every profile from v7e on lands at 38-43. Remaining failures are y_timesheet / y_tzreport (never solved),
+  and h_md / h_sync / y_ledger_split (solved about half the time). Single-run harness tweaks are now below the noise.
 
 - Repo-scale tasks that need more than ~80 steps of real work (y_timesheet: four features from a spec;
   y_tzreport: bug in the interaction of two layers).
+- Counting call arguments toward the soft limit without raising it (40k) masked file reads early in long tasks;
+  repo-scale fell to 1/5. Any change to what the model sees needs a full run, not only the target task.
 - Variance: v7e scored 43 and 40 on the same suite. Differences of 1-3 tasks between single full runs are noise;
   judge a change on the tasks it targets (probe, 2+ runs) and on the mean of full runs.
 - Refused-repeat loops bypass the stagnation nudge (refused steps `continue` before it): v7e run 2 h_md
