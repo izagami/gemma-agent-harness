@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Realistic Render</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0b0d10; overflow: hidden; font: 14px system-ui, sans-serif; color: #dfe6ee; }
+  #hud { position: fixed; left: 16px; top: 12px; pointer-events: none; text-shadow: 0 1px 3px #000; }
+  #hud b { font-size: 20px; display: block; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "./lib/three.module.js", "three/addons/": "./lib/addons/" } }
+</script>
+</head>
+<body>
+<div id="hud"><b id="title">Realistic render</b><span id="sub"></span></div>
+<script type="module">
+// Physically based render of a CAD assembly (glTF from cadtool): materials chosen from part names,
+// studio HDRI lighting and reflections, soft shadow, ACES tone mapping, a little bloom on the lights.
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+const q = new URLSearchParams(location.search);
+const MODEL = q.get('m') || 'models/claude-car.glb';
+const PAINT = q.get('paint') || '#a3141c';
+document.getElementById('title').textContent = q.get('title') || 'Realistic render';
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color('#0b0d10');
+const camera = new THREE.PerspectiveCamera(35, innerWidth / innerHeight, 0.05, 200);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.autoRotate = true;
+controls.autoRotateSpeed = 0.6;
+controls.maxPolarAngle = Math.PI * 0.49;
+
+const pmrem = new THREE.PMREMGenerator(renderer);
+new RGBELoader().load('env/studio.hdr', (hdr) => {
+  scene.environment = pmrem.fromEquirectangular(hdr).texture;
+  hdr.dispose();
+});
+
+// key light for the shadow; the HDRI does the rest
+const sun = new THREE.DirectionalLight('#ffffff', 1.3);
+sun.position.set(3, 8, 4);
+sun.castShadow = true;
+sun.shadow.mapSize.set(4096, 4096);
+sun.shadow.radius = 6;
+sun.shadow.bias = -0.0004;
+Object.assign(sun.shadow.camera, { left: -5, right: 5, top: 5, bottom: -5, near: 0.5, far: 25 });
+scene.add(sun);
+
+// floor: dark satin, fades into the background
+const floorMat = new THREE.MeshPhysicalMaterial({ color: '#0e1013', roughness: 0.55, metalness: 0.0, clearcoat: 0.25, clearcoatRoughness: 0.35,
+                                                  envMapIntensity: 0.25 });
+const floor = new THREE.Mesh(new THREE.CircleGeometry(30, 96), floorMat);
+floor.rotation.x = -Math.PI / 2;
+floor.receiveShadow = true;
+scene.add(floor);
+scene.fog = new THREE.Fog('#0b0d10', 10, 28);
+
+const M = {
+  paint: new THREE.MeshPhysicalMaterial({ color: PAINT, metalness: 0.55, roughness: 0.32, clearcoat: 1.0, clearcoatRoughness: 0.03,
+                                          sheen: 0.2, sheenColor: new THREE.Color('#ff8080') }),
+  glass: new THREE.MeshPhysicalMaterial({ color: '#070b10', metalness: 0.3, roughness: 0.14, clearcoat: 1.0, clearcoatRoughness: 0.0,
+                                          envMapIntensity: 1.6 }),   // tinted glass: dark, mirror-like
+  rubber: new THREE.MeshPhysicalMaterial({ color: '#141414', roughness: 0.88, metalness: 0.0, sheen: 0.4, sheenColor: new THREE.Color('#303030') }),
+  chrome: new THREE.MeshPhysicalMaterial({ color: '#d8dce2', metalness: 1.0, roughness: 0.12 }),
+  plastic: new THREE.MeshPhysicalMaterial({ color: '#1c1e21', roughness: 0.55, metalness: 0.0, clearcoat: 0.2 }),
+  head: new THREE.MeshPhysicalMaterial({ color: '#fff8e0', emissive: '#fff4d0', emissiveIntensity: 2.2, roughness: 0.1 }),
+  tail: new THREE.MeshPhysicalMaterial({ color: '#c00010', emissive: '#ff0018', emissiveIntensity: 1.4, roughness: 0.15 }),
+  alloy: new THREE.MeshPhysicalMaterial({ color: '#c9ced6', metalness: 1.0, roughness: 0.22 }),
+  darkMetal: new THREE.MeshPhysicalMaterial({ color: '#2a2d31', metalness: 0.9, roughness: 0.4 }),
+  badge: new THREE.MeshPhysicalMaterial({ color: '#111', metalness: 0.6, roughness: 0.2, clearcoat: 1 }),
+  disc: new THREE.MeshPhysicalMaterial({ color: '#6d6f73', metalness: 1.0, roughness: 0.45 }),
+  calliper: new THREE.MeshPhysicalMaterial({ color: '#c8101a', roughness: 0.35, clearcoat: 0.6 }),
+  drl: new THREE.MeshPhysicalMaterial({ color: '#ffffff', emissive: '#e8f2ff', emissiveIntensity: 3.0 }),
+  grille: new THREE.MeshPhysicalMaterial({ color: '#08090a', roughness: 0.35, metalness: 0.4, clearcoat: 0.5 }),
+};
+const RULES = [
+  [/glass|window|windshield|canopy|ガラス|窓/i, 'glass'],
+  [/tyre|tire|rubber|タイヤ/i, 'rubber'],
+  [/trim|bumper|grille|chassis|frame|plastic|バンパー|グリル/i, 'plastic'],
+  [/(^|[^a-z])rims?([^a-z]|$)|hub|wheel|chrome|metal|exhaust|engine|ホイール/i, 'chrome'],
+  [/head|lamp_f|ヘッド/i, 'head'],
+  [/tail|brake|テール/i, 'tail'],
+  [/body|cab|cargo|fuselage|hull|paint|ボディ|胴体/i, 'paint'],
+];
+function materialFor(obj) {
+  for (let o = obj; o; o = o.parent) {
+    for (const [re, key] of RULES) if (o.name && re.test(o.name)) return M[key];
+  }
+  return null;
+}
+
+function place(root, alreadyMetres) {
+  if (!alreadyMetres) {
+    const box = new THREE.Box3().setFromObject(root);
+    const size = box.getSize(new THREE.Vector3());
+    root.scale.setScalar(4.2 / Math.max(size.x, size.z));
+  }
+  const b2 = new THREE.Box3().setFromObject(root);
+  const c = b2.getCenter(new THREE.Vector3());
+  root.position.set(-c.x, -b2.min.y, -c.z);
+  scene.add(root);
+  const h = (b2.max.y - b2.min.y);
+  controls.target.set(0, h * 0.4, 0);
+  camera.position.set(4.6, 1.3 + h * 0.3, 4.4);
+  document.getElementById('sub').textContent = MODEL.split('/').pop();
+}
+
+if (MODEL === 'procedural') {
+  import('./car_procedural.js').then(({ buildCar }) => place(buildCar(M), true));
+} else new GLTFLoader().load(MODEL, (gltf) => {
+  const root = gltf.scene;
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    o.castShadow = true;
+    o.receiveShadow = true;
+    const m = materialFor(o);
+    if (m) o.material = m;
+    else if (o.material) { o.material = new THREE.MeshPhysicalMaterial({ color: o.material.color, roughness: 0.4, metalness: 0.1, clearcoat: 0.4 }); }
+    o.geometry.computeVertexNormals();
+  });
+  place(root, false);   // CAD units are mm: scaled to a few metres, stood on the floor, centred
+});
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+composer.addPass(new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.35, 0.5, 0.92));
+composer.addPass(new OutputPass());
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight); composer.setSize(innerWidth, innerHeight);
+});
+renderer.setAnimationLoop(() => { controls.update(); composer.render(); });
+</script>
+</body>
+</html>

@@ -6,3 +6,6 @@ tasks/
 tasks.new/
 tasks.old/
 tasks_cad/
+cad/render/lib/
+cad/render/env/
+cad/render/models/

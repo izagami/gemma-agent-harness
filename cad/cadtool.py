@@ -4,7 +4,8 @@
 usage: python3 /opt/cad/cadtool.py model.py [--name part] [--no-render]
        python3 /opt/cad/cadtool.py --api WORD     (look up CadQuery methods by name)
 
-model.py must leave the part in a variable named `result` (cq.Workplane or cq.Shape). Spec tests can use
+model.py must leave the part in a variable named `result` (cq.Workplane or cq.Shape), or list coloured parts in
+PARTS = [(name, part, (r, g, b)), ...] (an assembly: coloured GLB, per-part sizes in the report). Spec tests can use
 load(), size() and features() from this module (sys.path.insert(0, "/opt/cad"); from cadtool import ...). Writes <name>.step,
 <name>.stl and <name>.png (four views) next to model.py, and prints a report: bounding box, volume, validity,
 closed mesh, and every cylindrical feature (holes and bosses with diameter, depth and axis) so dimensions can be
@@ -228,20 +229,42 @@ def main():
         tb = traceback.format_exc().strip().splitlines()
         print("error while running the model:\n" + "\n".join(tb[-6:]))
         sys.exit(1)
-    if "result" not in g:
-        sys.exit("error: model.py must assign the final part to a variable named `result`")
-    shape = shape_of(g["result"])
+    parts = g.get("PARTS")  # optional [(name, workplane_or_shape, (r, g, b)), ...] for a coloured assembly
+    if parts:
+        try:
+            parts = [(str(n), shape_of(p), tuple(float(c) for c in rgb)) for n, p, rgb in parts]
+        except (TypeError, ValueError):
+            sys.exit("error: PARTS must be a list of (name, part, (r, g, b)) with colour values 0..1")
+    if "result" not in g and not parts:
+        sys.exit("error: model.py must assign the final part to `result` (or list coloured parts in PARTS)")
+    # with PARTS, the drawing and report always show every part (a `result` next to PARTS is ignored)
+    shape = cq.Compound.makeCompound([p for _, p, _ in parts]) if parts else shape_of(g["result"])
     exact = shape.BoundingBox()  # before export: meshing for STL widens the box by the mesh tolerance
     step, stl, png = (os.path.join(here, f"{name}.{e}") for e in ("step", "stl", "png"))
     cq.exporters.export(shape, step)
     cq.exporters.export(shape, stl, tolerance=0.02, angularTolerance=0.1)
     mesh = trimesh.load(stl, force="mesh")
     # glTF for browser viewers: metres, Y up
-    glb = mesh.copy()
-    glb.apply_scale(0.001)
-    glb.apply_transform(trimesh.transformations.rotation_matrix(-math.pi / 2, (1, 0, 0)))
-    glb.export(os.path.join(here, f"{name}.glb"))
+    if parts:  # coloured glTF of the assembly (OCCT writes it Y up)
+        asm = cq.Assembly(name=name)
+        for n, p, rgb in parts:
+            asm.add(p, name=n, color=cq.Color(*rgb))
+        import warnings
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            asm.save(os.path.join(here, f"{name}.glb"), exportType="GLTF")
+    else:
+        glb = mesh.copy()
+        glb.apply_scale(0.001)
+        glb.apply_transform(trimesh.transformations.rotation_matrix(-math.pi / 2, (1, 0, 0)))
+        glb.export(os.path.join(here, f"{name}.glb"))
     print(report(shape, mesh, exact))
+    if parts:
+        print("parts:")
+        for n, p, _ in parts:
+            b = p.BoundingBox()
+            print(f"  {n}: X {b.xmin:.1f}..{b.xmax:.1f}  Y {b.ymin:.1f}..{b.ymax:.1f}  Z {b.zmin:.1f}..{b.zmax:.1f}  "
+                  f"solids {len(p.Solids())}  volume {p.Volume():.0f}")
     if not a.no_render:
         render(mesh, png, os.path.basename(a.model))
     print(f"wrote {os.path.basename(step)}, {os.path.basename(stl)}, {name}.glb" + ("" if a.no_render else f", {os.path.basename(png)} (4 views)"))
