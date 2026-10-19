@@ -11,7 +11,7 @@ Differences from agent.py/v4:
 - On finish the harness itself compiles Python files, runs tests it can find, and gives the exit codes to a
   fast boolean judge; at most one fix-and-retry round.
 """
-import hashlib, json, os, re, time
+import hashlib, json, os, re, shlex, time
 import agent as base
 import judge
 
@@ -217,9 +217,17 @@ def run_tool(box, workdir, st, name, args):
         st.todo = [{"text": str(i.get("text", ""))[:200], "status": i.get("status", "pending")} for i in args.get("items", [])][:20]
         return "todo updated"
     if name == "read_file":
-        p = os.path.join(workdir, base.safe_path(args["path"]))
-        with open(p, encoding="utf-8", errors="replace") as f:
-            lines = f.read().split("\n")
+        path = str(args["path"]).strip()
+        if path.startswith("/tmp/") and ".." not in path.split("/"):
+            # scratch copies live in the sandbox's /tmp (v7f y_ledger_split moved the original there and could not read it back)
+            code, out, err = box.sh(f"cat -- {shlex.quote(path)}")
+            if code != 0:
+                return f"error: {err.strip() or 'cannot read ' + path}"
+            lines = out.split("\n")
+        else:
+            p = os.path.join(workdir, base.safe_path(path))
+            with open(p, encoding="utf-8", errors="replace") as f:
+                lines = f.read().split("\n")
         a, b = max(1, int(args.get("start") or 1)), min(len(lines), int(args.get("end") or len(lines)))
         if getattr(st, "read_window", False):
             # never cut the middle of a file: show a window that fits and say exactly how to read the rest
