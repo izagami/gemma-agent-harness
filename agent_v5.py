@@ -704,6 +704,12 @@ def run_task(task_text, workdir, profile, log):
                         log({"finish_rejected": r[:800]})
                 else:
                     obs = missing_args(tools, name, a) if st.v6b else None
+                    if obs is None and name == "todo" and "plan_lock" in F and any(
+                            len(str(i.get("text", ""))) > 200 for i in (a.get("items") or []) if isinstance(i, dict)):
+                        # v7i duration: the model reasoned inside todo item texts (thousands of characters per call)
+                        obs = ("error: todo items must be short (one line, under 15 words each). Nothing was saved. "
+                               "Put reasoning in the think tool, then set a short todo list.")
+                        log({"todo_too_long": True})
                     if obs is None and name == "think" and "plan_lock" in F:
                         obs = plan_lock(st, a, withheld=st.thinks >= 2)
                         if obs:
