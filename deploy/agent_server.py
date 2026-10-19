@@ -9,7 +9,8 @@ Environment:
   AGENT_API      model server chat endpoint (OpenAI-compatible), e.g. http://llama:8080/v1/chat/completions
   AGENT_MODEL    model name sent to that server
   AGENT_API_KEY  optional key for that server
-  AGENT_PROFILE  harness profile (default v7e)
+  AGENT_PROFILE  harness profile (default v7e); model "local-cad" uses CAD_PROFILE (default v8c, CadQuery parts)
+  CAD_SHARE / CAD_PUBLIC  where finished CAD files are copied and the URL prefix browsers use for them
   SANDBOX_URL    command runner (deploy/sandbox_server.py); unset = local podman sandbox
   WORKSPACE_ROOT where workspaces live (default /workspaces)
   HOST           listen address (default 0.0.0.0; 127.0.0.1 when running on a shared host)
@@ -23,6 +24,10 @@ import agent_v5
 
 ROOT = os.environ.get("WORKSPACE_ROOT", "/workspaces")
 PROFILE = os.environ.get("AGENT_PROFILE", "v7e")
+CAD_PROFILE = os.environ.get("CAD_PROFILE", "v8c")
+CAD_SHARE = os.environ.get("CAD_SHARE", "")      # folder served to browsers (e.g. by the web server); unset = no publishing
+CAD_PUBLIC = os.environ.get("CAD_PUBLIC", "")    # URL prefix of CAD_SHARE as browsers see it, e.g. /videos/cad
+CAD_ID = "local-cad"
 KEY = os.environ.get("SERVER_API_KEY", "")
 MODEL_ID = "local-agent"
 LOCK = threading.Lock()  # one task at a time: small local servers slow down sharply with parallel requests
@@ -75,7 +80,7 @@ def describe(ev):
     return None
 
 
-def run_agent(task, workdir, emit):
+def run_agent(task, workdir, emit, profile=PROFILE):
     before = snapshot(workdir)
     summary = {}
 
@@ -90,11 +95,35 @@ def run_agent(task, workdir, emit):
                 pass
 
     with LOCK:
-        info = agent_v5.run_task(task, workdir, PROFILE, log)
+        info = agent_v5.run_task(task, workdir, profile, log)
     after = snapshot(workdir)
     hidden = lambda p: p.startswith(".agent/") or "__pycache__" in p
     changed = sorted(p for p in after if before.get(p) != after[p] and not hidden(p))
     return info, summary.get("text", ""), changed
+
+
+def publish_cad(workdir):
+    """Copy the part's files to CAD_SHARE under an unguessable folder; return markdown plus a machine-readable line."""
+    import shutil
+    files = {e: os.path.join(workdir, f"model.{e}") for e in ("png", "step", "stl", "glb")}
+    if not os.path.exists(files["step"]):
+        return "\n（model.step ができていません）\n"
+    try:
+        report = open(os.path.join(workdir, ".agent", "cad_report.txt")).read()
+    except OSError:
+        report = ""
+    if not (CAD_SHARE and CAD_PUBLIC):
+        return "\n" + "".join(f"- `{p}`\n" for p in files.values() if os.path.exists(p))
+    key = uuid.uuid4().hex
+    dst = os.path.join(CAD_SHARE, key)
+    os.makedirs(dst)
+    urls = {}
+    for e, p in files.items():
+        if os.path.exists(p):
+            shutil.copy(p, os.path.join(dst, f"part.{e}"))
+            urls[e] = f"{CAD_PUBLIC}/{key}/part.{e}"
+    md = (f"\n![part]({urls['png']})\n" if "png" in urls else "") + " / ".join(f"[{e.upper()}]({u})" for e, u in urls.items() if e != "png")
+    return md + "\n\n<!-- cad-files " + json.dumps(urls) + " -->\n" + (f"\n```\n{report[:1500]}\n```\n" if report else "")
 
 
 def previews(workdir, changed, n=3, limit=1500):
@@ -132,7 +161,8 @@ class H(BaseHTTPRequestHandler):
         if not self._auth():
             return self._json({"error": "unauthorized"}, 401)
         if self.path.rstrip("/").endswith("/models"):
-            return self._json({"object": "list", "data": [{"id": MODEL_ID, "object": "model", "owned_by": "local",
+            return self._json({"object": "list", "data": [{"id": CAD_ID, "object": "model", "owned_by": "local", "name": "3D部品モデリング (12B, CadQuery)"},
+                                                           {"id": MODEL_ID, "object": "model", "owned_by": "local",
                                                             "name": "ローカル作業エージェント (12B)"}]})
         self._json({"error": "not found"}, 404)
 
@@ -148,6 +178,7 @@ class H(BaseHTTPRequestHandler):
         if prior:
             task = "Earlier conversation (for context):\n" + "\n".join(prior) + "\n\nCurrent request:\n" + task
         task += "\n\n(Write the finish summary in the same language as the request.)"
+        cad = req.get("model") == CAD_ID
         workdir = workspace_for(req, msgs)
         cid, created = "chatcmpl-" + uuid.uuid4().hex[:12], int(time.time())
         q = queue.Queue()
@@ -155,7 +186,7 @@ class H(BaseHTTPRequestHandler):
 
         def worker():
             try:
-                result["v"] = run_agent(task, workdir, q.put)
+                result["v"] = run_agent(task, workdir, q.put, CAD_PROFILE if cad else PROFILE)
             except Exception as e:
                 result["err"] = f"{type(e).__name__}: {e}"
             q.put(None)
@@ -169,7 +200,7 @@ class H(BaseHTTPRequestHandler):
             files = "\n".join(f"- `{p}`" for p in changed[:50]) or "（なし）"
             status = "完了" if info.get("finished") else f"ステップ上限（{info.get('steps')}）で停止"
             return (f"\n</details>\n\n**{status}**（{info.get('seconds')} 秒）\n\n{summ}\n\n**変更したファイル**（作業フォルダ `{workdir}`）\n{files}\n"
-                    + previews(workdir, changed))
+                    + (publish_cad(workdir) if cad else previews(workdir, changed)))
 
         if not req.get("stream"):
             buf = []

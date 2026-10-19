@@ -12,6 +12,7 @@ record the outcome in docs/EXPERIENCE.md.
 import collections, json, os, queue, subprocess, sys, threading, time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+TASKS_DIR = os.environ.get("TASKS_DIR", os.path.join(HERE, "tasks"))
 LANES = os.environ.get("LANES", "http://127.0.0.1:8085,http://127.0.0.1:8086,http://127.0.0.1:8087").split(",")
 
 

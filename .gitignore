@@ -5,3 +5,4 @@ tasks/
 *.log
 tasks.new/
 tasks.old/
+tasks_cad/

@@ -7,17 +7,20 @@ Writes runs/<profile>-<time>/ like eval.py (results.jsonl has every task) and pr
 import json, os, queue, subprocess, sys, threading, time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+TASKS_DIR = os.environ.get("TASKS_DIR", os.path.join(HERE, "tasks"))
 LANES = os.environ.get("LANES", "http://127.0.0.1:8085,http://127.0.0.1:8086,http://127.0.0.1:8087").split(",")
 
 
 def tier(t):
+    if t.startswith("cad_"):
+        return "cad"
     return {"h": "hard", "x": "multi-file", "y": "repo-scale"}.get(t.split("_")[0], "easy") if "_" in t and t[1] == "_" else "easy"
 
 
 def main():
-    prof, tasks = sys.argv[1], sys.argv[2:] or sorted(os.listdir(os.path.join(HERE, "tasks")))
+    prof, tasks = sys.argv[1], sys.argv[2:] or sorted(os.listdir(TASKS_DIR))
     # longest tasks first so the lanes finish together
-    order = sorted(tasks, key=lambda t: {"repo-scale": 0, "multi-file": 1, "hard": 2, "easy": 3}[tier(t)])
+    order = sorted(tasks, key=lambda t: {"repo-scale": 0, "multi-file": 1, "hard": 2, "cad": 2, "easy": 3}[tier(t)])
     q = queue.Queue(); [q.put(t) for t in order]
     stamp = time.strftime("%m%d-%H%M%S")
     run = os.path.join(HERE, "runs", f"{prof}-{stamp}")

@@ -1,0 +1,7 @@
+# Sandbox for the CAD agent: CadQuery (OCCT) + mesh checks + headless rendering. No network at run time.
+FROM docker.io/library/python:3.12-slim
+ENV XDG_CACHE_HOME=/tmp/.cache MPLCONFIGDIR=/tmp/.mpl
+RUN apt-get update && apt-get install -y --no-install-recommends libgl1 libglib2.0-0 libxrender1 libxext6 \
+    && rm -rf /var/lib/apt/lists/*
+RUN pip install --no-cache-dir cadquery==2.8.0 trimesh==4.8.3 matplotlib==3.10.7 numpy scipy shapely rtree networkx
+RUN python -c "import cadquery, trimesh, matplotlib; print('ok')" && rm -rf /tmp/.mpl /tmp/.cache

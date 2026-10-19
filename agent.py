@@ -7,7 +7,8 @@ The harness (prompt, loop control, verification) is configured by a profile so v
 import json, os, re, subprocess, time, urllib.error, urllib.request, uuid
 
 API = os.environ.get("AGENT_API", "http://127.0.0.1:8085/v1/chat/completions")
-IMAGE = "docker.io/library/python:3.12-slim"
+IMAGE = os.environ.get("SANDBOX_IMAGE", "docker.io/library/python:3.12-slim")
+EXTRA_MOUNTS = [m for m in os.environ.get("SANDBOX_MOUNTS", "").split(";") if m]  # "host:container:ro,Z" entries, ";"-separated
 OBS_LIMIT = 6000
 SMART_EDIT = False  # set per run from the profile
 
@@ -44,15 +45,17 @@ class HttpSandbox:
         pass
 
 
-def make_sandbox(workdir):
-    return HttpSandbox(workdir) if os.environ.get("SANDBOX_URL") else Sandbox(workdir)
+def make_sandbox(workdir, image=None, mounts=()):
+    return HttpSandbox(workdir) if os.environ.get("SANDBOX_URL") else Sandbox(workdir, image, mounts)
 
 
 class Sandbox:
-    def __init__(self, workdir):
+    def __init__(self, workdir, image=None, mounts=()):
         self.name = "agent-" + uuid.uuid4().hex[:8]
+        mounts = list(mounts) or EXTRA_MOUNTS
         subprocess.run(["podman", "run", "-d", "--rm", "--name", self.name, "--network", "none", "--userns=keep-id",
-                        "-v", f"{workdir}:/work:Z", "-w", "/work", IMAGE, "sleep", "infinity"], check=True, capture_output=True)
+                        "-v", f"{workdir}:/work:Z", *[a for m in mounts for a in ("-v", m)], "-w", "/work", image or IMAGE,
+                        "sleep", "infinity"], check=True, capture_output=True)
 
     def sh(self, cmd, timeout=60):
         try:

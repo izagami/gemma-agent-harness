@@ -16,6 +16,7 @@ import agent as base
 import judge
 
 KEEP_FULL = 5
+CAD_IMAGE = os.environ.get("CAD_IMAGE", "localhost/local-agent-cad")  # built from cad/Dockerfile.cad
 CTX_SOFT_LIMIT = 90000  # characters incl. call arguments; above this, old outputs and arguments are masked in one batch
 MAX_STEPS = 30
 
@@ -66,6 +67,47 @@ How to work:
 7. When all todo items are done and verified, call finish with a short summary.
 
 Tools: bash runs `bash -lc` in /work (60 s limit). read_file shows line numbers (do not copy them into edits)."""
+
+SYSTEM_CAD_RULES = """
+CAD tasks (CadQuery 2.8, units mm):
+C1. Write the part in model.py and assign it to `result`. Build and measure it with
+    `python3 /opt/cad/cadtool.py model.py`: it writes model.step/.stl/.png and prints the bounding box, volume,
+    validity and every hole/boss/fillet with diameter, axis, length and position. Run it after every change.
+C2. Before calling finish, compare EVERY number in the task with the cadtool report (sizes, positions, hole
+    diameters and counts, depths) and look at model.png with view_image. Fix any difference first.
+C3. The spec test (.agent/spec_test.py) checks the model itself:
+      import sys; sys.path.insert(0, "/opt/cad"); from cadtool import load, size, features
+      s = load("model.py"); assert size(s) == (100.0, 60.0, 8.0)
+      holes = [f for f in features(s) if f["kind"] == "hole"]; assert len(holes) == 4 and holes[0]["diameter"] == 6.6
+    features() kinds: "hole", "boss", "inner fillet", "outer fillet"; "at" = where the axis crosses the plane through 0.
+C4. Facts (checked): Workplane("XY").extrude(h) goes +Z; Workplane("XZ").extrude(h) goes -Y (use a negative h for +Y);
+    Workplane("YZ").extrude(h) goes +X. box(x, y, z) is centred on the origin; box(x, y, z, centered=(True, True, False))
+    puts the bottom on Z=0. faces(">Z").workplane() keeps the global X/Y coordinates for points. workplane(offset=z)
+    starts at height z. polygon(n, d): d is the circumscribed diameter, one vertex on +X. slot2D(length, width):
+    length is end to end. polarArray(r, 0, 360, n) starts on +X. Revolve: Workplane("XZ").polyline(pts).close()
+    .revolve(360, (0, 0, 0), (0, 1, 0)) turns about the global Z axis (pts are (radius, z)).
+C5. Holes: .pushPoints([(x, y), ...]).hole(d) cuts through everything below the workplane; cboreHole(d, cbore_d,
+    cbore_depth); cskHole(d, csk_d, 90); cutBlind(-depth) for pockets; cutThruAll() for through cuts.
+    Edges: .edges("|Z").fillet(r) rounds the vertical edges; .faces(">Z").edges().chamfer(c). Combine solids with
+    a.union(b) / a.cut(b); make each extra solid with its own Workplane and translate((x, y, z)) if needed.
+    Open box: .faces(">Z").shell(-t) (negative = walls inward). Solids that only touch along a line are not one
+    solid: make them overlap.
+C6. Complex parts: list the features first (todo), then build each one as its own named solid in model.py
+    (base = ..., boss = ..., holes = ...), check its size and position with cadtool before combining, and combine
+    step by step (body = base.union(boss); body = body.cut(holes)). Cut holes and bores last, after every union,
+    so no later solid fills them again.
+C7. More facts (checked): solid.rotate((0, 0, 0), (0, 0, 1), deg) turns about Z, +X towards +Y; .mirror("YZ") mirrors
+    across X=0 (mirror("YZ", union=True) keeps both); rarray(dx, dy, nx, ny) is a centred grid of points;
+    .transformed(rotate=(a, 0, 0)) tilts the workplane about X; extrude(d, both=True) goes d both ways.
+    Sweep: path = Workplane("XZ").lineTo(0, 40).radiusArc((40, 80), 40).lineTo(100, 80) (points are (X, Z));
+    Workplane("XY").circle(r).sweep(path, transition="round") makes a pipe whose start is at the origin going +Z.
+    Loft: Workplane("XY").rect(40, 40).workplane(offset=30).circle(10).loft(). A profile in a side plane:
+    Workplane("YZ").workplane(offset=x0).polyline([(y, z), ...]).close().extrude(width) (points are (Y, Z)).
+"""
+
+VIEW_IMAGE_TOOL = {"type": "function", "function": {"name": "view_image", "description": "Look at an image file (PNG/JPEG) in /work, for example model.png from cadtool.",
+                   "parameters": {"type": "object", "properties": {"path": {"type": "string"}}, "required": ["path"]}}}
+
 
 THINK_TOOL = {"type": "function", "function": {"name": "think", "description": "Write down your reasoning or plan. It does not change anything. Use it instead of putting reasoning in commands, comments or files.",
     "parameters": {"type": "object", "properties": {"thought": {"type": "string"}}, "required": ["thought"]}}}
@@ -152,6 +194,9 @@ FEATURES = {
             "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs", "hard_tests", "read_window", "force_act", "plan_lock", "debug_rules", "keep_orig"},
     "v7j": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps120",
             "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs", "hard_tests", "read_window", "force_act", "plan_lock", "debug_rules", "keep_orig"},
+    # v8c: v7e for CAD tasks (CadQuery rules C1-C5, view_image, the part must build into one valid solid at finish)
+    "v8c": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps80",
+            "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs", "hard_tests", "read_window", "force_act", "cad"},
     # v7g: v7e with a 120-step budget
     "v7g": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps120",
             "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs", "hard_tests", "read_window", "force_act"},
@@ -181,6 +226,8 @@ class State:
         self.recent = []         # last 8 steps: True = every call was a refused repeat
         self.files_snap = None   # file hashes after the previous step
         self.todo_only = 0       # consecutive steps that only called todo (v7f+)
+        self.pending_image = None  # image requested with view_image, attached after the tool results
+        self.cad = False         # CAD task: the part must build before finish
         self.compact = False     # the server reported a full context: keep the prompt at half the usual size
         self.think_limit = False
         self.restore = False
@@ -233,6 +280,12 @@ def plan_lock(st, args, withheld):
 
 
 def run_tool(box, workdir, st, name, args):
+    if name == "view_image":
+        p = os.path.join(workdir, base.safe_path(args["path"]))
+        if not os.path.exists(p):
+            return f"error: {args['path']} does not exist"
+        st.pending_image = p
+        return f"{args['path']} is shown in the next message."
     if name == "think":
         st.thinks += 1
         if st.think_limit and st.thinks >= 2:
@@ -369,7 +422,10 @@ def view(messages, st, cache_friendly=False):
     else:
         hide = set(tool_idx[:-KEEP_FULL])
     out = []
+    imgs = [i for i, m in enumerate(messages) if isinstance(m.get("content"), list)]
     for i, m in enumerate(messages):
+        if i in imgs[:-1]:
+            m = dict(m, content=" ".join(p.get("text", "") for p in m["content"] if p.get("type") == "text") + " [image no longer shown]")
         if m["role"] == "tool" and i in hide and len(m["content"]) > 200:
             m = dict(m, content=f"[older output elided: {one_line(m['content'])}; {m['content'].count(chr(10)) + 1} lines]")
         elif m.get("tool_calls") and i in hide:
@@ -545,6 +601,21 @@ def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=N
             return ("[harness] Not accepted: you modified provided input files the task did not ask you to change: " + ", ".join(sus)
                     + ". They have been restored to their original content. Never write test data into them (use /tmp). "
                     "Run your program again on the real files, check the output, then call finish.")
+    if st.cad:
+        # the part must build into one valid solid before anything else is judged
+        code, out, err = box.sh("test -f model.py || exit 99; python3 /opt/cad/cadtool.py model.py", timeout=120)
+        rep = (out + err).strip()
+        try:  # the final report is published with the part (deploy/agent_server.py)
+            os.makedirs(os.path.join(st.workdir, ".agent"), exist_ok=True)
+            open(os.path.join(st.workdir, ".agent", "cad_report.txt"), "w").write(rep)
+        except OSError:
+            pass
+        if code == 99:
+            return "[harness] Not accepted: model.py does not exist. Write the part in model.py (result = ...) and build it with cadtool."
+        if code != 0 or "solids: 1 " not in rep or "valid: True" not in rep:
+            return ("[harness] Not accepted: the part must build into exactly one valid solid. cadtool says:\n" + base.clip(rep, 1500)
+                    + "\nFix model.py, run cadtool again, compare every dimension of the task with the report, then call finish.")
+        checks += "\ncadtool report:\n" + rep[:1500]
     if st.spec:
         code, out, err = isolated(st, box, "test -f .agent/spec_test.py || exit 99; python3 .agent/spec_test.py", 60)
         if code == 99:
@@ -586,7 +657,10 @@ def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=N
 
 
 def run_task(task_text, workdir, profile, log):
-    box = base.make_sandbox(workdir)
+    if "cad" in feats(profile):  # CadQuery image with the measuring/drawing tool mounted at /opt/cad
+        box = base.make_sandbox(workdir, CAD_IMAGE, [f"{os.path.join(os.path.dirname(os.path.abspath(__file__)), 'cad')}:/opt/cad:ro,Z"])
+    else:
+        box = base.make_sandbox(workdir)
     st = State()
     st.v6b = "v6b" in feats(profile)
     st.spec = "spec" in feats(profile)
@@ -596,6 +670,7 @@ def run_task(task_text, workdir, profile, log):
     st.restore = "restore_inputs" in feats(profile)
     st.hard_tests = "hard_tests" in feats(profile)
     st.read_window = "read_window" in feats(profile)
+    st.cad = "cad" in feats(profile)
     if "protect_inputs" in feats(profile):
         protect_inputs(st, task_text, log)
     st.judge_inputs = "judge_inputs" in feats(profile)
@@ -607,7 +682,9 @@ def run_task(task_text, workdir, profile, log):
     F = feats(profile)
     think = "think" in F
     tools = TOOLS + [THINK_TOOL] if think else TOOLS
-    messages = [{"role": "system", "content": SYSTEM + (SYSTEM_THINK_RULE + (SYSTEM_THINK_SHORT if "think_limit" in F else "") if think else "") + (SYSTEM_V6B_RULES if "v6b" in F else "") + (SYSTEM_V6C_RULES if "spec" in F else "") + (SYSTEM_V7B_RULES if "v7b_rules" in F else "") + (SYSTEM_DEBUG_RULES if "debug_rules" in F else "")},
+    if "cad" in F:
+        tools = tools + [VIEW_IMAGE_TOOL]
+    messages = [{"role": "system", "content": SYSTEM + (SYSTEM_THINK_RULE + (SYSTEM_THINK_SHORT if "think_limit" in F else "") if think else "") + (SYSTEM_V6B_RULES if "v6b" in F else "") + (SYSTEM_V6C_RULES if "spec" in F else "") + (SYSTEM_V7B_RULES if "v7b_rules" in F else "") + (SYSTEM_DEBUG_RULES if "debug_rules" in F else "") + (SYSTEM_CAD_RULES if "cad" in F else "")},
                 {"role": "user", "content": task_text}]
     finished, steps = False, 0
     try:
@@ -639,7 +716,7 @@ def run_task(task_text, workdir, profile, log):
                     msg = ("[harness] Your last tool call was cut off (it grew past the length limit), so nothing ran. "
                            "Do not write your reasoning as comments inside code or commands. Make the call short: "
                            "at most about 60 lines of content per write_file; continue with mode=\"append\".")
-                    if messages[-1]["role"] == "user" and messages[-1]["content"].startswith("[harness] Your last tool call was cut off"):
+                    if messages[-1]["role"] == "user" and str(messages[-1]["content"]).startswith("[harness] Your last tool call was cut off"):
                         continue  # do not stack the same warning
                 messages.append({"role": "user", "content": msg})
                 continue
@@ -662,7 +739,7 @@ def run_task(task_text, workdir, profile, log):
                     a = None
                 name = c["function"]["name"]
                 sem = "semantic_repeat" in F
-                skip = ("finish", "todo") if "force_act" in F else ("finish", "todo", "think")
+                skip = ("finish", "todo", "view_image") if "force_act" in F else ("finish", "todo", "think", "view_image")
                 if a is not None and name not in skip and akey(name, a, sem) in st.ran:
                     n, res = st.ran[akey(name, a, sem)]
                     st.ran[akey(name, a, sem)] = (n + 1, res)
@@ -763,6 +840,15 @@ def run_task(task_text, workdir, profile, log):
                     notes = []
                 messages.append({"role": "tool", "tool_call_id": c.get("id", ""), "content": obs})
                 log({"obs": obs[:1500]})
+            if st.pending_image:
+                import base64, mimetypes
+                mime = mimetypes.guess_type(st.pending_image)[0] or "image/png"
+                data = base64.b64encode(open(st.pending_image, "rb").read()).decode()
+                messages.append({"role": "user", "content": [
+                    {"type": "text", "text": f"[harness] {os.path.relpath(st.pending_image, workdir)}:"},
+                    {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{data}"}}]})
+                log({"image": os.path.relpath(st.pending_image, workdir)})
+                st.pending_image = None
             if done_now:
                 finished = True
                 break

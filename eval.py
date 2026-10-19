@@ -5,6 +5,7 @@ import json, os, shutil, subprocess, sys, time
 import agent
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+TASKS_DIR = os.environ.get("TASKS_DIR", os.path.join(HERE, "tasks"))
 
 
 def check(workdir, checkdir):
@@ -20,7 +21,7 @@ def main():
     if argv and argv[0].startswith("-j"):
         jobs = int(argv.pop(0)[2:])
     prof = argv[0]
-    tasks = argv[1:] or sorted(os.listdir(os.path.join(HERE, "tasks")))
+    tasks = argv[1:] or sorted(os.listdir(TASKS_DIR))
     run = os.path.join(HERE, "runs", f"{prof}-{time.strftime('%m%d-%H%M%S')}-{os.getpid()}")
     os.makedirs(run)
     import threading
@@ -29,7 +30,7 @@ def main():
     passed = [0]
 
     def one(tid):
-        src = os.path.join(HERE, "tasks", tid)
+        src = os.path.join(TASKS_DIR, tid)
         work = os.path.join(run, tid, "work")
         if os.path.isdir(os.path.join(src, "files")):
             shutil.copytree(os.path.join(src, "files"), work)
