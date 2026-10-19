@@ -30,6 +30,20 @@ SYSTEM_V6C_RULES = ("\n11. Test first: before implementing, write .agent/spec_te
 
 SYSTEM_THINK_SHORT = " Keep each thought short (under about 100 words) and follow it with an action."
 
+SYSTEM_DEBUG_RULES = """
+Finding a bug whose cause is not obvious:
+15. Reproduce it with the smallest input (one or two records) and work out the correct result by hand first.
+16. Follow that input through every stage (for example parse -> store -> query -> aggregate -> output): print the
+    value after each stage with a short python3 -c script. The first stage whose value differs from your hand
+    result contains a bug; fix it there, not in a later stage.
+17. Expect more than one bug. After each fix re-run all tests and repeat steps 15-16 for what still fails.
+18. Usual suspects when code spans several modules: a cache whose key misses something that changes (stored data,
+    a version counter, an argument) or that hands the same mutable object to every caller; a function that modifies
+    the dict or list it was given; dates and times compared or grouped in different time zones (convert to one zone
+    first); range ends off by one.
+"""
+
+
 SYSTEM_V7B_RULES = ("\n12. To move or split existing code, copy exact line ranges with a script (sed -n 'A,Bp' or Python slicing) "
                     "instead of retyping it from memory; then fix imports.\n"
                     "13. If the task says the output or behaviour must not change, first run the original version and save its output "
@@ -133,6 +147,11 @@ FEATURES = {
     # v7h: v7f with a 120-step budget
     "v7h": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps120",
             "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs", "hard_tests", "read_window", "force_act", "plan_lock"},
+    # v7i: v7f with a debugging playbook (rules 15-18); v7j: the same with 120 steps
+    "v7i": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps80",
+            "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs", "hard_tests", "read_window", "force_act", "plan_lock", "debug_rules"},
+    "v7j": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps120",
+            "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs", "hard_tests", "read_window", "force_act", "plan_lock", "debug_rules"},
     # v7g: v7e with a 120-step budget
     "v7g": {"repeat_result", "storm", "cache", "incontext", "think", "v6b", "spec", "think_limit", "restore_inputs", "judge_inputs", "steps120",
             "semantic_repeat", "v7b_rules", "stagnation", "protect_inputs", "hard_tests", "read_window", "force_act"},
@@ -533,7 +552,7 @@ def run_task(task_text, workdir, profile, log):
     F = feats(profile)
     think = "think" in F
     tools = TOOLS + [THINK_TOOL] if think else TOOLS
-    messages = [{"role": "system", "content": SYSTEM + (SYSTEM_THINK_RULE + (SYSTEM_THINK_SHORT if "think_limit" in F else "") if think else "") + (SYSTEM_V6B_RULES if "v6b" in F else "") + (SYSTEM_V6C_RULES if "spec" in F else "") + (SYSTEM_V7B_RULES if "v7b_rules" in F else "")},
+    messages = [{"role": "system", "content": SYSTEM + (SYSTEM_THINK_RULE + (SYSTEM_THINK_SHORT if "think_limit" in F else "") if think else "") + (SYSTEM_V6B_RULES if "v6b" in F else "") + (SYSTEM_V6C_RULES if "spec" in F else "") + (SYSTEM_V7B_RULES if "v7b_rules" in F else "") + (SYSTEM_DEBUG_RULES if "debug_rules" in F else "")},
                 {"role": "user", "content": task_text}]
     finished, steps = False, 0
     try:
