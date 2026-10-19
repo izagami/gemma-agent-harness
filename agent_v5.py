@@ -305,8 +305,15 @@ def elide_args(c):
         return c
     if not isinstance(a, dict):
         return c
-    a = {k: (f"[{len(v)} chars, elided; the file now holds the current version]" if isinstance(v, str) and len(v) > 300 else v)
-         for k, v in a.items()}
+    # only file data is replaced; a command keeps its start, because the model copies whatever an old call looks like
+    # (v7f h_md ran "[1982 chars, elided; ...]" as a bash command twice)
+    def short(k, v):
+        if not isinstance(v, str) or len(v) <= 300:
+            return v
+        if k == "command":
+            return v[:300] + "\n# ... (rest of this earlier command not shown)"
+        return f"[{len(v)} chars, elided; the file now holds the current version]"
+    a = {k: short(k, v) for k, v in a.items()}
     return dict(c, function=dict(c["function"], arguments=json.dumps(a, ensure_ascii=False)))
 
 
