@@ -16,7 +16,7 @@ import agent as base
 import judge
 
 KEEP_FULL = 5
-CTX_SOFT_LIMIT = 40000  # characters; above this, old outputs are masked in one batch
+CTX_SOFT_LIMIT = 90000  # characters incl. call arguments; above this, old outputs and arguments are masked in one batch
 MAX_STEPS = 30
 
 SYSTEM_V6B_RULES = ("\n9. Never overwrite or edit the provided input/data files to test your code; put test data in /tmp. "
