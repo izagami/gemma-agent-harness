@@ -228,6 +228,7 @@ class State:
         self.todo_only = 0       # consecutive steps that only called todo (v7f+)
         self.pending_image = None  # image requested with view_image, attached after the tool results
         self.cad = False         # CAD task: the part must build before finish
+        self.cad_numbers_checked = False
         self.compact = False     # the server reported a full context: keep the prompt at half the usual size
         self.think_limit = False
         self.restore = False
@@ -529,6 +530,19 @@ def isolated(st, box, cmd, timeout):
     return r
 
 
+def missing_numbers(task, report):
+    """Numbers in the task text that appear nowhere in the report (the report already gives radius and diameter)."""
+    nums = lambda t: [float(x) for x in re.findall(r"(?<![\d.])(\d+(?:\.\d+)?)", t)]
+    have = set()
+    for x in nums(report.replace("-", " ")):
+        have.add(round(x, 2))
+    out = []
+    for x in nums(task.split("共通の約束")[0]):
+        if x not in (0.0, 1.0) and round(x, 2) not in have and f"{x:g}" not in out:
+            out.append(f"{x:g}")
+    return out
+
+
 def harness_checks(box, st=None):
     """Run what the harness can verify by itself: compile all .py files, run unittest/test files if present."""
     lines = []
@@ -615,6 +629,17 @@ def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=N
         if code != 0 or "solids: 1 " not in rep or "valid: True" not in rep:
             return ("[harness] Not accepted: the part must build into exactly one valid solid. cadtool says:\n" + base.clip(rep, 1500)
                     + "\nFix model.py, run cadtool again, compare every dimension of the task with the report, then call finish.")
+        if not st.cad_numbers_checked:
+            # every dimension in the task should show up somewhere in the measured report (v8c cad_cbore used
+            # cskHole for a counterbore and finished without noticing that no 11 mm diameter existed)
+            st.cad_numbers_checked = True
+            missing = missing_numbers(task, rep)
+            if missing:
+                return ("[harness] Not accepted yet: these numbers from the task do not appear in the cadtool report: "
+                        + ", ".join(missing) + ". For each one, find the feature it belongs to in the report (a diameter, "
+                        "length, position or size). If it is missing or different, fix model.py and run cadtool again. If a number "
+                        "is a count, an angle cadtool already shows another way, or something cadtool cannot measure (for example "
+                        "a chamfer on a straight edge), check it yourself. Then call finish again.\ncadtool report:\n" + rep[:1500])
         checks += "\ncadtool report:\n" + rep[:1500]
     if st.spec:
         code, out, err = isolated(st, box, "test -f .agent/spec_test.py || exit 99; python3 .agent/spec_test.py", 60)

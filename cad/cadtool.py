@@ -83,6 +83,12 @@ def report(shape, mesh, bb=None):
         full = e["turn"] > 0.95
         kind = ("hole" if inner else "boss/outer cylinder") if full else ("inner fillet" if inner else "outer round/fillet")
         groups[(kind, dia, axis, round(e["zmax"] - e["zmin"], 1))].append(foot)
+    cones = cone_features(shape)
+    if cones:
+        lines.append("conical faces (countersinks / chamfered holes / cones):")
+        for c in cones:
+            lines.append(f"  {c['count']} x cone: diameter {c['d_small']:g} to {c['d_large']:g}, included angle {c['angle']:g} deg, "
+                         f"axis {c['axis']}, at {', '.join(str(a) for a in c['at'][:8])}")
     if groups:
         lines.append("cylindrical features (axis position = where the axis crosses the plane through the origin):")
         for (kind, dia, axis, length), feet in sorted(groups.items()):
@@ -91,6 +97,32 @@ def report(shape, mesh, bb=None):
     else:
         lines.append("cylindrical features: none")
     return "\n".join(lines)
+
+
+def cone_features(shape):
+    """Conical faces grouped by size: diameters at both ends and the included angle."""
+    from OCP.BRepAdaptor import BRepAdaptor_Surface
+    from OCP.GeomAbs import GeomAbs_Cone
+    groups = collections.defaultdict(list)
+    for f in shape.Faces():
+        ad = BRepAdaptor_Surface(f.wrapped)
+        if ad.GetType() != GeomAbs_Cone:
+            continue
+        cone = ad.Cone()
+        d = cone.Axis().Direction()
+        dv = (d.X(), d.Y(), d.Z())
+        names = [n for n, x in zip("XYZ", dv) if abs(x) > 0.999]
+        axis = names[0] if names else "(%.2f,%.2f,%.2f)" % dv
+        v0, v1 = ad.FirstVParameter(), ad.LastVParameter()
+        r0 = cone.RefRadius() + v0 * math.sin(cone.SemiAngle())
+        r1 = cone.RefRadius() + v1 * math.sin(cone.SemiAngle())
+        loc = cone.Axis().Location()
+        k = loc.X() * dv[0] + loc.Y() * dv[1] + loc.Z() * dv[2]
+        at = tuple(round(a - k * b, 2) + 0.0 for a, b in zip((loc.X(), loc.Y(), loc.Z()), dv))
+        key = (round(2 * min(abs(r0), abs(r1)), 2), round(2 * max(abs(r0), abs(r1)), 2), round(2 * math.degrees(abs(cone.SemiAngle())), 1), axis)
+        groups[key].append(at)
+    return [{"d_small": k[0], "d_large": k[1], "angle": k[2], "axis": k[3], "count": len(sorted(set(v))), "at": sorted(set(v))}
+            for k, v in sorted(groups.items())]
 
 
 def feats_items(f):
