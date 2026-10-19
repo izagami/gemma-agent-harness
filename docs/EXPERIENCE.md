@@ -13,6 +13,7 @@ failure that motivated it and the evidence that it helped. Executor: Gemma 4 12B
 | v7d | 19 | 14 | 5 | 1 | 39 | |
 | v7e | 20 | 15 | 5 | 3 | 43 | run 1 |
 | v7e | 20 | 13 | 5 | 2 | 40 | run 2 (2 lanes): h_sync, h_md, y_ledger_split flipped to fail -> spread ~3 tasks |
+| v7i | 18 | 14 | 5 | 2 | 39 | all harness-bug fixes + plan_lock + debug rules + .agent/orig; within v7e's spread. New: todo storm (duration, context full), test run overwrote the real output (log_errors) |
 
 ## Principles (each confirmed more than once)
 
@@ -55,6 +56,9 @@ failure that motivated it and the evidence that it helped. Executor: Gemma 4 12B
 
 ## Neutral or rejected
 
+- 120 steps (v7g, v7h): 1/8 and 0/8 on the four hardest tasks; loops just ran longer.
+- Debugging playbook (v7i rules 15-18): y_tzreport still 0/1 (0/10 over all profiles).
+
 - Bigger step budget without loop fixes (v7: 38/45, below v6f).
 - LLM finish judge as the only check (accepted known failures several times).
 - Parallel slots on one server (`-np 4`): per-slot speed fell to 3-9 tok/s; one task per server instead.
@@ -79,6 +83,8 @@ The side-by-side probes (probe.py) found more harness bugs than model weaknesses
 - Elided bash commands were copied verbatim by the model and run. Now commands keep their first 300 chars.
 - read_file refused /tmp, where the rules tell the model to keep scratch copies.
 - Interleaved repeat loops (never 3 in a row) and .agent/ rewrites hid stagnation from both nudges.
+- todo calls were exempt from repeat checks and never elided: ~60 multi-KB todo calls filled the context (v7i duration).
+  todo calls are now stored capped (12 items x 150 chars); v7f+ refuses a 3rd todo-only step in a row.
 
 Lesson: **when the model looks stupid, first check what the harness showed it.** Read the observations in the log,
 not only the actions.

@@ -180,6 +180,7 @@ class State:
         self.refused = 0         # consecutive steps whose calls were all refused repeats
         self.recent = []         # last 8 steps: True = every call was a refused repeat
         self.files_snap = None   # file hashes after the previous step
+        self.todo_only = 0       # consecutive steps that only called todo (v7f+)
         self.compact = False     # the server reported a full context: keep the prompt at half the usual size
         self.think_limit = False
         self.restore = False
@@ -658,12 +659,27 @@ def run_task(task_text, workdir, profile, log):
                 continue
             if any(n not in ("todo", "think") for _, n, _ in fresh):
                 st.refused = 0
+                st.todo_only = 0
+            elif "plan_lock" in F and all(n == "todo" for _, n, _ in fresh):
+                st.todo_only += 1
+                if st.todo_only >= 3:
+                    open_items = [i["text"] for i in st.todo if i.get("status") != "done"]
+                    log({"todo_storm": st.todo_only})
+                    messages.append({"role": "user", "content": "[harness] The todo list was not updated: you have only edited it "
+                                     f"{st.todo_only} times in a row. Do the first open item now with bash, write_file or edit_file"
+                                     + (f": {open_items[0]}" if open_items else "") + "."})
+                    continue
             # never put unparsable arguments into the history: llama-server re-parses every past tool call and
             # one broken call there makes every later request fail with the same HTTP 500
             safe = []
-            for c, _, a in fresh:
+            for c, name, a in fresh:
                 if a is None:
                     c = dict(c, function=dict(c["function"], arguments=json.dumps({"_harness": "call was cut off or invalid JSON"})))
+                elif name == "todo":
+                    # v7i duration: ~60 todo calls of several thousand characters each filled the 64K context
+                    items = [{"text": str(i.get("text", ""))[:150], "status": i.get("status", "pending")}
+                             for i in (a.get("items") if isinstance(a.get("items"), list) else []) if isinstance(i, dict)][:12]
+                    c = dict(c, function=dict(c["function"], arguments=json.dumps({"items": items}, ensure_ascii=False)))
                 safe.append(c)
             entry = {"role": "assistant", "content": m.get("content") or "", "tool_calls": safe}
             messages.append(entry)
