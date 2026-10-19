@@ -179,6 +179,7 @@ class State:
         self.thoughts = []       # accepted thoughts (v7f)
         self.refused = 0         # consecutive steps whose calls were all refused repeats
         self.recent = []         # last 8 steps: True = every call was a refused repeat
+        self.files_snap = None   # file hashes after the previous step
         self.compact = False     # the server reported a full context: keep the prompt at half the usual size
         self.think_limit = False
         self.restore = False
@@ -707,6 +708,12 @@ def run_task(task_text, workdir, profile, log):
             if done_now:
                 finished = True
                 break
+            # files changed by any tool (bash heredocs, scripts, mv/rm) make earlier results stale; only write/edit
+            # used to reset them, so v7h h_md got a pre-write ModuleNotFoundError replayed 60+ times
+            snap_now = snapshot(workdir)
+            if st.files_snap is not None and snap_now != st.files_snap:
+                st.ran, st.full = {}, {}
+            st.files_snap = snap_now
             if "stagnation" in F:
                 snap = snapshot(workdir)
                 if "plan_lock" in F:  # rewriting its own spec test is not progress on the code (v7f h_md)

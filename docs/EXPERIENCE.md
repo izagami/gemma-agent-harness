@@ -69,6 +69,20 @@ failure that motivated it and the evidence that it helped. Executor: Gemma 4 12B
 - Refused-repeat loops bypass the stagnation nudge (refused steps `continue` before it): v7e run 2 h_md
   (44 refused, 3 commands cycling, no edit) and y_ledger_split (48 identical writes). Targeted by v7f.
 
+## Harness bugs found by probing (2026-10-19)
+
+The side-by-side probes (probe.py) found more harness bugs than model weaknesses. All are fixed for every profile:
+- Repeat cache reset only after write_file/edit_file: files written by bash heredocs left stale results that were
+  replayed as "already ran, nothing changed" (v7h h_md: a pre-write ModuleNotFoundError replayed 60+ times; the
+  model chased a non-existent import problem). Now any file change resets it. **Every earlier profile had this.**
+- Context overflow at ~110 steps: write_file arguments were never masked (HTTP 400). Now counted and elided.
+- Elided bash commands were copied verbatim by the model and run. Now commands keep their first 300 chars.
+- read_file refused /tmp, where the rules tell the model to keep scratch copies.
+- Interleaved repeat loops (never 3 in a row) and .agent/ rewrites hid stagnation from both nudges.
+
+Lesson: **when the model looks stupid, first check what the harness showed it.** Read the observations in the log,
+not only the actions.
+
 ## How to add an entry
 
 After a probe (`probe.py`) or full run: the failure (task, steps, what the log shows), the change, and the
