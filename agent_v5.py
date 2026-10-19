@@ -587,7 +587,10 @@ def run_task(task_text, workdir, profile, log):
             if v5d and st.broken:
                 temp = 0.9  # the same prefix at low temperature reproduces the same runaway call
             try:
-                ch = base.chat(view(messages, st, cf), [t for t in tools if t["function"]["name"] != "think"] if ("force_act" in F and st.thinks >= 2) else tools, max_tokens=(1536 if v5d and st.broken else 4096), temperature=temp)
+                offered = [t for t in tools if t["function"]["name"] != "think"] if ("force_act" in F and st.thinks >= 2) else tools
+                if "plan_lock" in F and st.todo_only >= 2:  # v7i duration: 80 todo calls in a row, refusals ignored
+                    offered = [t for t in offered if t["function"]["name"] != "todo"]
+                ch = base.chat(view(messages, st, cf), offered, max_tokens=(1536 if v5d and st.broken else 4096), temperature=temp)
             except base.ContextFull as e:
                 log({"context_full": str(e)[:200]})
                 if st.compact:
