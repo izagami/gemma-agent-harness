@@ -103,6 +103,11 @@ C7. More facts (checked): solid.rotate((0, 0, 0), (0, 0, 1), deg) turns about Z,
     Workplane("XY").circle(r).sweep(path, transition="round") makes a pipe whose start is at the origin going +Z.
     Loft: Workplane("XY").rect(40, 40).workplane(offset=30).circle(10).loft(). A profile in a side plane:
     Workplane("YZ").workplane(offset=x0).polyline([(y, z), ...]).close().extrude(width) (points are (Y, Z)).
+C8. Never guess an API. Before using a method you are not sure of, and after any AttributeError or TypeError from
+    CadQuery, look it up: `python3 /opt/cad/cadtool.py --api fillet` prints the real signatures and docs of every
+    method whose name contains the word. Edge/face positions: e.Center() (a method), not e.center.
+C9. Rounded inner corners of a pocket or cavity: make the cavity as its own solid (rect(...).extrude(h).edges("|Z")
+    .fillet(r)) and cut it from the body, instead of selecting inner edges after cutting.
 """
 
 VIEW_IMAGE_TOOL = {"type": "function", "function": {"name": "view_image", "description": "Look at an image file (PNG/JPEG) in /work, for example model.png from cadtool.",

@@ -2,6 +2,7 @@
 """Build, measure and draw a CadQuery model. Runs inside the CAD sandbox.
 
 usage: python3 /opt/cad/cadtool.py model.py [--name part] [--no-render]
+       python3 /opt/cad/cadtool.py --api WORD     (look up CadQuery methods by name)
 
 model.py must leave the part in a variable named `result` (cq.Workplane or cq.Shape). Spec tests can use
 load(), size() and features() from this module (sys.path.insert(0, "/opt/cad"); from cadtool import ...). Writes <name>.step,
@@ -186,7 +187,28 @@ def size(shape):
     return round(bb.xlen, 3), round(bb.ylen, 3), round(bb.zlen, 3)
 
 
+def api(word):
+    """Signatures and first doc lines of CadQuery methods whose name contains `word` (Workplane, Shape, Sketch)."""
+    import inspect
+    import cadquery as cq
+    shown = 0
+    for cls in (cq.Workplane, cq.Shape, cq.Solid, cq.Edge, cq.Face, cq.Sketch, cq.Vector):
+        for name in sorted(n for n in dir(cls) if word.lower() in n.lower() and not n.startswith("_")):
+            obj = getattr(cls, name)
+            try:
+                sig = str(inspect.signature(obj)).replace("self: ~T, ", "").replace("self, ", "").replace(" -> ~T", "").replace("(self)", "()")
+            except (TypeError, ValueError):
+                sig = "" if not callable(obj) else "(...)"
+            doc = (inspect.getdoc(obj) or "").strip().split("\n\n")[0].replace("\n", " ")
+            print(f"{cls.__name__}.{name}{sig}\n    {doc[:300]}")
+            shown += 1
+    if not shown:
+        print(f"no CadQuery method contains '{word}'. Try a shorter word (for example: hole, fillet, chamfer, cut, extrude, rotate).")
+
+
 def main():
+    if len(sys.argv) == 3 and sys.argv[1] == "--api":
+        return api(sys.argv[2])
     ap = argparse.ArgumentParser()
     ap.add_argument("model")
     ap.add_argument("--name", default=None)
