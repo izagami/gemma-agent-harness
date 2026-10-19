@@ -443,30 +443,63 @@ def keep_originals(st, log):
     log({"kept_originals": n})
 
 
-def harness_checks(box):
+def isolated(st, box, cmd, timeout):
+    """Run a check command and undo its side effects on the workspace: the agent's own spec test may write, delete
+    or clean up files (v7e dedupe: its cleanup deleted the real output names_unique.txt during the finish check)."""
+    skip = lambda p: p.startswith(".agent/") or "__pycache__" in p
+    before = {}
+    snap = {p: h for p, h in snapshot(st.workdir, before).items() if not skip(p)}
+    r = box.sh(cmd, timeout=timeout)
+    after = {p: h for p, h in snapshot(st.workdir).items() if not skip(p)}
+    for p in set(snap) | set(after):
+        full = os.path.join(st.workdir, p)
+        if p not in snap:
+            try:
+                os.remove(full)
+            except OSError:
+                pass
+        elif after.get(p) != snap[p] and p in before:
+            mode = os.stat(full).st_mode if os.path.exists(full) else None
+            try:
+                os.makedirs(os.path.dirname(full), exist_ok=True)
+                if mode is not None:
+                    os.chmod(full, 0o644)
+                with open(full, "wb") as f:
+                    f.write(before[p])
+                if mode is not None:
+                    os.chmod(full, mode)
+            except OSError:
+                pass
+    return r
+
+
+def harness_checks(box, st=None):
     """Run what the harness can verify by itself: compile all .py files, run unittest/test files if present."""
     lines = []
     code, out, err = box.sh("python3 -m compileall -q . >/dev/null 2>/tmp/ce; c=$?; tail -c 600 /tmp/ce; exit $c", timeout=30)
     lines.append(f"compile all python files: exit {code}" + (f" ({(out + err).strip()[-300:]})" if code else ""))
     code, out, _ = box.sh("ls test_*.py tests/test_*.py 2>/dev/null | head -5")
     if out.strip():
-        c2, o2, e2 = box.sh("python3 -m unittest discover -s tests -q 2>&1 | tail -3; for f in test_*.py; do [ -f \"$f\" ] && python3 \"$f\" 2>&1 | tail -2; done", timeout=60)
+        cmd = "python3 -m unittest discover -s tests -q 2>&1 | tail -3; for f in test_*.py; do [ -f \"$f\" ] && python3 \"$f\" 2>&1 | tail -2; done"
+        c2, o2, e2 = isolated(st, box, cmd, 60) if st else box.sh(cmd, timeout=60)
         lines.append(f"tests found ({' '.join(out.split())}): output tail: {(o2 + e2).strip()[-400:]}")
     return "\n".join(lines)
 
 
-def failing_tests(box):
+def failing_tests(box, st=None):
     """Run the project's tests; return the failure report, or None when everything passes (or there are no tests)."""
     code, out, _ = box.sh("ls tests/test_*.py test_*.py 2>/dev/null | head -20")
     if not out.strip():
         return None
     reports = []
     if "tests/" in out:
-        c, o, e = box.sh("python3 -m unittest discover -s tests 2>&1 | tail -40", timeout=120)
+        c, o, e = (isolated(st, box, "python3 -m unittest discover -s tests 2>&1 | tail -40", 120) if st
+                   else box.sh("python3 -m unittest discover -s tests 2>&1 | tail -40", timeout=120))
         if "FAILED" in o or ("Error" in o and not o.rstrip().endswith("OK")):
             reports.append(o.strip()[-2500:])
     for f in [x for x in out.split() if "/" not in x]:
-        c, o, e = box.sh(f"python3 -m unittest {f[:-3]} 2>&1 | tail -30", timeout=120)
+        c, o, e = (isolated(st, box, f"python3 -m unittest {f[:-3]} 2>&1 | tail -30", 120) if st
+                   else box.sh(f"python3 -m unittest {f[:-3]} 2>&1 | tail -30", timeout=120))
         if "FAILED" in o:
             reports.append(o.strip()[-1500:])
     return "\n\n".join(reports) or None
@@ -474,7 +507,7 @@ def failing_tests(box):
 
 def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=None):
     if st.hard_tests and st.test_gate_tries < 4:
-        rep = failing_tests(box)
+        rep = failing_tests(box, st)
         if rep:
             st.test_gate_tries += 1
             return ("[harness] Not accepted: the project's tests fail. Fix the code (do not edit existing tests unless the task "
@@ -483,7 +516,7 @@ def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=N
     if st.finish_tries > 2:
         return None
     open_items = [i["text"] for i in st.todo if i["status"] not in ("done", "dropped")]
-    checks = harness_checks(box)
+    checks = harness_checks(box, st)
     if st.restore:
         if st.judge_inputs:
             # decide per changed provided file with a fast boolean judgment instead of a filename heuristic
@@ -513,7 +546,7 @@ def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=N
                     + ". They have been restored to their original content. Never write test data into them (use /tmp). "
                     "Run your program again on the real files, check the output, then call finish.")
     if st.spec:
-        code, out, err = box.sh("test -f .agent/spec_test.py || exit 99; python3 .agent/spec_test.py", timeout=60)
+        code, out, err = isolated(st, box, "test -f .agent/spec_test.py || exit 99; python3 .agent/spec_test.py", 60)
         if code == 99:
             if st.finish_tries == 1:
                 return ("[harness] Not accepted yet: .agent/spec_test.py does not exist. Write it with an assert for every example, "
