@@ -106,6 +106,15 @@ C7. More facts (checked): solid.rotate((0, 0, 0), (0, 0, 1), deg) turns about Z,
 C8. Never guess an API. Before using a method you are not sure of, and after any AttributeError or TypeError from
     CadQuery, look it up: `python3 /opt/cad/cadtool.py --api fillet` prints the real signatures and docs of every
     method whose name contains the word. Edge/face positions: e.Center() (a method), not e.center.
+C10. Objects with many parts (vehicles, furniture, machines, buildings) or anything that is easier to place by
+    coordinates: use the building blocks in /opt/cad/cadparts.py (from cadparts import *): box(x0, x1, y0, y1, z0, z1),
+    cyl_x/cyl_y/cyl_z (axis position, radius, start, end), cone_x/cone_y/cone_z (tapered: radius at start and end),
+    loft_x([(x, y, z, r), ...]) (round body through circular stations: fuselage, bottle), tube_y, sphere, profile_xz/profile_xy/profile_yz (outline
+    points + extrusion range), loft_z (two rectangles given as (x_min, x_max, y_min, y_max)), round_edges, wheel_y,
+    mirror_y (left/right pair), union_all. Every size is a min/max coordinate, so no workplane rules are needed.
+    Read the closest example first (ls /opt/cad/examples; e.g. car.py) and adapt its pattern. For colours, list the
+    parts instead of `result`: PARTS = [("body", body, (0.8, 0.1, 0.1)), ("glass", glass, (0.1, 0.1, 0.2)), ...];
+    cadtool then reports every part's box and writes a coloured model.glb.
 C9. Rounded inner corners of a pocket or cavity: make the cavity as its own solid (rect(...).extrude(h).edges("|Z")
     .fillet(r)) and cut it from the body, instead of selecting inner edges after cutting.
 """
@@ -234,6 +243,7 @@ class State:
         self.pending_image = None  # image requested with view_image, attached after the tool results
         self.cad = False         # CAD task: the part must build before finish
         self.cad_numbers_checked = False
+        self.cad_image_shown = False
         self.compact = False     # the server reported a full context: keep the prompt at half the usual size
         self.think_limit = False
         self.restore = False
@@ -631,8 +641,10 @@ def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=N
             pass
         if code == 99:
             return "[harness] Not accepted: model.py does not exist. Write the part in model.py (result = ...) and build it with cadtool."
-        if code != 0 or "solids: 1 " not in rep or "valid: True" not in rep:
-            return ("[harness] Not accepted: the part must build into exactly one valid solid. cadtool says:\n" + base.clip(rep, 1500)
+        assembly = "\nparts:" in rep   # PARTS: several coloured parts, each may hold several solids (v8c airliner)
+        if code != 0 or "valid: True" not in rep or (not assembly and "solids: 1 " not in rep):
+            need = "every part must build into valid solids" if assembly else "the part must build into exactly one valid solid"
+            return (f"[harness] Not accepted: {need}. cadtool says:\n" + base.clip(rep, 1500)
                     + "\nFix model.py, run cadtool again, compare every dimension of the task with the report, then call finish.")
         if not st.cad_numbers_checked:
             # every dimension in the task should show up somewhere in the measured report (v8c cad_cbore used
@@ -645,6 +657,15 @@ def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=N
                         "length, position or size). If it is missing or different, fix model.py and run cadtool again. If a number "
                         "is a count, an angle cadtool already shows another way, or something cadtool cannot measure (for example "
                         "a chamfer on a straight edge), check it yourself. Then call finish again.\ncadtool report:\n" + rep[:1500])
+        png = os.path.join(st.workdir, "model.png")
+        if not st.cad_image_shown and os.path.exists(png):
+            # the model checks numbers but rarely looks (v8c airliner: fuselage built vertical, never viewed)
+            st.cad_image_shown = True
+            st.pending_image = png
+            return ("[harness] Not accepted yet: look at the four views of your model in the next message. For every "
+                    "component the task asks for, say in a think call whether it is there, in the right place and pointing "
+                    "the right way (for example a fuselage along X, wheels outside the body, windows visible). Fix anything "
+                    "that is wrong, run cadtool again, then call finish.")
         checks += "\ncadtool report:\n" + rep[:1500]
     if st.spec:
         code, out, err = isolated(st, box, "test -f .agent/spec_test.py || exit 99; python3 .agent/spec_test.py", 60)

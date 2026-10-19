@@ -36,6 +36,29 @@ def tube_y(x, z, r_out, r_in, y0, y1):
     return t.cut(cyl_y(x, z, r_in, y0, y1)) if r_in > 0 else t
 
 
+def cone_x(y, z, r0, r1, x0, x1):
+    """Round tube along X whose radius goes from r0 at x0 to r1 at x1 (r1=0 gives a point); axis at (Y=y, Z=z)."""
+    return cq.Workplane("XY").add(cq.Solid.makeCone(r0, r1, x1 - x0, cq.Vector(x0, y, z), cq.Vector(1, 0, 0))).combine()
+
+
+def cone_y(x, z, r0, r1, y0, y1):
+    """Round tube along Y, radius r0 at y0 to r1 at y1."""
+    return cq.Workplane("XY").add(cq.Solid.makeCone(r0, r1, y1 - y0, cq.Vector(x, y0, z), cq.Vector(0, 1, 0))).combine()
+
+
+def cone_z(x, y, r0, r1, z0, z1):
+    """Round tube along Z, radius r0 at z0 to r1 at z1."""
+    return cq.Workplane("XY").add(cq.Solid.makeCone(r0, r1, z1 - z0, cq.Vector(x, y, z0), cq.Vector(0, 0, 1))).combine()
+
+
+def loft_x(stations, smooth=False):
+    """Body along X through circular stations [(x, y, z, r), ...] in increasing x (fuselage, bottle, rocket).
+    Straight between stations by default, so it never grows past the given radii; smooth=True rounds it but can
+    bulge between stations."""
+    wires = [cq.Wire.makeCircle(r, cq.Vector(x, y, z), cq.Vector(1, 0, 0)) for x, y, z, r in stations]
+    return cq.Workplane("XY").add(cq.Solid.makeLoft(wires, ruled=not smooth)).combine()
+
+
 def sphere(x, y, z, r):
     return cq.Workplane("XY").sphere(r).translate((x, y, z))
 
