@@ -91,8 +91,10 @@
       const rx = halfW + ov - l * 2, rz = hd + ov - l * 2;
       if (rx < 0 || rz < 0) break;
       for (let x = -rx; x <= rx; x++) for (let z = -rz; z <= rz; z++) {
-        const onEdge = Math.abs(x) >= rx - 1 || Math.abs(z) >= rz - 1;
-        if (!onEdge && l < layers - 1) continue;
+        // each layer reaches inward to just inside the wall line (halfW - 1 - l), so the roof rests on the walls /
+        // brackets below and the layers overlap - no gap under the eaves
+        const inner = Math.abs(x) < halfW - 1 - l && Math.abs(z) < hd - 1 - l;
+        if (inner && l < layers - 1) continue;
         const corner = Math.abs(x) >= rx - 1 && Math.abs(z) >= rz - 1;
         const lift = l === 0 && corner ? 1 : 0;
         VK.set(cx + x, y + l + lift, cz + z, l === 0 && (Math.abs(x) === rx || Math.abs(z) === rz) ? edge : color, { label: o.label });
@@ -147,7 +149,11 @@
   };
   VK.blobTree = (x, z, o = {}) => {
     const h0 = VK.H(x, z) + 1, th = o.trunkH ?? 6, r = o.r ?? 4, colors = o.colors ?? VK.PAL.sakura;
-    for (let y = 0; y < th; y++) VK.set(x + (y > th * 0.6 ? 1 : 0), h0 + y, z, o.trunk ?? VK.PAL.bark, { jitter: 0.1, label: o.label ?? "tree" });
+    for (let y = 0; y < th; y++) {
+      const dx = y > th * 0.6 ? 1 : 0;
+      VK.set(x + dx, h0 + y, z, o.trunk ?? VK.PAL.bark, { jitter: 0.1, label: o.label ?? "tree" });
+      if (dx && !(y - 1 > th * 0.6)) VK.set(x, h0 + y, z, o.trunk ?? VK.PAL.bark, { jitter: 0.1, label: o.label ?? "tree" }); // keep the bend connected
+    }
     VK.sphere(x + 1, h0 + th + 1, z, r, colors, { fill: o.fill ?? 0.88, squash: 0.75, jitter: 0.05, label: o.label ?? "tree" });
     for (let i = 0; i < (o.fallen ?? 12); i++) {
       const px = x + Math.round((VK.rand() - 0.5) * r * 3), pz = z + Math.round((VK.rand() - 0.5) * r * 3), ph = VK.H(px, pz);
@@ -157,7 +163,11 @@
   };
   VK.padTree = (x, z, o = {}) => {
     const h0 = VK.H(x, z) + 1, colors = o.colors ?? VK.PAL.pine;
-    for (let y = 0; y < 7; y++) VK.set(x + (y > 3 ? 1 : 0) + (y > 5 ? 1 : 0), h0 + y, z, o.trunk ?? VK.PAL.bark, { jitter: 0.1, label: "tree" });
+    for (let y = 0; y < 7; y++) {
+      const dx = (y > 3 ? 1 : 0) + (y > 5 ? 1 : 0);
+      VK.set(x + dx, h0 + y, z, o.trunk ?? VK.PAL.bark, { jitter: 0.1, label: "tree" });
+      if (y === 4 || y === 6) VK.set(x + dx - 1, h0 + y, z, o.trunk ?? VK.PAL.bark, { jitter: 0.1, label: "tree" });  // connected bends
+    }
     for (const [ox, oy, oz, r] of o.pads ?? [[2, 7, 0, 3], [-1, 5, 1, 2.2], [3, 4, -1, 2], [0, 9, 0, 2]])
       for (let dx = -r; dx <= r; dx++) for (let dz = -r; dz <= r; dz++) for (let dy = 0; dy <= 1; dy++)
         if (Math.hypot(dx, dz) < r - dy * 0.6) VK.set(x + ox + dx, h0 + oy + dy, z + oz + dz, colors, { jitter: 0.08, label: "tree" });
@@ -185,6 +195,22 @@
       if (v.water || v.label === "pond" || v.label === "island") continue;
       const [x, y, z] = k.split(",").map(Number), wy = waterY.get(x + "," + z);
       if (wy !== undefined && (y === wy + 1 || y === wy + 2)) { const l = v.label || "unlabelled"; stats.overWater[l] = (stats.overWater[l] || 0) + 1; }
+    }
+    // floating parts: voxels not touching (26-neighbour) anything connected to the island / ground
+    stats.floating = {};
+    {
+      const seen = new Set(), queue = [];
+      for (const [k, v] of vox) if (v.label === "island") { seen.add(k); queue.push(k); }
+      if (!queue.length) { let lowest = null; for (const k of vox.keys()) { const y = +k.split(",")[1]; if (lowest === null || y < lowest[1]) lowest = [k, y]; } if (lowest) { seen.add(lowest[0]); queue.push(lowest[0]); } }
+      while (queue.length) {
+        const [x, y, z] = queue.pop().split(",").map(Number);
+        for (let a = -1; a <= 1; a++) for (let b = -1; b <= 1; b++) for (let c = -1; c <= 1; c++) {   // touching at an edge or corner counts
+          const n = K(x + a, y + b, z + c);
+          if (vox.has(n) && !seen.has(n)) { seen.add(n); queue.push(n); }
+        }
+      }
+      stats.floatSample = {};
+      for (const [k, v] of vox) if (!seen.has(k)) { const l = v.label || "unlabelled"; stats.floating[l] = (stats.floating[l] || 0) + 1; if (!stats.floatSample[l]) stats.floatSample[l] = k; }
     }
     if (!stats.voxels) throw new Error("VK.start(): no voxels were set - build the world before calling VK.start()");
     const mk = (list, mat, cast) => {

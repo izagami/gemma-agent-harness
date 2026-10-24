@@ -139,6 +139,10 @@ def main():
         kinds = [k for k in labels if k not in ("island", "pond")]
         if len(kinds) < 8:
             print(f"parts: {len(kinds)} labelled kinds besides island/pond (a rich scene has 8+; give every part a label)")
+        fl = {k: n for k, n in (vk.get("floating") or {}).items() if n >= 4 and not any(w in k for w in ("petal", "cloud", "bird", "lantern light"))}
+        if fl:
+            print("floating: " + ", ".join(f"{k} {n} voxels" for k, n in fl.items())
+                  + "  (not connected to anything below - a gap between parts; close it or rest it on the part below)")
         ow = {k: n for k, n in (vk.get("overWater") or {}).items() if "bridge" not in k and "lily" not in k and n >= 20}
         if ow:
             print("over the pond: " + ", ".join(f"{k} {n} voxels" for k, n in ow.items())

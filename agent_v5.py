@@ -2024,6 +2024,15 @@ def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=N
         if code != 0:
             return ("[harness] Not accepted: the page does not render cleanly. render.py says:\n" + base.clip(rep, 1500)
                     + "\nFix scene.js, build and render again, then call finish.")
+        m_parts = re.search(r"^parts: (\d+) labelled kinds", rep, re.M)
+        m_vox = re.search(r"^voxelkit: (\d+) voxels.*?\"island\": (\d+)", rep, re.M)
+        thin = (m_parts and int(m_parts.group(1)) < 6) or (m_vox and int(m_vox.group(1)) - int(m_vox.group(2)) < 1500)
+        if st.__dict__.get("webart_review") and thin and st.__dict__.get("webart_thin", 0) < 2:
+            # cycle 55: two runs cut scene.js down to 3-6 lines to get rid of an error and finished with an empty island
+            st.webart_thin = st.__dict__.get("webart_thin", 0) + 1
+            return ("[harness] Not accepted: the scene is too thin for the task (few labelled parts / few voxels besides the "
+                    "island). Do not shrink the scene to get rid of an error - fix the reported line instead. Build the "
+                    "hero and 8+ labelled supporting parts again, then build, render and call finish.\n" + base.clip(rep, 800))
         if not st.__dict__.get("webart_review"):
             # cycle 53: the first kit scene was clean but thin (3 trees, the pagoda standing in the pond, 100 lines)
             st.webart_review = True
@@ -2035,6 +2044,7 @@ def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=N
                     "2. Count the supporting element kinds (labels above): a rich scene has 8 or more (water, bridge, gate, "
                     "lanterns, path, 2-3 tree kinds, shrubs, flowers, rocks, fence...). Add the missing ones, placed so they "
                     "do not overlap each other.\n3. Life: petals / animals / lights that move.\n"
+                    "4. Nothing floating and nothing standing in water (see 'floating' / 'over the pond' above).\n"
                     "Then build and render again, and call finish.")
         checks += "\nrender report:\n" + rep[:1200]
     if st.spec and not webart:
