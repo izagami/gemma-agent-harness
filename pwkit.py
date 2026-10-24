@@ -46,7 +46,7 @@ Reading
                                               screen while the new one loads - never read right after typing
     find_row(scope, rows_sel, key, col=0)     the row whose cell col is exactly key (not R-12 for R-125), or None
 Acting
-    modal_submit(page, values, submit_sel, dialog_sel='[role="dialog"]')
+    modal_submit(page, values, submit_sel, dialog_sel='[role="dialog"]', done_sel=None)
                                               for a form that opens in a dialog after a click: waits for the dialog,
                                               fill_form(values) inside it, clicks submit_sel ONCE (a confirm() is accepted
                                               by open_browser's handler), waits until the dialog is gone. Click the row's
@@ -280,15 +280,21 @@ def search_and_wait(scope, input_sel, query, rows_sel, table_sel=None):
     _loc(scope, input_sel).first.fill(query)
     q = query.lower()
 
+    t0 = time.time()
+
     def c():
-        if table_sel:
-            t = _loc(scope, table_sel).first
+        # without table_sel: any busy element / any data-query on the page counts (cycle 71 passed only 'tbody tr' and
+        # got 0 rows - the table was still loading - which looked like "every row matches")
+        tsel = table_sel or "[aria-busy], [data-query]"
+        for t in _loc(scope, tsel).all():
             if t.get_attribute("aria-busy") == "true":
                 return False, "table busy"
             dq = t.get_attribute("data-query")
             if dq is not None and dq != query:
                 return False, f"table shows query {dq!r}"
         texts = [x.lower() for x in _loc(scope, rows_sel).all_text_contents()]
+        if not texts and time.time() - t0 < 2:
+            return False, "no rows yet"
         return all(q in x for x in texts), f"{len(texts)} rows"
     _poll(c, f"rows of {rows_sel} for search {query!r}", scope)
     time.sleep(0.2)                 # one more look: a slow older response may still overwrite the table
@@ -307,7 +313,7 @@ def find_row(scope, rows_sel, key, col=0):
     return None
 
 
-def modal_submit(page, values, submit_sel, dialog_sel='[role="dialog"]'):
+def modal_submit(page, values, submit_sel, dialog_sel='[role="dialog"]', done_sel=None, **_):
     """dialog form: wait for it, fill it, click submit ONCE, wait until it is gone; returns the dialog's last text"""
     dlg = page.locator(dialog_sel).first
     _wait_state(page, dialog_sel, "visible")
@@ -320,6 +326,8 @@ def modal_submit(page, values, submit_sel, dialog_sel='[role="dialog"]'):
             return True, None
         return False, (page.locator(dialog_sel).first.text_content() or "").strip()[:200]
     _poll(c, f"the dialog {dialog_sel} to close after clicking {submit_sel} once", page)
+    if done_sel:                    # optional: also wait for a confirmation element (toast) to show
+        wait_visible(page, done_sel)
     return last
 
 
