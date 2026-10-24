@@ -1221,7 +1221,7 @@ def lint_note(st, workdir, rel):
         import know
         text = open(os.path.join(workdir, rel), encoding="utf-8", errors="replace").read()
         seen = st.__dict__.setdefault("lint_seen", set())
-        new = [(k, m) for k, m in know.lint(st.know_keys, rel, text) if (k, rel) not in seen]
+        new = [(k, m) for k, m in know.lint(st.know_keys, rel, text, root=workdir) if (k, rel) not in seen]
         seen.update((k, rel) for k, _ in new)
         if st.log and new:
             st.log({"lint": [k for k, _ in new], "path": rel})
@@ -1911,7 +1911,7 @@ def lint_unresolved(st):
                 if not fn.endswith(".py") or fn in ("vbcompat.py", "pwkit.py", "sqlkit.py") or (rel in st.seed and st.seed.get(rel) == now.get(rel)):
                     continue
                 text = open(os.path.join(dp, fn), encoding="utf-8", errors="replace").read()
-                left += [f"- {rel}: {m}" for _, m in know.lint(st.know_keys, rel, text)]
+                left += [f"- {rel}: {m}" for _, m in know.lint(st.know_keys, rel, text, root=st.workdir)]
         return left
     except Exception as e:
         if st.log:

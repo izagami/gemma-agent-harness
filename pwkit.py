@@ -10,7 +10,10 @@ Discover
     sel_testid(name) / sel_label(text)    '[data-testid="name"]' / '[aria-label="text"]'
 Session
     open_browser()                        -> (playwright, browser, page) with page.on("dialog") accepting confirm()/alert()
-    close_browser(pw, browser)
+    close_browser(pw, browser)            starts/stops Playwright itself: do NOT also use `with sync_playwright()`
+                                          pw, browser, page = open_browser()
+                                          try: ... finally: close_browser(pw, browser)
+All helpers are plain functions taking the page/frame first: wait_attr(page, sel, ...), never page.wait_attr(...)
     login(page, url, user, password, user_sel, pass_sel, submit_sel, after_url_part=None)
 Waiting
     wait_visible(scope, selector) / wait_hidden(scope, selector)

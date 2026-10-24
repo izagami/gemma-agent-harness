@@ -196,7 +196,27 @@ def _open_w_calls(text):
     return [m.group(0) for m in re.finditer(r"open\([^\n]*?[\"'][wa]b?\+?[\"'][^\n]*", text)]
 
 
-def lint(keys, path, text):
+def _page_ids(root):
+    """ids, data-testids, names and aria-labels found in the project's .html files (and inline JS that sets them)"""
+    ids, testids, others = set(), set(), set()
+    for dp, dns, fns in os.walk(root):
+        dns[:] = [d for d in dns if not d.startswith(".") and d not in ("node_modules", "lib")]
+        for fn in fns:
+            if fn.endswith((".html", ".htm", ".js")) and fn != "pwkit.py":
+                try:
+                    t = open(os.path.join(dp, fn), encoding="utf-8", errors="replace").read()
+                except OSError:
+                    continue
+                ids |= set(re.findall(r"""\bid\s*=\s*["']([\w-]+)["']""", t)) | set(re.findall(r"""\.id\s*=\s*["']([\w-]+)["']""", t))
+                testids |= set(re.findall(r"""data-testid\s*=\s*["']([\w-]+)["']""", t)) | set(re.findall(r"""testid\s*=\s*["']([\w-]+)["']""", t))
+                others |= set(re.findall(r"""(?:aria-label|name)\s*=\s*["']([^"']+)["']""", t))
+                others |= {"attr:" + a for a in re.findall(r"\b(data-[\w-]+|aria-[\w-]+)", t)}
+                others |= {"attr:data-" + re.sub(r"[A-Z]", lambda m: "-" + m.group(0).lower(), a)
+                           for a in re.findall(r"\.dataset\.(\w+)", t)}
+    return ids, testids, others
+
+
+def lint(keys, path, text, root=None):
     """-> list of (rule id, message) for Python code written under the sheets in keys"""
     if not path.endswith(".py") or path.startswith((".agent/", "app/")) or "/tests/" in "/" + path:
         return []
@@ -250,6 +270,36 @@ def lint(keys, path, text):
         if re.search(r"\bsorted\(|\.sort\(", text):
             out.append(("vba-sort", "sorted()/.sort() order ties differently from the macro's own sort loop (a bubble sort "
                         "that swaps on <= reverses equal neighbours). Reproduce the macro's loop."))
+    if "browser" in keys and root:
+        # cycle 51 q_browser_fix: the script used #name/#email/#dept; the page has data-testid="name" ... only, so every
+        # wait timed out although the HTML was in the first message
+        ids, testids, others = _page_ids(root)
+        if ids or testids:
+            used = set(re.findall(r"""["']#([A-Za-z][\w-]*)(?=[\s"'.:\[>])""", text))
+            missing = sorted(u for u in used if u not in ids)
+            attrs = {o[5:] for o in others if o.startswith("attr:")}
+            used_attrs = set(re.findall(r"\[((?:data|aria)-[\w-]+)\s*[~|^$*]?=", text))
+            bad_attrs = sorted(a for a in used_attrs if a not in attrs and a != "data-testid")
+            if bad_attrs:
+                out.append(("br-attr", f"attribute selectors {', '.join('[' + a + '=...]' for a in bad_attrs[:4])}: no page "
+                            f"in the project has {'these attributes' if len(bad_attrs) > 1 else 'this attribute'}. Attributes "
+                            f"that exist: {', '.join(sorted(attrs)[:12]) or 'none'}. Select by what the HTML really has."))
+            if missing:
+                hint = ", ".join(f'[data-testid="{t}"]' for t in sorted(testids)[:12]) or ", ".join(f"#{i}" for i in sorted(ids)[:12])
+                out.append(("br-selector", f"selectors {', '.join('#' + m for m in missing[:6])} do not exist in the project's "
+                            f"pages (no element has those ids). The pages use: {hint}. Check the HTML (or pwkit inspect(page)) "
+                            "and use selectors that exist."))
+    if "browser" in keys and "pwkit" in text:
+        # cycle 51 h_browser_approve: pwkit functions called as page methods, open_browser() inside sync_playwright()
+        m = re.search(r"\b(?:page|frame|scope|form\w*)\.(wait_text|wait_text_change|wait_attr|wait_for_attr|wait_count|wait_options|"
+                      r"wait_visible|wait_hidden|read_rows|open_and_read|collect_pages|submit_once|click_and_wait_change|fill_form|select_label)\(", text)
+        if m:
+            out.append(("br-kit-call", f"`.{m.group(1)}(` is not a Playwright method: pwkit functions take the page/frame as "
+                        f"the FIRST ARGUMENT, e.g. {m.group(1).replace('wait_for_attr', 'wait_attr')}(page, selector, ...)."))
+        if re.search(r"\bopen_browser\(", text) and re.search(r"with\s+sync_playwright\(\)", text):
+            out.append(("br-kit-open", "open_browser() starts Playwright itself; calling it inside `with sync_playwright()` fails "
+                        "('Sync API inside the asyncio loop'). Use either `pw, browser, page = open_browser()` ... "
+                        "close_browser(pw, browser) in try/finally, or sync_playwright yourself - not both."))
     if "browser" in keys:
         if re.search(r"\btime\.sleep\(|wait_for_timeout\(", text):
             out.append(("br-sleep", "a fixed wait (time.sleep / wait_for_timeout) breaks when the system is slower: wait for "
