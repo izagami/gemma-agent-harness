@@ -2030,7 +2030,8 @@ def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=N
             return ("[harness] Not accepted yet - the page renders; now make it rich. render.py says:\n" + base.clip(rep, 1200)
                     + "\nIn a think call, check each point and then improve scene.js:\n"
                     "1. The hero structure: is it big (it should dominate the picture) and detailed (several tiers/levels, "
-                    "pillars, trims, ornaments, a top piece), and does it stand on solid ground (not in water)?\n"
+                    "pillars, trims, ornaments, a top piece), and does it stand on solid ground (not in water)? Between stacked roofs "
+                    "the walls, pillars and windows must stay visible: each storey needs a body taller than its roof layers.\n"
                     "2. Count the supporting element kinds (labels above): a rich scene has 8 or more (water, bridge, gate, "
                     "lanterns, path, 2-3 tree kinds, shrubs, flowers, rocks, fence...). Add the missing ones, placed so they "
                     "do not overlap each other.\n3. Life: petals / animals / lights that move.\n"

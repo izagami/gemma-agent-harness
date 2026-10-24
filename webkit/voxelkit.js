@@ -213,8 +213,11 @@
     const radius = size.length() / 2;
     const camera = new THREE.PerspectiveCamera(42, innerWidth / innerHeight, 0.5, radius * 20);
     // frame what is above ground mostly (the rocky underside of an island should not push the camera away)
-    const focus = center.clone(); focus.y = bb.min.y + size.y * 0.6;
-    const fitDist = radius / Math.sin(THREE.MathUtils.degToRad(42) / 2) * (innerWidth < innerHeight ? 1.25 : 0.78);
+    // ground level = most common top height of the island; frame from slightly below it to the top
+    const tops = [...height.values()].sort((a, b) => a - b), ground = tops.length ? tops[tops.length >> 1] : bb.min.y;
+    const low = Math.max(bb.min.y, ground - size.y * 0.15), focus = center.clone(); focus.y = (low + bb.max.y) / 2;
+    const frameR = Math.hypot(size.x, bb.max.y - low, size.z) / 2;
+    const fitDist = frameR / Math.sin(THREE.MathUtils.degToRad(42) / 2) * (innerWidth < innerHeight ? 1.3 : 0.85);
     const dir = new THREE.Vector3(0.62, 0.36, 0.66).normalize();
     camera.position.copy(focus).addScaledVector(dir, fitDist);
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
