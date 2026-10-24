@@ -56,7 +56,7 @@ seed and passes with the reference solution (`refs.py`). Run: `python3 eval.py v
 
 Current best configuration (profile `v7o` plus environment flags; run through `cycle.py` / `run_vllm.sh`):
 
-    THINK_SCHEMA=3 THINK_LEARNED=800 THINK_NEXT=400 AGENT_TEMP=0 EDIT2=1 MIDGATE=1 KNOW=1 LINT=1 EDIT3=1
+    THINK_SCHEMA=3 THINK_LEARNED=800 THINK_NEXT=400 AGENT_TEMP=0 EDIT2=1 MIDGATE=1 KNOW=1 LINT=1 EDIT3=1 VBC=1 KIT=1
 
 | Flag | What it does |
 |---|---|
@@ -66,6 +66,8 @@ Current best configuration (profile `v7o` plus environment flags; run through `c
 | `MIDGATE` | the finish gate (`evidence.py`: run the task's commands on a fresh copy, then judge every requirement with a fast logprob judge) also runs in the background at 35 % / 65 % of the time limit and reports violations |
 | `KNOW` | `know.py`: domain sheets (VBA port, browser automation, SQLite, firewall audit, exact output files) plus all docs/code in the first message. The sheets are the facts a strong model used to solve the tasks this model failed - general facts of each domain, not answers |
 | `LINT` | the sheets as checks on every written file (e.g. `executescript` inside `BEGIN`, `open(..., "w")` without `newline=""`, `//` for VBA `\`, `time.sleep` in Playwright) |
+| `VBC` | VBA ports get `vbcompat.py`, a tested VBA runtime (CLng/Round banker's rounding, Format, `\`/Mod, Val, StrConv, DateSerial/DateAdd/DateDiff, Shift_JIS + CRLF output ...): call it instead of re-deriving VBA semantics |
+| `KIT` | browser tasks get `pwkit.py` (Playwright: waits on state, read-after-open, collect pages, submit once, exact CSV), SQLite tasks get `sqlkit.py` (all-or-nothing transactions, executescript replacement) |
 | `EDIT3` | stops tool calls that turn into reasoning in code comments or prose (they used to run to the token limit), writes path-less test/CAD files to their usual path, warns when a rewrite drops a function |
 
 Evaluation: `tasks_qg/` (25 tasks with graded hidden checks), `tasks_v8/` (12), and `tasks_h/` (7 held-out tasks in the
@@ -76,6 +78,9 @@ configurations side by side on the same tasks and prints a paired comparison.
 Measured on tasks never used to build the sheets (`tasks_h`, 4 runs per task per configuration):
 mean graded score 0.291 → 0.418 (VBA inventory valuation 0.01 → 0.53, browser inventory export 0.00 → 0.47,
 firewall audit 0.42 → 0.70). On the 9 tasks the sheets came from: 0.30 → 0.54, 4 passes vs 0.
+
+Tested helper modules beat explained knowledge: VBA ports 1/10 → 4/10 passes with `VBC` (score 0.44 → 0.64);
+browser/SQLite tasks 0/18 → 1/18 and 0/18 → 2/18 with `KIT` in two runs (score +0.10 both times).
 
 ## Security notes
 
