@@ -15,6 +15,14 @@
 //   VK.roof(cx, y, cz, halfW, opts)                       East-Asian hip roof: wide eaves, steps inward, corners
 //                                                         curl up; opts {halfD, overhang:3, layers:3, color, edge,
 //                                                         tip (corner ornament color), glowTips} -> top y
+//   VK.building(cx, cz, {storeys: 3, halfW: 5, halfD, taper: 1, firstH: 5, storeyH: 4, wall, pillar, trim, window,
+//               roof: "hip"|"flat"|"none", roofColor, roofEdge, bracket, tip, overhang: 3, spire: true, spireH: 9,
+//               plinth: true, label}) -> {base, top}
+//                                 TESTED storeyed building on the ground at (cx, cz): stone plinth + steps, every storey
+//                                 with pillars, walls, windows, trim, bracket band and an upturned hip roof resting on it,
+//                                 finial on top. Five storeys + taper 0.75 = a five-storey pagoda; roof "flat" + storeys 3
+//                                 = a tower house; wall/pillar colors make temples, castles, lighthouses. Use it for the
+//                                 hero, then add your own details around it.
 //   VK.island({radius: 30, top: 4, hill: [x, z, r, h], depthScale}) -> floating island with grass/dirt/stone
 //                                                         layers and a rocky underside; afterwards VK.H(x, z)
 //                                                         gives the ground top (or -Infinity off the island)
@@ -105,6 +113,51 @@
       }
     }
     return y + layers;
+  };
+  // storeyed building: pagoda, castle keep, temple hall, tower house, lighthouse ... -> {top, base}
+  VK.building = (cx, cz, o = {}) => {
+    const L = o.label ?? "building", P = VK.PAL;
+    const n = o.storeys ?? 3, w0 = o.halfW ?? 5, d0 = o.halfD ?? w0, taper = o.taper ?? 1;
+    const wallC = o.wall ?? P.white, pillarC = o.pillar ?? P.red, trimC = o.trim ?? P.wood, winC = o.window ?? 0x3a2a1a;
+    const g = o.y ?? VK.H(cx, cz) + 1;
+    let y = g;
+    if (o.plinth !== false) {                                           // stone base with steps at the front
+      VK.box(cx - w0 - 2, y, cz - d0 - 2, cx + w0 + 2, y, cz + d0 + 2, P.stoneD, { label: L });
+      VK.box(cx - w0 - 1, y + 1, cz - d0 - 1, cx + w0 + 1, y + 1, cz + d0 + 1, P.stone, { label: L });
+      VK.box(cx - 1, y, cz + d0 + 3, cx + 1, y, cz + d0 + 3, P.stone, { label: L });
+      y += 2;
+    }
+    for (let t = 0; t < n; t++) {
+      const w = Math.max(1, w0 - Math.floor(t * taper)), d = Math.max(1, d0 - Math.floor(t * taper));
+      const h = t === 0 ? (o.firstH ?? 5) : (o.storeyH ?? 4);
+      VK.box(cx - w + 1, y, cz - d + 1, cx + w - 1, y, cz + d - 1, trimC, { label: L });           // floor
+      for (let yy = 0; yy < h; yy++) for (let x = -w; x <= w; x++) for (let z = -d; z <= d; z++) {
+        if (Math.abs(x) !== w && Math.abs(z) !== d) continue;
+        const corner = Math.abs(x) === w && Math.abs(z) === d;
+        const pillar = corner || (Math.abs(x) === w ? z % 2 === 0 : x % 2 === 0);
+        if (t === 0 && Math.abs(x) <= 1 && z === d && yy < 3) continue;                             // doorway
+        const win = !pillar && yy >= 1 && yy <= h - 2 && (yy % 2 === 1);
+        VK.set(cx + x, y + yy, cz + z, pillar ? pillarC : yy === h - 1 ? trimC : win ? winC : wallC, { label: L });
+      }
+      y += h;
+      if (o.roof !== "flat" && o.roof !== "none") {
+        VK.shell(cx - w - 1, y, cz - d - 1, cx + w + 1, y, cz + d + 1, o.bracket ?? P.gold, { label: L });  // bracket band
+        y = VK.roof(cx, y + 1, cz, w + 1, { halfD: d + 1, overhang: o.overhang ?? 3, layers: 3, color: o.roofColor ?? P.roof,
+          edge: o.roofEdge ?? P.roofL, tip: o.tip ?? P.gold, label: L });
+      } else {
+        VK.shell(cx - w - 1, y, cz - d - 1, cx + w + 1, y, cz + d + 1, trimC, { label: L });          // parapet
+        VK.box(cx - w, y, cz - d, cx + w, y, cz + d, trimC, { label: L });
+        y += 1;
+      }
+    }
+    if (o.spire !== false) {                                            // finial: shaft with rings and a glowing top
+      const sh = o.spireH ?? 9;
+      VK.box(cx, y, cz, cx, y + sh, cz, o.spireColor ?? P.gold, { label: L });
+      for (let i = 1; i < sh - 1; i += 2) for (const [a, b] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) VK.set(cx + a, y + i, cz + b, o.spireColor ?? P.gold, { label: L });
+      VK.set(cx, y + sh + 1, cz, P.lantern, { glow: true, label: L });
+      y += sh + 2;
+    }
+    return { base: g, top: y };
   };
   const height = new Map();
   VK.H = (x, z) => height.get(Math.round(x) + "," + Math.round(z)) ?? -Infinity;
