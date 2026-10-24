@@ -2577,9 +2577,11 @@ def run_task(task_text, workdir, profile, log):
                     if key in keys:
                         rel = os.path.join(where, mod) if where else mod
                         os.makedirs(os.path.join(workdir, where or "."), exist_ok=True)
-                        shutil.copy(os.path.join(here, mod), os.path.join(workdir, rel))
+                        # PWKIT_SRC=pwkit_v1.py: A/B against the previous pwkit (cycle 69), copied under the same name
+                        src = os.environ.get("PWKIT_SRC", mod) if mod == "pwkit.py" else mod
+                        shutil.copy(os.path.join(here, src), os.path.join(workdir, rel))
                         kmsg += (f"\n\n[harness] {rel} is in the project: a TESTED helper module - use it instead of "
-                                 f"writing these parts yourself. Import it {how} Its API:\n" + know.kit_api(mod))
+                                 f"writing these parts yourself. Import it {how} Its API:\n" + know.kit_api(src))
                         log({"kit": rel})
                 if "webart" in keys:
                     # voxel / three.js scenes: tested voxel kit + one-file builder + headless render report

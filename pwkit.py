@@ -1,7 +1,8 @@
 """pwkit: tested helpers for Playwright (sync API, Python) automation of slow, changing web pages.
 
 Copy next to your script and `from pwkit import *`. Every wait is on STATE (text, visibility, count), never on time,
-and uses one generous timeout (TIMEOUT ms, 60 s by default) because real systems are slower than test ones.
+with one timeout (TIMEOUT ms, 15 s by default: pages answer within a few seconds, and a wait that runs out means the
+selector or the page is wrong - the error then says which URL the page is on and what it has, so read it and fix that).
 `scope` below is a Page or a FrameLocator/Frame (forms inside an <iframe>: scope = page.frame_locator("iframe[...]")).
 
 Discover
@@ -15,6 +16,8 @@ Session
                                           try: ... finally: close_browser(pw, browser)
 All helpers are plain functions taking the page/frame first: wait_attr(page, sel, ...), never page.wait_attr(...)
     login(page, url, user, password, user_sel, pass_sel, submit_sel, after_url_part=None)
+                                          returns only when the login page is gone (raises with the page's error
+                                          message if the login failed) - only then page.goto() another page
 Waiting
     wait_visible(scope, selector) / wait_hidden(scope, selector)
     wait_text(scope, selector, text)          until text_content() == text (exact, stripped)
@@ -22,7 +25,7 @@ Waiting
     wait_count(scope, selector, n)            until exactly n elements
     wait_attr(scope, selector, attr, value)   until the attribute equals value (e.g. aria-busy "false")
     wait_options(scope, select_selector)      until a <select> has a real (non-empty value) option
-    click_and_wait_change(page, click_sel, watch_sel, scope=None)
+    click_and_wait_change(page, click_sel, watch_sel, scope=None)   click_sel: a selector or a Locator (tabs.nth(i))
                                               remembers watch_sel's text, clicks, waits until it changed: use for
                                               "next page", tabs, filters, search - anything that replaces content
                                               (a tab that is already selected: clicks and returns at once)
@@ -39,9 +42,11 @@ Acting
     submit_once(scope, page, submit_sel, done_sel, error_sel=None)
                                               clicks ONCE and waits until done_sel is visible or error_sel has text;
                                               returns ("ok", text) / ("error", text). Never clicks again (no double records)
-    fill_form(scope, {selector: value, ...}) / select_label(scope, selector, label)
+    fill_form(scope, {selector: value, ...})  text inputs are filled; a <select> gets the option whose label (or value)
+                                              is the value; a checkbox/radio is checked when the value is true
+    select_label(scope, selector, label)
 Output
-    write_csv(path, header, rows, encoding="utf-8", newline="\\n")
+    write_csv(path, header, rows, encoding="utf-8", newline="\\n")   rows: lists, or dicts keyed by the header names
                                               quotes a value only if it contains , or " (doubling "), no BOM
     parse_int(s)                              '¥12,345' -> 12345, '¥-3,000' -> -3000, '▲1,234' -> -1234
 """
@@ -49,7 +54,21 @@ import os
 import re
 import time
 
-TIMEOUT = int(os.environ.get("PWKIT_TIMEOUT", "60000"))
+# 15 s: cycle 68 scripts that waited on a wrong selector (or on a page they had been redirected away from) sat in a
+# 60 s wait past the checker's 22-42 s limit -> score 0 and no error message to learn from
+TIMEOUT = int(os.environ.get("PWKIT_TIMEOUT", "15000"))
+
+
+def _where(scope):
+    """'page is at URL; it has: ...' for timeout messages"""
+    try:
+        page = scope if hasattr(scope, "goto") else getattr(scope, "page", None)
+        if page is None:
+            return ""
+        have = page.eval_on_selector("body", _INSPECT_JS)[:15]
+        return f" - the page is at {page.url}; it has: " + "; ".join(have)
+    except Exception:
+        return ""
 
 
 # ---------------------------------------------------------------- selectors / discovery
@@ -98,7 +117,7 @@ def open_browser(headless=True):
     return pw, browser, page
 
 
-def close_browser(pw, browser):
+def close_browser(pw, browser, *_):
     try:
         browser.close()
     finally:
@@ -109,9 +128,26 @@ def login(page, url, user, password, user_sel, pass_sel, submit_sel, after_url_p
     page.goto(url)
     page.fill(user_sel, user)
     page.fill(pass_sel, password)
+    login_url = page.url
     page.click(submit_sel)
     if after_url_part:
         page.wait_for_url(re.compile(re.escape(after_url_part)), timeout=TIMEOUT)
+        return
+
+    # cycle 68 h_browser_inventory: page.goto(next page) right after the click raced the login -> redirected back to
+    # the login page, then a 60 s wait for an element of the next page. Wait until the login form is gone.
+    def c():
+        if page.url != login_url or page.locator(pass_sel).count() == 0 or not page.locator(pass_sel).first.is_visible():
+            return True, None
+        msg = page.locator('[role="alert"], .error, #error').all_text_contents()
+        msg = " ".join(m.strip() for m in msg if m.strip())
+        if msg:
+            raise RuntimeError(f"pwkit login: the login page says {msg!r} (user {user!r})")
+        return False, None
+    try:
+        _poll(c, "the login page to go away")
+    except TimeoutError:
+        raise TimeoutError(f"pwkit login: still on the login page after {TIMEOUT // 1000} s{_where(page)}") from None
 
 
 # ---------------------------------------------------------------- waiting
@@ -119,15 +155,24 @@ def _loc(scope, selector):
     return scope.locator(selector)
 
 
+def _wait_state(scope, selector, state):
+    try:
+        _loc(scope, selector).first.wait_for(state=state, timeout=TIMEOUT)
+    except Exception as e:
+        if "Timeout" not in type(e).__name__ and "Timeout" not in str(e)[:200]:
+            raise
+        raise TimeoutError(f"pwkit: {selector} not {state} after {TIMEOUT // 1000} s{_where(scope)}") from None
+
+
 def wait_visible(scope, selector):
-    _loc(scope, selector).first.wait_for(state="visible", timeout=TIMEOUT)
+    _wait_state(scope, selector, "visible")
 
 
 def wait_hidden(scope, selector):
-    _loc(scope, selector).first.wait_for(state="hidden", timeout=TIMEOUT)
+    _wait_state(scope, selector, "hidden")
 
 
-def _poll(cond, what):
+def _poll(cond, what, scope=None):
     end = time.time() + TIMEOUT / 1000
     last = None
     while time.time() < end:
@@ -138,7 +183,8 @@ def _poll(cond, what):
         except Exception as e:      # element not there yet / detached during a re-render
             last = repr(e)
         time.sleep(0.05)
-    raise TimeoutError(f"pwkit: timed out waiting for {what} (last seen: {last!r})")
+    raise TimeoutError(f"pwkit: timed out after {TIMEOUT // 1000} s waiting for {what} (last seen: {last!r})"
+                       + (_where(scope) if scope is not None else ""))
 
 
 def text(scope, selector):
@@ -150,22 +196,22 @@ def text(scope, selector):
 
 def wait_text(scope, selector, expected):
     expected = str(expected).strip()
-    return _poll(lambda: (text(scope, selector) == expected, text(scope, selector)), f"{selector} == {expected!r}")
+    return _poll(lambda: (text(scope, selector) == expected, text(scope, selector)), f"{selector} == {expected!r}", scope)
 
 
 def wait_text_change(scope, selector, old):
-    return _poll(lambda: ((t := text(scope, selector)) != old, t), f"{selector} to change from {old!r}")
+    return _poll(lambda: ((t := text(scope, selector)) != old, t), f"{selector} to change from {old!r}", scope)
 
 
 def wait_count(scope, selector, n):
-    return _poll(lambda: (_loc(scope, selector).count() == n, _loc(scope, selector).count()), f"{n} x {selector}")
+    return _poll(lambda: (_loc(scope, selector).count() == n, _loc(scope, selector).count()), f"{n} x {selector}", scope)
 
 
 def wait_attr(scope, selector, attr, value):
     def c():
         v = _loc(scope, selector).first.get_attribute(attr)
         return v == value, v
-    return _poll(c, f"{selector}[{attr}={value!r}]")
+    return _poll(c, f"{selector}[{attr}={value!r}]", scope)
 
 
 def wait_options(scope, select_selector):
@@ -183,13 +229,19 @@ def _content(scope, selector):
 def click_and_wait_change(page, click_sel, watch_sel, scope=None):
     """click click_sel, then wait until watch_sel's HTML differs from before (content replaced, not just 'loading')"""
     scope = scope or page
-    target = _loc(scope, click_sel).first
+    # click_sel may also be a Locator (e.g. tabs.nth(i)); cycle 68 passed the tab as scope= and a selector inside it
+    if not isinstance(click_sel, str):
+        target, scope = click_sel.first, page if scope is click_sel else scope
+    elif hasattr(scope, "click") and not hasattr(scope, "goto"):     # scope is an element Locator: it is the target
+        target, scope = scope, page
+    else:
+        target = _loc(scope, click_sel).first
     if any(target.get_attribute(a) in ("true", "page") for a in ("aria-selected", "aria-current", "aria-pressed")):
         target.click()          # already the current tab / page: its content will not change, nothing to wait for
         return None
     before = _content(scope, watch_sel)
     target.click()
-    return _poll(lambda: ((c := _content(scope, watch_sel)) is not None and c != before, None), f"{watch_sel} to change")
+    return _poll(lambda: ((c := _content(scope, watch_sel)) is not None and c != before, None), f"{watch_sel} to change", scope)
 
 
 # ---------------------------------------------------------------- reading
@@ -227,8 +279,21 @@ def collect_pages(page, read_page, next_sel, watch_sel, scope=None, max_pages=10
 
 # ---------------------------------------------------------------- acting
 def fill_form(scope, values):
+    # cycle 68 q_browser_fix: fill() on a <select> waits for an editable element until the timeout
     for sel, v in values.items():
-        _loc(scope, sel).first.fill(str(v))
+        el = _loc(scope, sel).first
+        el.wait_for(state="attached", timeout=TIMEOUT)
+        tag, typ = el.evaluate("e => [e.tagName.toLowerCase(), (e.type || '').toLowerCase()]")
+        if tag == "select":
+            wait_options(scope, sel)
+            try:
+                el.select_option(label=str(v), timeout=3000)
+            except Exception:
+                el.select_option(value=str(v))
+        elif typ in ("checkbox", "radio"):
+            el.set_checked(bool(v) and str(v).lower() not in ("0", "false", "no", "off", ""))
+        else:
+            el.fill(str(v))
 
 
 def select_label(scope, selector, label):
@@ -251,7 +316,7 @@ def submit_once(scope, page, submit_sel, done_sel, error_sel=None):
             if t and t != err_before and not t.endswith("…") and "中" not in t[-3:]:
                 return True, ("error", t)
         return False, None
-    return _poll(c, f"{done_sel} or an error")
+    return _poll(c, f"{done_sel} or an error", scope)
 
 
 # ---------------------------------------------------------------- output
@@ -267,6 +332,8 @@ def write_csv(path, header, rows, encoding="utf-8", newline="\n"):
         os.makedirs(d, exist_ok=True)
     with open(path, "w", encoding=encoding, newline="") as f:
         for r in [header] + list(rows):
+            if isinstance(r, dict):     # cycle 68: rows given as dicts wrote their keys on every line
+                r = [r.get(h, "") for h in header]
             f.write(",".join(csv_field(x) for x in r) + newline)
 
 

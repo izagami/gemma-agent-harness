@@ -313,6 +313,12 @@ def lint(keys, path, text, root=None):
         if m:
             out.append(("br-kit-call", f"`.{m.group(1)}(` is not a Playwright method: pwkit functions take the page/frame as "
                         f"the FIRST ARGUMENT, e.g. {m.group(1).replace('wait_for_attr', 'wait_attr')}(page, selector, ...)."))
+        # cycle 68 q_browser_fix: the script defined its own fill_form(scope, row) over pwkit's -> called itself with a dict
+        shadow = [n for n in re.findall(r"^def\s+(\w+)\s*\(", text, re.M) if n in _PWKIT_NAMES]
+        if shadow:
+            out.append(("br-kit-shadow", f"this file defines {', '.join(shadow)}() although pwkit already has a function with "
+                        f"that name: your def replaces pwkit's (and calls to it now call yours, maybe itself). Rename yours "
+                        f"(e.g. fill_{shadow[0].split('_')[-1]}_row) or use pwkit's."))
         if re.search(r"\bopen_browser\(", text) and re.search(r"with\s+sync_playwright\(\)", text):
             out.append(("br-kit-open", "open_browser() starts Playwright itself; calling it inside `with sync_playwright()` fails "
                         "('Sync API inside the asyncio loop'). Use either `pw, browser, page = open_browser()` ... "
@@ -324,6 +330,11 @@ def lint(keys, path, text, root=None):
         if "inner_text(" in text:
             out.append(("br-innertext", "inner_text() may change whitespace; use text_content() when the exact text matters."))
     return out
+
+
+_PWKIT_NAMES = {"inspect", "sel_testid", "sel_label", "open_browser", "close_browser", "login", "wait_visible", "wait_hidden",
+                "wait_text", "wait_text_change", "wait_count", "wait_attr", "wait_options", "click_and_wait_change", "text",
+                "read_rows", "open_and_read", "collect_pages", "submit_once", "fill_form", "select_label", "write_csv", "parse_int"}
 
 
 def vbc_api():
