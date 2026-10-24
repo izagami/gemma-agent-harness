@@ -2,7 +2,7 @@ import os, re, subprocess, sys
 if not os.path.exists("/work/index.html"):
     print("index.html missing"); print("SCORE 0/12"); sys.exit(1)
 html = open("/work/index.html", encoding="utf-8", errors="replace").read()
-r = subprocess.run(["env", "RENDER_SIZE=800x500", sys.executable, "/check/webkit/render.py", "/work/index.html", "/tmp/shot.png"], capture_output=True, text=True, timeout=56)
+r = subprocess.run(["env", "RENDER_SIZE=800x500", "RENDER_LIMIT=50", sys.executable, "/check/webkit/render.py", "/work/index.html", "/tmp/shot.png"], capture_output=True, text=True, timeout=56)
 out = r.stdout + r.stderr
 print(out[-1200:])
 pts, why = 0, []

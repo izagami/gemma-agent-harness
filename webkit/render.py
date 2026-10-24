@@ -72,8 +72,20 @@ def vendor_route(route):
 BLOCKED = []
 
 
+def on_alarm(signum, frame):
+    # a page stuck in an endless loop blocks the browser thread; Playwright's own timeouts never fire then
+    print("screenshot: none - the page did not finish building its scene in time")
+    print("errors:\n  - TIMEOUT: scene.js never finished: an endless loop (check every while/for loop and recursion) or a "
+          "far too heavy scene (millions of voxels: huge radius, nested loops over big boxes). Make it smaller/faster, then "
+          "render again.", flush=True)
+    os._exit(1)
+
+
 def main():
     import base64
+    import signal
+    signal.signal(signal.SIGALRM, on_alarm)
+    signal.alarm(int(os.environ.get("RENDER_LIMIT", "100")))
     from playwright.sync_api import sync_playwright
     if len(sys.argv) < 2:
         sys.exit(__doc__)
@@ -89,7 +101,13 @@ def main():
         page.on("console", lambda m: m.type == "error" and errors.append(m.text[:300]))
         page.add_init_script("window.__vkLowCost = true")   # voxelkit: smaller shadow map, pixel ratio 1
         t0 = time.time()
-        page.goto("file://" + html)
+        page.goto("file://" + html, wait_until="commit", timeout=60000)
+        try:
+            page.wait_for_function("() => (window.__vk && (window.__vk.started || window.__vkError)) || window.__vkError "
+                                   "|| (!window.__vk && document.readyState === 'complete')", timeout=75000)
+        except Exception as e:
+            if "Timeout" not in str(e):
+                raise
         page.wait_for_timeout(2500)
         shot1 = page.screenshot()
         page.wait_for_timeout(1000)

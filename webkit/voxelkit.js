@@ -44,7 +44,8 @@
 //   VK.town(cx, cz, {houses: 8, radius: 12, stalls: 3}) -> [[x, z], ...]    houses + market stalls on free ground
 //   VK.conifer(x, z, {h: 10, snow: false})                                   pine / fir; snow: true for winter
 //   VK.sea({radius: 48, level: 2})     ocean around the island with sand beaches (call right after VK.island)
-//   VK.boat(x, z, {len: 5, dir: "x", sail: true}) / VK.pier(x0, z0, x1, z1)   boats on the sea, a dock
+//   VK.harbor(x, z, {toward: [dx, dz], boats: 3, length: 12})   quay + piers + moored boats at a shore point (x, z)
+//   VK.boat(x, z, {len: 7, dir: "x", sail: true, cabin: true, hull, sailColor}) / VK.pier(x0, z0, x1, z1)
 //   VK.island({radius, top, hill, snow: true, ground: color})   snow: snow-covered ground
 //   VK.start({... snow: true, sky: "winter"|"sea"|...})          falling snow
 //   VK.island({radius: 30, top: 4, hill: [x, z, r, h], depthScale}) -> floating island with grass/dirt/stone
@@ -312,17 +313,52 @@
     VK.claim(x, z, Math.round(h * (o.width ?? 0.38)) + 1);
     return [x, g + h, z];
   };
-  // boat on water at (x, z): hull, deck, optional mast + sail; dir "x" or "z"
+  // boat on water at (x, z): wide hull with a stripe, deck, small wheelhouse, optional mast + sail; dir "x" or "z"
   VK.boat = (x, z, o = {}) => {
-    const L = o.label ?? "boat", n = o.len ?? 5, ax = (o.dir ?? "x") === "x", y = (waterY.get(Math.round(x) + "," + Math.round(z)) ?? VK.H(x, z)) + 1;
+    const L = o.label ?? "boat", n = o.len ?? 7, ax = (o.dir ?? "x") === "x", y = (waterY.get(Math.round(x) + "," + Math.round(z)) ?? VK.H(x, z)) + 1;
+    const P = (i, k, yy, c) => VK.set(ax ? x + i : x + k, yy, ax ? z + k : z + i, c, { label: L });
+    const hull = o.hull ?? 0x7a4a2a, stripe = o.stripe ?? 0xf3ede1;
     for (let i = -n; i <= n; i++) {
-      const w = Math.abs(i) >= n - 1 ? 0 : 1;
-      for (let k = -w; k <= w; k++) { VK.set(ax ? x + i : x + k, y, ax ? z + k : z + i, o.hull ?? 0x7a4a2a, { label: L }); if (Math.abs(k) === w) VK.set(ax ? x + i : x + k, y + 1, ax ? z + k : z + i, o.hull ?? 0x7a4a2a, { label: L }); }
+      const w = Math.abs(i) >= n ? 0 : Math.abs(i) >= n - 2 ? 1 : 2;          // pointed bow and stern
+      for (let k = -w; k <= w; k++) {
+        P(i, k, y, hull);                                                     // bottom
+        if (Math.abs(k) === w) { P(i, k, y + 1, stripe); P(i, k, y + 2, hull); }   // sides with a stripe
+        else P(i, k, y + 1, VK.PAL.woodL);                                    // deck
+      }
     }
+    if (o.cabin !== false) { for (let i = -1; i <= 1; i++) for (let k = -1; k <= 1; k++) for (let yy = 2; yy <= 3; yy++) P(i - 2, k, y + yy, yy === 3 ? (o.roof ?? 0xc0392b) : 0xf3ede1); P(-2, 0, y + 2, 0x9fd3e8); }
     if (o.sail !== false) {
-      VK.box(x, y + 1, z, x, y + 7, z, VK.PAL.wood, { label: L });
-      for (let k = 2; k <= 6; k++) for (let i = 1; i <= Math.round((7 - k) * 0.8) + 1; i++) VK.set(ax ? x + i : x, y + k, ax ? z : z + i, o.sailColor ?? 0xf3ede1, { label: L });
+      for (let yy = 2; yy <= 10; yy++) P(2, 0, y + yy, VK.PAL.wood);
+      for (let yy = 4; yy <= 9; yy++) for (let i = 1; i <= Math.round((10 - yy) * 0.7) + 1; i++) P(2 + i, 0, y + yy, o.sailColor ?? 0xf3ede1);
     }
+  };
+  // harbor at a shore point: stone quay along the shore, two piers out to sea with boats moored beside them, crates,
+  // lamp posts. toward = [dx, dz] direction of the open sea (default: away from the island center). Call after VK.sea.
+  VK.harbor = (x, z, o = {}) => {
+    let [dx, dz] = o.toward ?? [x, z]; const len = Math.hypot(dx, dz) || 1; dx /= len; dz /= len;
+    const ax = Math.abs(dx) >= Math.abs(dz), sx = Math.sign(dx) || 1, sz = Math.sign(dz) || 1;
+    const out = o.length ?? 12, boats = o.boats ?? 3;
+    // quay: a stone strip along the shore, perpendicular to the sea direction
+    for (let t = -8; t <= 8; t++) {
+      const qx = ax ? x : x + t, qz = ax ? z + t : z, h = VK.H(qx, qz);
+      if (h === -Infinity) continue;
+      const top = Math.max(h, (waterY.get(qx + "," + qz) ?? h) + 1);
+      VK.box(qx, top - 2, qz, qx, top, qz, [VK.PAL.stone, VK.PAL.stoneD], { label: "quay" });
+      if (t % 4 === 0) { VK.box(qx, top + 1, qz, qx, top + 3, qz, 0x333333, { label: "quay" }); VK.set(qx, top + 4, qz, VK.PAL.lantern, { glow: true, label: "quay" }); }
+      if (t % 5 === 2) VK.box(qx - (ax ? sx : 0), top + 1, qz - (ax ? 0 : sz), qx - (ax ? sx : 0), top + 1, qz - (ax ? 0 : sz), 0x8a5a3b, { label: "crates" });
+    }
+    // piers + boats
+    for (const off of [-5, 5]) {
+      const px = ax ? x : x + off, pz = ax ? z + off : z;
+      VK.pier(px, pz, px + (ax ? sx * out : 0), pz + (ax ? 0 : sz * out), { label: "pier" });
+    }
+    const colors = [[0xc0392b, 0xf3ede1], [0x2f6fb5, 0xf3ede1], [0x2a6138, 0xe8c860], [0xe0b23c, 0xf3ede1]];
+    for (let b = 0; b < boats; b++) {
+      const along = 5 + (b % 2) * 5, side = b < 2 ? -1 : 1, lane = side * (b % 2 ? 9 : 1);
+      const bx = ax ? x + sx * along : x + lane, bz = ax ? z + lane : z + sz * along;
+      VK.boat(bx, bz, { dir: ax ? "x" : "z", hull: colors[b % 4][0], sailColor: colors[b % 4][1], sail: b % 2 === 0, len: 6 });
+    }
+    VK.claim(x, z, 9);
   };
   // pier / dock: planks from the shore out over the water
   VK.pier = (x0, z0, x1, z1, o = {}) => {
