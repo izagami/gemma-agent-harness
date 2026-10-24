@@ -253,3 +253,9 @@ def lint(keys, path, text):
         if "inner_text(" in text:
             out.append(("br-innertext", "inner_text() may change whitespace; use text_content() when the exact text matters."))
     return out
+
+
+def vbc_api():
+    """the docstring of vbcompat.py (its API list), for the start message"""
+    import vbcompat
+    return vbcompat.__doc__.split("\n", 3)[-1].strip()

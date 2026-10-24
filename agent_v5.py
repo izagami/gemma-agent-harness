@@ -1900,6 +1900,30 @@ def failing_tests(box, st=None):
 
 
 def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=None):
+    if os.environ.get("LINT") == "1" and getattr(st, "know_keys", None) and not st.__dict__.get("lint_finish_done"):
+        # cycle 49 h_vba_kintai: the tx-crcr finding was shown once and ignored; the final code still wrote \r\r\n.
+        # At the first finish, every finding still present in the code goes back once.
+        st.lint_finish_done = True
+        try:
+            import know
+            left, now = [], snapshot(st.workdir)
+            for dp, dns, fns in os.walk(st.workdir):
+                dns[:] = [d for d in dns if not d.startswith(".") and d not in ("__pycache__",)]
+                for fn in fns:
+                    rel = os.path.relpath(os.path.join(dp, fn), st.workdir)
+                    if not fn.endswith(".py") or rel == "vbcompat.py" or (rel in st.seed and st.seed.get(rel) == now.get(rel)):
+                        continue
+                    text = open(os.path.join(dp, fn), encoding="utf-8", errors="replace").read()
+                    left += [f"- {rel}: {m}" for _, m in know.lint(st.know_keys, rel, text)]
+            if left:
+                if st.log:
+                    st.log({"lint_finish": len(left)})
+                return ("[harness] Not accepted yet: these problems are still in your code (each was reported when you wrote "
+                        "the file). Fix each one, or if a finding does not apply, say why in one line; then call finish again.\n"
+                        + "\n".join(left[:8]))
+        except Exception as e:
+            if st.log:
+                st.log({"lint_finish_error": repr(e)[:200]})
     if st.hard_tests and st.test_gate_tries < 4:
         rep = failing_tests(box, st)
         if rep:
@@ -2441,6 +2465,16 @@ def run_task(task_text, workdir, profile, log):
             import know
             keys, kmsg = know.message(workdir, task_text)
             st.know_keys = keys
+            if "vba" in keys and os.environ.get("VBC") == "1":
+                # VBC: a tested VBA runtime emulation (vbcompat.py) in the project, so the model calls CLng / Format /
+                # DateSerial / ... instead of re-deriving them in code comments (cycle 46: vba_dates 6 comment stops per
+                # run); a 52-line port of q_vba_sales on it passes the hidden check
+                shutil.copy(os.path.join(os.path.dirname(os.path.abspath(__file__)), "vbcompat.py"), os.path.join(workdir, "vbcompat.py"))
+                kmsg += ("\n\n[harness] vbcompat.py is in the project: a TESTED module that reproduces the VBA runtime. Use it "
+                         "(`from vbcompat import *`) instead of writing these functions yourself - every function behaves exactly "
+                         "like the VBA one, including the cases where VBA differs from Python. Keep vbcompat.py next to your "
+                         "script. Its API:\n" + know.vbc_api())
+                log({"vbcompat": True})
             if kmsg:
                 messages[-1]["content"] = task_text + "\n\n" + kmsg
             log({"know": keys, "chars": len(kmsg)})
