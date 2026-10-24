@@ -12,6 +12,8 @@
 //   forest               decorate({flora: "conifer"}) or many VK.conifer / VK.blobTree
 //   house / cabin        VK.house (roof: P.snow for a snowy roof) - give it a yard: keep trees 4+ voxels away
 //   windmill, farm ...   VK.building / VK.house + your own VK.box / VK.cylinder details (see the example scene)
+//   CAMERA: the default view looks from the +x, +z side (front-right). Put what must be seen (harbor, gate, town,
+//   the hero's front) on that side - e.g. VK.harbor(14, 14) rather than (-14, -14), which is hidden behind the island.
 //
 // World (integer coordinates, y is up; 1 unit = 1 voxel)
 //   VK.seed(n); VK.rand() -> [0,1); VK.noise(x, z) -> smooth [0,1)

@@ -2052,7 +2052,7 @@ def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=N
                     st.webart_fid = st.__dict__.get("webart_fid", 0) + 1
                     st.pending_image = shot
                     # cycle 66: VK.harbor existed but no run used it - name the tested function for each missing thing
-                    hints = {"harbor": "VK.harbor(x, z) at a shore point (after VK.sea)", "harbour": "VK.harbor(x, z)", "port": "VK.harbor(x, z)",
+                    hints = {"harbor": "VK.harbor(x, z) at a shore point on the camera side (+x, +z), after VK.sea", "harbour": "VK.harbor(x, z)", "port": "VK.harbor(x, z)",
                              "boat": "VK.boat(x, z) on the sea or VK.harbor", "ship": "VK.boat(x, z, {len: 9})",
                              "castle": "VK.wall x4 + VK.tower({roof: 'cone'}) corners + VK.building({roof: 'battlement'}) keep",
                              "town": "VK.town(x, z, {houses: 10})", "village": "VK.town(x, z, {houses: 8})", "market": "VK.town (has market stalls)",
