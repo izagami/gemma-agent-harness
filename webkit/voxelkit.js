@@ -16,7 +16,7 @@
 //                                                         curl up; opts {halfD, overhang:3, layers:3, color, edge,
 //                                                         tip (corner ornament color), glowTips} -> top y
 //   VK.building(cx, cz, {storeys: 3, halfW: 5, halfD, taper: 1, firstH: 5, storeyH: 4, wall, pillar, trim, window,
-//               roof: "hip"|"flat"|"none", roofColor, roofEdge, bracket, tip, overhang: 3, spire: true, spireH: 9,
+//               roof: "hip"|"gable"|"battlement"|"flat"|"none", roofColor, roofEdge, bracket, tip, overhang: 3, spire, spireH,
 //               plinth: true, label}) -> {base, top}
 //                                 TESTED storeyed building on the ground at (cx, cz): stone plinth + steps, every storey
 //                                 with pillars, walls, windows, trim, bracket band and an upturned hip roof resting on it,
@@ -30,8 +30,23 @@
 //   VK.lantern(x, z)                                 stone lantern, glows at night
 //   VK.path([[x, z], [x, z], ...])                   stepping-stone path (skips water)
 //   VK.fence(x0, z0, x1, z1)                         low wooden fence
-//   VK.decorate({trees: 4, pines: 2, shrubs: 25, rocks: 12, flowers: 150}) -> {trees: canopy centers for petals}
+//   VK.decorate({flora: "temperate"|"sakura"|"autumn"|"conifer"|"snow"|"coast", trees, conifers, pines, shrubs: 25,
+//                rocks: 12, flowers: 150}) -> {trees: canopy centers for petals}  - pick the flora that fits the task
 //                                                    fills the remaining free ground - call it LAST, before VK.start
+//   More buildings / scenery (TESTED, generic - combine them for castles, villages, harbors, winter scenes ...):
+//   VK.gable(cx, y, cz, halfW, halfD, {axis, color, overhang}) -> top y     pitched roof (houses, barns, halls)
+//   VK.cone(cx, y, cz, r, {h, color, flag}) -> top y                        conical roof with a flag (round towers)
+//   VK.battlements(x0, y, z0, x1, z1, {color})                              crenellated parapet around a rectangle
+//   VK.tower(cx, cz, {r: 3, h: 14, wall, stripes: [c1, c2], roof: "cone"|"battlement"|"lantern", roofColor})
+//                     -> {base, top, light: [x, y, z]}   castle tower / watchtower / lighthouse (roof "lantern" glows)
+//   VK.wall(x0, z0, x1, z1, {h: 6, color, gate: true})                      curtain wall with walkway + crenels
+//   VK.house(cx, cz, {halfW: 3, halfD: 2, h: 4, wall, frame, roof, litWindows}) timber-frame house, gable roof
+//   VK.town(cx, cz, {houses: 8, radius: 12, stalls: 3}) -> [[x, z], ...]    houses + market stalls on free ground
+//   VK.conifer(x, z, {h: 10, snow: false})                                   pine / fir; snow: true for winter
+//   VK.sea({radius: 48, level: 2})     ocean around the island with sand beaches (call right after VK.island)
+//   VK.boat(x, z, {len: 5, dir: "x", sail: true}) / VK.pier(x0, z0, x1, z1)   boats on the sea, a dock
+//   VK.island({radius, top, hill, snow: true, ground: color})   snow: snow-covered ground
+//   VK.start({... snow: true, sky: "winter"|"sea"|...})          falling snow
 //   VK.island({radius: 30, top: 4, hill: [x, z, r, h], depthScale}) -> floating island with grass/dirt/stone
 //                                                         layers and a rocky underside; afterwards VK.H(x, z)
 //                                                         gives the ground top (or -Infinity off the island)
@@ -66,7 +81,10 @@
     sand: 0xe8dcc0, sandD: 0xd6c7a4, water: 0x3d9bc4, red: 0xc0392b, redD: 0x962d22, wood: 0x6b4226, woodL: 0x9a6a3f,
     roof: 0x2f3b45, roofL: 0x3d4c58, gold: 0xe0b23c, white: 0xf3ede1, bark: 0x5b3a29, lantern: 0xffd27a,
     sakura: [0xf7b6c8, 0xf29bb5, 0xfcd4df], maple: [0xd9481f, 0xe8742a, 0xb5301c], pine: [0x2f6b3a, 0x3f7f47],
-    flowers: [0xffffff, 0xffd84d, 0xb388ff, 0xff6f91], azalea: 0xd94f7a, lily: 0x5d9e3f, koi: 0xf2762e
+    flowers: [0xffffff, 0xffd84d, 0xb388ff, 0xff6f91], azalea: 0xd94f7a, lily: 0x5d9e3f, koi: 0xf2762e,
+    snow: 0xf4f7fb, snow2: 0xdfe7f0, conifer: [0x1f5130, 0x2a6138, 0x245a33], oak: [0x4f8a3c, 0x5c9a45, 0x6aa84f],
+    castle: 0x9a978f, castleD: 0x7d7a73, slate: 0x4a5560, tile: 0xa8432f, thatch: 0xc9a25a, plaster: 0xeee3c8,
+    timber: 0x5a3b24, sea: 0x2e86ab, sand2: 0xf0e2b6, glass: 0xfff2b0
   };
   const vox = new Map();
   const K = (x, y, z) => x + "," + y + "," + z;
@@ -151,7 +169,15 @@
         VK.set(cx + x, y + yy, cz + z, pillar ? pillarC : yy === h - 1 ? trimC : win ? winC : wallC, { label: L });
       }
       y += h;
-      if (o.roof !== "flat" && o.roof !== "none") {
+      const last = t === n - 1;
+      if (o.roof === "gable") {                                   // pitched roof on the top storey, trim band between storeys
+        if (last) y = VK.gable(cx, y, cz, w, d, { color: o.roofColor ?? VK.PAL.tile, gableWall: wallC, label: L, overhang: 1 });
+        else { VK.shell(cx - w, y, cz - d, cx + w, y, cz + d, trimC, { label: L }); VK.box(cx - w, y, cz - d, cx + w, y, cz + d, trimC, { label: L }); y += 1; }
+      } else if (o.roof === "battlement") {                       // castle keep: flat floors, crenellated top
+        VK.box(cx - w - (last ? 1 : 0), y, cz - d - (last ? 1 : 0), cx + w + (last ? 1 : 0), y, cz + d + (last ? 1 : 0), o.trim ?? VK.PAL.castleD, { label: L });
+        if (last) VK.battlements(cx - w - 1, y + 1, cz - d - 1, cx + w + 1, cz + d + 1, { color: wallC, label: L });
+        y += last ? 3 : 1;
+      } else if (o.roof !== "flat" && o.roof !== "none") {
         VK.shell(cx - w - 1, y, cz - d - 1, cx + w + 1, y, cz + d + 1, o.bracket ?? P.gold, { label: L });  // bracket band
         y = VK.roof(cx, y + 1, cz, w + 1, { halfD: d + 1, overhang: o.overhang ?? 3, layers: 3, color: o.roofColor ?? P.roof,
           edge: o.roofEdge ?? P.roofL, tip: o.tip ?? P.gold, label: L });
@@ -171,6 +197,142 @@
     VK.claim(cx, cz, Math.max(w0, d0) + 4);
     return { base: g, top: y };
   };
+  // pitched (gable) roof: ridge along x (axis "x") or z; steps up one voxel per voxel inward -> top y
+  VK.gable = (cx, y, cz, halfW, halfD, o = {}) => {
+    const ax = (o.axis ?? (halfW >= halfD ? "x" : "z")) === "x", ov = o.overhang ?? 1, L = o.label;
+    const span = (ax ? halfD : halfW) + ov, len = (ax ? halfW : halfD) + ov, c = o.color ?? VK.PAL.tile;
+    for (let k = 0; k <= span; k++) for (let a = -len; a <= len; a++) for (const sgn of k ? [-1, 1] : [1]) {
+      const b = sgn * (span - k);
+      VK.set(cx + (ax ? a : b), y + k, cz + (ax ? b : a), k === span ? (o.ridge ?? c) : c, { label: L });
+      if (Math.abs(a) === len - ov && k < span) for (let f = 0; f < k; f++) VK.set(cx + (ax ? a : b), y + f, cz + (ax ? b : a), o.gableWall ?? VK.PAL.plaster, { label: L });
+    }
+    return y + span + 1;
+  };
+  // conical roof (round towers) -> top y
+  VK.cone = (cx, y, cz, r, o = {}) => {
+    const h = o.h ?? Math.round(r * 1.8), c = o.color ?? VK.PAL.slate;
+    for (let k = 0; k < h; k++) { const rr = (r + 1) * (1 - k / h); for (let x = -r - 1; x <= r + 1; x++) for (let z = -r - 1; z <= r + 1; z++) if (Math.hypot(x, z) <= rr + 0.3) VK.set(cx + x, y + k, cz + z, c, { label: o.label }); }
+    if (o.flag !== false) { VK.box(cx, y + h, cz, cx, y + h + 3, cz, 0x333333, { label: o.label }); VK.box(cx + 1, y + h + 2, cz, cx + 2, y + h + 3, cz, o.flagColor ?? VK.PAL.red, { label: o.label }); }
+    return y + h + 4;
+  };
+  // crenellated parapet (merlons on every other voxel) around a rectangle at height y
+  VK.battlements = (x0, y, z0, x1, z1, o = {}) => {
+    const c = o.color ?? VK.PAL.castle;
+    for (let x = x0; x <= x1; x++) for (let z = z0; z <= z1; z++) {
+      if (x !== x0 && x !== x1 && z !== z0 && z !== z1) continue;
+      VK.set(x, y, z, c, { label: o.label }); if ((x + z) % 2 === 0) VK.set(x, y + 1, z, c, { label: o.label });
+    }
+  };
+  // round tower: castle tower, watchtower, lighthouse. roof "cone" | "battlement" | "lantern" (glass room + light)
+  VK.tower = (cx, cz, o = {}) => {
+    const L = o.label ?? "tower", r = o.r ?? 3, h = o.h ?? 14, g = o.y ?? VK.H(cx, cz) + 1;
+    const stripes = o.stripes;                                   // e.g. [white, red] bands for a lighthouse
+    for (let y = 0; y < h; y++) for (let x = -r; x <= r; x++) for (let z = -r; z <= r; z++) {
+      const d = Math.hypot(x, z); if (d > r + 0.3 || d < r - 0.7) continue;
+      const win = y % 5 === 3 && (x === 0 || z === 0);
+      VK.set(cx + x, g + y, cz + z, win ? (o.window ?? 0x2a2a2a) : stripes ? stripes[Math.floor(y / (o.stripeH ?? 3)) % stripes.length] : (o.wall ?? VK.PAL.castle), { label: L });
+    }
+    VK.cylinder(cx, g, cz, r - 1, 1, o.wall ?? VK.PAL.castleD, { label: L });
+    let top = g + h;
+    const roof = o.roof ?? "cone";
+    if (roof === "cone") top = VK.cone(cx, top, cz, r, { color: o.roofColor, label: L, flag: o.flag });
+    else if (roof === "battlement") { VK.cylinder(cx, top, cz, r + 1, 1, o.wall ?? VK.PAL.castle, { label: L }); VK.battlements(cx - r - 1, top + 1, cz - r - 1, cx + r + 1, cz + r + 1, { color: o.wall, label: L }); top += 3; }
+    else if (roof === "lantern") {                                // gallery, glass lantern room that glows, cap
+      VK.cylinder(cx, top, cz, r + 1, 1, 0x333333, { label: L });
+      for (let y = 1; y <= 3; y++) VK.cylinder(cx, top + y, cz, Math.max(1, r - 1), 1, VK.PAL.glass, { glow: true, jitter: 0, label: L });
+      VK.cone(cx, top + 4, cz, Math.max(1, r - 1), { color: o.roofColor ?? VK.PAL.red, flag: false, h: 3, label: L });
+      top += 8;
+    }
+    VK.claim(cx, cz, r + 2);
+    return { base: g, top, light: [cx, g + h + 2, cz] };
+  };
+  // straight wall with walkway and battlements; gate: true leaves an opening in the middle
+  VK.wall = (x0, z0, x1, z1, o = {}) => {
+    const L = o.label ?? "wall", h = o.h ?? 6, n = Math.max(Math.abs(x1 - x0), Math.abs(z1 - z0), 1), c = o.color ?? VK.PAL.castle;
+    for (let i = 0; i <= n; i++) {
+      const x = Math.round(x0 + (x1 - x0) * i / n), z = Math.round(z0 + (z1 - z0) * i / n), g = VK.H(x, z) + 1;
+      if (g === -Infinity || VK.inWater(x, z)) continue;
+      const gap = o.gate && Math.abs(i - n / 2) <= 1.5;
+      for (let y = 0; y < h; y++) if (!gap || y >= 4) VK.set(x, g + y, z, (y + i) % 4 === 0 ? (o.dark ?? VK.PAL.castleD) : c, { label: L });
+      VK.set(x, g + h, z, c, { label: L }); if (i % 2 === 0) VK.set(x, g + h + 1, z, c, { label: L });
+      VK.claim(x, z, 1);
+    }
+  };
+  // small house: plaster or wood walls, timber frame, door, windows, gable roof, chimney. For towns and villages.
+  VK.house = (cx, cz, o = {}) => {
+    const L = o.label ?? "house", w = o.halfW ?? 3, d = o.halfD ?? 2, h = o.h ?? 4, g = VK.H(cx, cz) + 1;
+    const wall = o.wall ?? VK.PAL.plaster, frame = o.frame ?? VK.PAL.timber;
+    for (let y = 0; y < h; y++) for (let x = -w; x <= w; x++) for (let z = -d; z <= d; z++) {
+      if (Math.abs(x) !== w && Math.abs(z) !== d) continue;
+      const post = (Math.abs(x) === w && Math.abs(z) === d) || y === h - 1 || y === 0;
+      const door = z === d && x === 0 && y < 2, win = y === 2 && !post && (Math.abs(x) === w ? z === 0 : x % 2 === 0 && x !== 0);
+      if (door) { VK.set(cx + x, g + y, cz + z, 0x4a2f1c, { label: L }); continue; }
+      VK.set(cx + x, g + y, cz + z, win ? (o.window ?? 0x9fd3e8) : post ? frame : wall, { label: L, glow: win && o.litWindows });
+    }
+    VK.box(cx - w + 1, g, cz - d + 1, cx + w - 1, g, cz + d - 1, frame, { label: L });
+    const top = VK.gable(cx, g + h, cz, w, d, { color: o.roof ?? VK.PAL.tile, gableWall: wall, label: L, axis: w >= d ? "x" : "z" });
+    if (o.chimney !== false) VK.box(cx + w - 1, g + h, cz - 1, cx + w - 1, top + 1, cz - 1, VK.PAL.stoneD, { label: L });
+    VK.claim(cx, cz, Math.max(w, d) + (o.yard ?? 3));          // keep a small yard free so the house stays visible
+    return { base: g, top };
+  };
+  // town: n houses with varied roofs/walls on free ground around (cx, cz), plus market stalls; -> list of [x, z]
+  VK.town = (cx, cz, o = {}) => {
+    const n = o.houses ?? 8, R = o.radius ?? 12, out = [];
+    const roofs = o.roofs ?? [VK.PAL.tile, VK.PAL.slate, VK.PAL.thatch, 0x8b3a2a], walls = o.walls ?? [VK.PAL.plaster, 0xe8d8b0, 0xd9c7a3, 0xf3ede1];
+    for (let t = 0; t < n * 30 && out.length < n; t++) {
+      const a = VK.rand() * Math.PI * 2, rr = 3 + VK.rand() * R, x = Math.round(cx + Math.cos(a) * rr), z = Math.round(cz + Math.sin(a) * rr);
+      const w = 2 + Math.round(VK.rand()), d = 2;
+      if (!VK.free(x, z, Math.max(w, d) + 1)) continue;
+      VK.house(x, z, { yard: 1, halfW: w, halfD: d, h: 3 + Math.round(VK.rand() * 2), roof: roofs[out.length % roofs.length], wall: walls[out.length % walls.length], litWindows: true, label: o.label ?? "house" });
+      out.push([x, z]);
+    }
+    for (let i = 0; i < (o.stalls ?? 3); i++) {                  // market stalls: counter + striped awning
+      for (let t = 0; t < 30; t++) {
+        const x = Math.round(cx + (VK.rand() - 0.5) * 8), z = Math.round(cz + (VK.rand() - 0.5) * 8);
+        if (!VK.free(x, z, 2)) continue;
+        const g = VK.H(x, z) + 1, col = [VK.PAL.red, 0x2f6fb5, 0xe0b23c][i % 3];
+        VK.box(x - 1, g, z, x + 1, g, z, VK.PAL.woodL, { label: "market stall" });
+        for (const dx of [-1, 1]) VK.box(x + dx, g + 1, z - 1, x + dx, g + 2, z - 1, VK.PAL.wood, { label: "market stall" });
+        for (let dx = -2; dx <= 2; dx++) VK.set(x + dx, g + 3, z - 1 + (dx % 2 === 0 ? 0 : 0), dx % 2 ? col : 0xffffff, { label: "market stall" });
+        VK.claim(x, z, 2); break;
+      }
+    }
+    return out;
+  };
+  // conifer (pine / fir / spruce): stacked shrinking discs, optional snow on top of each layer
+  VK.conifer = (x, z, o = {}) => {
+    const g = VK.H(x, z) + 1, h = o.h ?? 10, L = o.label ?? "conifer", colors = o.colors ?? VK.PAL.conifer;
+    VK.box(x, g, z, x, g + 2, z, VK.PAL.bark, { label: L });
+    for (let k = 0; k < h; k++) {
+      const r = Math.max(0, Math.round((h - k) * (o.width ?? 0.38))), y = g + 2 + k;
+      for (let dx = -r; dx <= r; dx++) for (let dz = -r; dz <= r; dz++) if (Math.hypot(dx, dz) <= r + 0.3)
+        VK.set(x + dx, y, z + dz, o.snow && k % 3 === 2 && Math.hypot(dx, dz) > r - 1.2 && VK.rand() < 0.75 ? VK.PAL.snow : colors, { label: L });
+    }
+    VK.set(x, g + 2 + h, z, o.snow ? VK.PAL.snow : colors, { label: L });
+    VK.claim(x, z, Math.round(h * (o.width ?? 0.38)) + 1);
+    return [x, g + h, z];
+  };
+  // boat on water at (x, z): hull, deck, optional mast + sail; dir "x" or "z"
+  VK.boat = (x, z, o = {}) => {
+    const L = o.label ?? "boat", n = o.len ?? 5, ax = (o.dir ?? "x") === "x", y = (waterY.get(Math.round(x) + "," + Math.round(z)) ?? VK.H(x, z)) + 1;
+    for (let i = -n; i <= n; i++) {
+      const w = Math.abs(i) >= n - 1 ? 0 : 1;
+      for (let k = -w; k <= w; k++) { VK.set(ax ? x + i : x + k, y, ax ? z + k : z + i, o.hull ?? 0x7a4a2a, { label: L }); if (Math.abs(k) === w) VK.set(ax ? x + i : x + k, y + 1, ax ? z + k : z + i, o.hull ?? 0x7a4a2a, { label: L }); }
+    }
+    if (o.sail !== false) {
+      VK.box(x, y + 1, z, x, y + 7, z, VK.PAL.wood, { label: L });
+      for (let k = 2; k <= 6; k++) for (let i = 1; i <= Math.round((7 - k) * 0.8) + 1; i++) VK.set(ax ? x + i : x, y + k, ax ? z : z + i, o.sailColor ?? 0xf3ede1, { label: L });
+    }
+  };
+  // pier / dock: planks from the shore out over the water
+  VK.pier = (x0, z0, x1, z1, o = {}) => {
+    const n = Math.max(Math.abs(x1 - x0), Math.abs(z1 - z0), 1), ax = Math.abs(x1 - x0) >= Math.abs(z1 - z0);
+    for (let i = 0; i <= n; i++) {
+      const x = Math.round(x0 + (x1 - x0) * i / n), z = Math.round(z0 + (z1 - z0) * i / n), wy = waterY.get(x + "," + z), y = (wy ?? VK.H(x, z)) + 1;
+      for (let k = -1; k <= 1; k++) VK.set(ax ? x : x + k, y, ax ? z + k : z, VK.PAL.woodL, { label: o.label ?? "pier" });
+      if (wy !== undefined && i % 3 === 0) for (const k of [-1, 1]) VK.box(ax ? x : x + k, wy - 1, ax ? z + k : z, ax ? x : x + k, y + 1, ax ? z + k : z, VK.PAL.wood, { label: o.label ?? "pier" });
+    }
+  };
   const height = new Map();
   VK.H = (x, z) => height.get(Math.round(x) + "," + Math.round(z)) ?? -Infinity;
   VK.island = (o = {}) => {
@@ -183,13 +345,32 @@
       const depth = Math.round(3 + (R - d) * ds + VK.noise(x * 0.3, z * 0.3) * 4);
       height.set(x + "," + z, h);
       for (let y = -depth; y <= h; y++)
-        VK.set(x, y, z, y === h ? (VK.noise(x * 0.4, z * 0.4) > 0.55 ? VK.PAL.grass2 : VK.PAL.grass)
-          : y > h - 3 ? VK.PAL.dirt : VK.rand() < 0.15 ? VK.PAL.stoneD : VK.PAL.stone, { jitter: 0.08, label: "island" });
+        VK.set(x, y, z, y === h ? (o.snow ? VK.PAL.snow : o.ground ?? (VK.noise(x * 0.4, z * 0.4) > 0.55 ? VK.PAL.grass2 : VK.PAL.grass))
+          : y > h - 3 ? (o.snow && y === h - 1 ? VK.PAL.snow2 : VK.PAL.dirt) : VK.rand() < 0.15 ? VK.PAL.stoneD : VK.PAL.stone, { jitter: o.snow ? 0.03 : 0.08, label: "island" });
     }
     return VK.H;
   };
   const ponds = [], waterY = new Map();
-  VK.inPond = (x, z) => ponds.some(([cx, cz, rx, rz]) => ((x - cx) / rx) ** 2 + ((z - cz) / rz) ** 2 < 1);
+  const seaCells = new Set();
+  VK.inPond = (x, z) => seaCells.has(Math.round(x) + "," + Math.round(z)) || ponds.some(([cx, cz, rx, rz]) => ((x - cx) / rx) ** 2 + ((z - cz) / rz) ** 2 < 1);
+  VK.inWater = VK.inPond;
+  // sea around the island: a water ring at `level` out to `radius`; shore cells of the island turn into sand beach.
+  // Call after VK.island. Boats go on it (VK.boat); VK.H(x, z) on the sea = water level.
+  VK.sea = (o = {}) => {
+    const R = o.radius ?? 48, lvl = o.level ?? 2;
+    for (let x = -R; x <= R; x++) for (let z = -R; z <= R; z++) {
+      if (Math.hypot(x, z) > R) continue;
+      const h = VK.H(x, z);
+      if (h === -Infinity || h < lvl) {
+        if (h !== -Infinity) for (let y = h + 1; y < lvl; y++) VK.set(x, y, z, VK.PAL.sandD, { label: "sea" });
+        VK.set(x, lvl, z, o.color ?? VK.PAL.sea, { jitter: 0.04, water: true, label: "sea" });
+        seaCells.add(x + "," + z); waterY.set(x + "," + z, lvl);
+        if (h === -Infinity) height.set(x + "," + z, lvl);
+      } else if (h <= lvl + 2 && [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([a, b]) => VK.H(x + a, z + b) === -Infinity || VK.H(x + a, z + b) < lvl)) {
+        VK.set(x, h, z, VK.PAL.sand2, { jitter: 0.05, label: "beach" });
+      }
+    }
+  };
   VK.pond = (cx, cz, rx, rz) => {
     ponds.push([cx, cz, rx, rz]);
     for (let x = Math.floor(cx - rx - 1); x <= cx + rx + 1; x++) for (let z = Math.floor(cz - rz - 1); z <= cz + rz + 1; z++) {
@@ -296,10 +477,18 @@
     }
   };
   VK.decorate = (o = {}) => {                            // fill the free ground: shrubs, flowers, rocks, extra trees
-    const out = { trees: [] };
-    VK.scatter(o.trees ?? 4, (x, z) => { if (!VK.free(x, z, 4)) return false;
-      out.trees.push(VK.blobTree(x, z, { colors: VK.rand() < 0.6 ? VK.PAL.sakura : VK.PAL.maple, r: 3 + Math.round(VK.rand()), label: "tree" })); VK.claim(x, z, 4); });
-    VK.scatter(o.pines ?? 2, (x, z) => { if (!VK.free(x, z, 4)) return false; VK.padTree(x, z); VK.claim(x, z, 4); });
+    // flora: "temperate" (default: green broadleaf + conifers), "sakura" (cherry + maple + pruned pines, Japanese),
+    //        "autumn", "conifer" (forest), "snow" (snowy conifers, no flowers), "coast" (few trees, grass, rocks)
+    const out = { trees: [] }, fl = o.flora ?? "temperate";
+    const leaf = { temperate: [VK.PAL.oak], sakura: [VK.PAL.sakura, VK.PAL.maple], autumn: [VK.PAL.maple, [0xe0a030, 0xd08a20, 0xb86f18]], coast: [VK.PAL.oak] }[fl];
+    const nTrees = o.trees ?? (fl === "coast" ? 2 : fl === "conifer" || fl === "snow" ? 0 : 4);
+    VK.scatter(nTrees, (x, z) => { if (!VK.free(x, z, 4) || !leaf) return false;
+      out.trees.push(VK.blobTree(x, z, { colors: leaf[Math.floor(VK.rand() * leaf.length)], r: 3 + Math.round(VK.rand()), fallen: fl === "sakura" || fl === "autumn" ? 12 : 0, label: "tree" })); VK.claim(x, z, 4); });
+    const nCon = o.conifers ?? (fl === "conifer" || fl === "snow" ? 14 : fl === "sakura" ? 0 : 2);
+    VK.scatter(nCon, (x, z) => { if (!VK.free(x, z, 3)) return false; out.trees.push(VK.conifer(x, z, { h: 8 + Math.round(VK.rand() * 6), snow: fl === "snow" })); });
+    VK.scatter(o.pines ?? (fl === "sakura" ? 2 : 0), (x, z) => { if (!VK.free(x, z, 4)) return false; VK.padTree(x, z); VK.claim(x, z, 4); });
+    if (fl === "snow") { o = Object.assign({ flowers: 0, shrubs: 0 }, o); }
+    if (fl === "coast") { o = Object.assign({ flowers: 40, shrubs: 10, rocks: 20 }, o); }
     VK.scatter(o.shrubs ?? 25, (x, z, h) => { if (!VK.free(x, z, 1)) return false;
       VK.sphere(x, h + 1, z, VK.rand() < 0.5 ? 1 : 2, VK.rand() < 0.35 ? VK.PAL.azalea : [VK.PAL.moss, VK.PAL.leaf], { jitter: 0.12, label: "shrub" }); VK.claim(x, z, 1); });
     VK.scatter(o.rocks ?? 12, (x, z, h) => { if (!VK.free(x, z, 1)) return false;
@@ -321,14 +510,14 @@
       const [x, y, z] = k.split(",").map(Number);
       stats.voxels++;
       if (v.label) stats.labels[v.label] = (stats.labels[v.label] || 0) + 1;
-      bb.expandByPoint(new THREE.Vector3(x, y, z));
+      if (v.label !== "sea") bb.expandByPoint(new THREE.Vector3(x, y, z));   // frame the land, not the whole ocean
       if (VK.has(x + 1, y, z) && VK.has(x - 1, y, z) && VK.has(x, y + 1, z) && VK.has(x, y - 1, z) && VK.has(x, y, z + 1) && VK.has(x, y, z - 1)) continue;
       groups[v.water ? "water" : v.glow ? "glow" : "solid"].push([x, y, z, v.c]);
     }
     // parts built over a pond (a building standing in the water is a placement mistake; bridges are fine)
     stats.overWater = {};
     for (const [k, v] of vox) {
-      if (v.water || v.label === "pond" || v.label === "island") continue;
+      if (v.water || ["pond", "island", "sea", "beach", "boat", "pier", "bridge"].includes(v.label)) continue;
       const [x, y, z] = k.split(",").map(Number), wy = waterY.get(x + "," + z);
       if (wy !== undefined && (y === wy + 1 || y === wy + 2)) { const l = v.label || "unlabelled"; stats.overWater[l] = (stats.overWater[l] || 0) + 1; }
     }
@@ -397,7 +586,8 @@
     scene.add(sun);
     const glowPts = groups.glow.slice(0, 6).map(([x, y, z]) => { const l = new THREE.PointLight(0xffa64d, 0, 18, 1.6); l.position.set(x, y, z); scene.add(l); return l; });
 
-    const SKY = { sunset: [0x7fb8e6, 0xf9d7c3, 0xf6b38a], day: [0x5aa9e6, 0xcfe8f7, 0xa9d3ee], dusk: [0x2c3e7a, 0xe08a6b, 0x6a4a7a] }[o.sky ?? "sunset"] ?? [0x7fb8e6, 0xf9d7c3, 0xf6b38a];
+    const SKY = { sunset: [0x7fb8e6, 0xf9d7c3, 0xf6b38a], day: [0x5aa9e6, 0xcfe8f7, 0xa9d3ee], dusk: [0x2c3e7a, 0xe08a6b, 0x6a4a7a],
+      winter: [0x8fa9c9, 0xdfe7f0, 0xc5d3e3], sea: [0x4a90c8, 0xd8ecf5, 0x9cc9e0] }[o.sky ?? "sunset"] ?? [0x7fb8e6, 0xf9d7c3, 0xf6b38a];
     const skyMat = new THREE.ShaderMaterial({
       side: THREE.BackSide, depthWrite: false,
       uniforms: { top: { value: new THREE.Color(SKY[0]) }, mid: { value: new THREE.Color(SKY[1]) }, bot: { value: new THREE.Color(SKY[2]) } },
@@ -409,6 +599,7 @@
 
     // petals
     let petals = null, petalData = [];
+    if (o.snow) o.petals = { colors: [0xffffff, 0xf0f4fa], count: 900, from: Array.from({ length: 30 }, () => [bb.min.x + VK.rand() * size.x, bb.max.y + 4, bb.min.z + VK.rand() * size.z]) };
     if (o.petals) {
       const n = o.petals.count ?? 400, from = o.petals.from?.length ? o.petals.from : [[center.x, bb.max.y, center.z]];
       petals = new THREE.InstancedMesh(new THREE.PlaneGeometry(0.35, 0.25), new THREE.MeshStandardMaterial({ side: THREE.DoubleSide }), n);

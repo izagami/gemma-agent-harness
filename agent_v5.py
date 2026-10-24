@@ -11,7 +11,7 @@ Differences from agent.py/v4:
 - On finish the harness itself compiles Python files, runs tests it can find, and gives the exit codes to a
   fast boolean judge; at most one fix-and-retry round.
 """
-import hashlib, json, os, re, shlex, shutil, time
+import hashlib, json, os, re, shlex, shutil, sys, time
 from concurrent.futures import ThreadPoolExecutor
 import agent as base
 import judge
@@ -2034,6 +2034,30 @@ def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=N
             return ("[harness] Not accepted: the scene is too thin for the task (few labelled parts / few voxels besides the "
                     "island). Do not shrink the scene to get rid of an error - fix the reported line instead. Build the "
                     "hero and 8+ labelled supporting parts again, then build, render and call finish.\n" + base.clip(rep, 800))
+        shot = os.path.join(st.workdir, ".agent", "shot.png")
+        if VISION and os.path.exists(shot) and st.__dict__.get("webart_fid", 0) < 2:
+            # prompt fidelity on the picture: the things the task names must be recognizable at a glance
+            # (cycle 62: "castle" runs made grey pagodas, "lighthouse" runs had no harbor or boats - all scored 12/12)
+            try:
+                sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "webkit"))
+                import fidelity
+                fidelity.API = os.environ.get("JUDGE_API") or os.environ.get("AGENT_API", fidelity.API)
+                if not st.__dict__.get("webart_things"):
+                    st.webart_things = fidelity.things(st.task)
+                res = [(t, *fidelity.present(shot, t)) for t in st.webart_things]
+                miss = [t for t, v, p in res if p < 0.5]
+                if st.log:
+                    st.log({"fidelity": [(t, round(p, 2)) for t, v, p in res]})
+                if miss:
+                    st.webart_fid = st.__dict__.get("webart_fid", 0) + 1
+                    st.pending_image = shot
+                    return ("[harness] Not accepted yet: looking at the screenshot (next message), these things the task asks for "
+                            "are NOT recognizable at a glance: " + ", ".join(miss) + ". Make each one clearly what it is and big "
+                            "enough to see from the default camera (right shape, typical details and colors, placed where it is "
+                            "visible), then build, render and call finish again.")
+            except Exception as e:
+                if st.log:
+                    st.log({"fidelity_error": repr(e)[:200]})
         if not st.__dict__.get("webart_review"):
             if VISION and os.path.exists(os.path.join(st.workdir, ".agent", "shot.png")):
                 st.pending_image = os.path.join(st.workdir, ".agent", "shot.png")
