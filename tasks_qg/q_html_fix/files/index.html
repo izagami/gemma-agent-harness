@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>売上ダッシュボード</title>
+<link rel="stylesheet" href="style.css">
+<script src="data.js"></script>
+<script src="app.js"></script>
+</head>
+<body>
+<header class="toolbar">
+  <h1>売上ダッシュボード</h1>
+  <input id="filter" type="search" placeholder="名前・地域で絞り込み">
+  <button id="export-btn" type="button">CSVを表示</button>
+</header>
+<main>
+  <p id="sum"></p>
+  <div class="table-wrap">
+    <table id="tbl">
+      <thead><tr>
+        <th data-key="name">名前</th><th data-key="region">地域</th><th data-key="amount">金額</th><th data-key="date">日付</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <textarea id="csv" rows="8" readonly></textarea>
+</main>
+</body>
+</html>

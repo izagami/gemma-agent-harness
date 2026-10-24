@@ -1,0 +1,9 @@
+関西の数字がずれていた原因は2つ（どちらも関西の旧POS posmate のデータに関係）。
+
+1. 店舗 K07 は 2026-07 に K12 へ番号変更された旧ID。config/regions.d/kansai.ini の kansai の stores に K12 と旧ID K07 の両方が書かれており、
+   aggregate.region_totals が店舗IDを正規化（K07 -> K12）したうえで1件ずつ足していたため、K12 の売上が2回数えられていた。
+   また posmate の返金は旧ID K07 のまま届くが、load_refunds は店舗IDを正規化していなかったので K07 の返金が K12 に計上されず落ちていた。
+   -> 正規化後の店舗IDで重複を除いて1回だけ数え、返金も store_aliases.csv で正規化するよう修正。
+2. posmate は 2026-09-16 以降、返金の日付を YYYY/MM/DD 形式で出力している（refunds/posmate/2026-09.csv）。
+   load_refunds は date.startswith("2026-09") で月を判定していたため、これらの返金が取りこぼされていた。
+   -> 日付の / を - に正規化してから月を判定するよう修正。

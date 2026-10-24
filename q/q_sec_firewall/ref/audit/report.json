@@ -1,0 +1,8 @@
+{"violations": [
+ {"id": "admin4", "kind": "wide_cidr", "detail": "admin4 is 10.0.0.0/16; the admin VLAN is 10.0.10.0/24, so SSH is open to the whole office"},
+ {"id": "in4-04", "kind": "shadowing", "detail": "unconditional icmp accept before the 5/second limit rule in4-05"},
+ {"id": "in4-09", "kind": "debug_rule", "detail": "temporary vendor accept for 10.0.99.0/24 left in place"},
+ {"id": "output4", "kind": "missing_state", "detail": "no ct established,related accept: replies to accepted connections are dropped"},
+ {"id": "in6-05", "kind": "shadowing", "detail": "tcp 22 accepted from anywhere before the admin6-only rule in6-06"},
+ {"id": "output6", "kind": "missing_chain", "detail": "no ip6 output chain: all IPv6 outbound traffic is accepted"}
+]}

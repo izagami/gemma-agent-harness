@@ -1,0 +1,5 @@
+id,name,email,city,note
+C001,Aoki Ken,aoki@example.jp,Sapporo,
+C002,Baba Yui,baba@example.jp,Sendai,VIP
+C003,Chiba Ryo,,Tokyo,"call before 10:00, not after"
+C004,Doi Mao,doi@example.jp,Nagoya,

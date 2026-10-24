@@ -1,0 +1,24 @@
+# Operations
+
+## Overview
+
+On-call rotates weekly.[^note] See the [reference][ref].
+
+### Paging
+
+Pages go to the phone.[^pager][^note]
+
+## Runbooks
+
+### Disk full
+
+Check `df -h` first.[^1]
+
+### Errors
+
+Read the logs. The [changelog][] is elsewhere.
+
+[^pager]: Use the app, not SMS.
+[^note]: Rotation starts on Monday.
+[^1]: Clean `/var/tmp`.
+[ref]: https://ops.example/runbooks

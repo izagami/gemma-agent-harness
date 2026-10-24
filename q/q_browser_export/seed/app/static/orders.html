@@ -1,0 +1,38 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>受注一覧</title>
+<style>body{font-family:sans-serif;margin:24px}table{border-collapse:collapse}td,th{border:1px solid #999;padding:4px 8px}
+.modal{position:fixed;inset:0;background:#0006;display:flex;align-items:center;justify-content:center}.modal[hidden]{display:none}
+.box{background:#fff;padding:16px 24px;min-width:320px}#loading{color:#666}</style></head><body>
+<h1>受注一覧</h1>
+<div><button id="prev">前へ</button> <span id="pageinfo"></span> <button id="next">次へ</button>
+ <a id="export" href="/api/export.csv">CSV出力</a></div>
+<div id="loading" hidden>読み込み中…</div>
+<table id="orders"><thead><tr><th>注文番号</th><th>顧客</th><th>金額</th><th>状態</th><th></th></tr></thead><tbody></tbody></table>
+<div id="modal" class="modal" hidden><div class="box"><h2>注文詳細 <span class="oid"></span></h2>
+<dl><dt>担当者</dt><dd class="owner"></dd><dt>備考</dt><dd class="note"></dd></dl><button class="close">閉じる</button></div></div>
+<script>
+const $ = s => document.querySelector(s);
+let page = 1, pages = 1;
+async function load(p) {
+  $('#loading').hidden = false; $('#prev').disabled = $('#next').disabled = true;
+  const d = await (await fetch('/api/orders?page=' + p)).json();
+  page = d.page; pages = d.pages;
+  const tb = $('#orders tbody'); tb.innerHTML = '';
+  for (const o of d.rows) {
+    const tr = document.createElement('tr'); tr.dataset.id = o.id;
+    for (const k of ['id', 'customer', 'amount', 'status']) { const td = document.createElement('td'); td.textContent = o[k]; tr.appendChild(td); }
+    const td = document.createElement('td'), b = document.createElement('button');
+    b.textContent = '詳細'; b.className = 'detail'; b.onclick = () => detail(o.id); td.appendChild(b); tr.appendChild(td); tb.appendChild(tr);
+  }
+  $('#pageinfo').textContent = page + ' / ' + pages;
+  $('#prev').disabled = page <= 1; $('#next').disabled = page >= pages; $('#loading').hidden = true;
+}
+async function detail(id) {
+  $('#modal').hidden = false;  // 内容は読み込みが終わってから差し替わる
+  const d = await (await fetch('/api/orders/' + encodeURIComponent(id))).json();
+  $('#modal .oid').textContent = d.id; $('#modal .owner').textContent = d.owner; $('#modal .note').textContent = d.note;
+}
+$('#modal .close').onclick = () => { $('#modal').hidden = true; };
+$('#prev').onclick = () => load(page - 1);
+$('#next').onclick = () => load(page + 1);
+load(1);
+</script></body></html>

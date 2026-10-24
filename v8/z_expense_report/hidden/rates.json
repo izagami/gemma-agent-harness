@@ -1,0 +1,5 @@
+{
+  "base": "JPY",
+  "note": "1 unit of each currency in JPY",
+  "rates": {"JPY": "1", "USD": "150.25", "EUR": "162.4", "KRW": "0.109", "TWD": "4.65"}
+}

@@ -1,0 +1,28 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>申請フォーム</title>
+<style>body{font-family:sans-serif}label{display:block;margin:6px 0}textarea{width:420px;height:80px}.err{color:#c00}</style></head><body>
+<form data-testid="form">
+<label>氏名 <input data-testid="name" name="name"></label>
+<label>メール <input data-testid="email" name="email" type="email"></label>
+<label>部署 <select data-testid="dept" name="dept"><option value="">(読み込み中)</option></select></label>
+<label>金額(円) <input data-testid="amount" name="amount" inputmode="numeric"></label>
+<label>理由 <textarea data-testid="reason" name="reason"></textarea></label>
+<button type="submit" data-testid="submit">申請する</button> <span class="err" data-testid="error"></span>
+</form>
+<div data-testid="done" hidden><p data-testid="result"></p><button data-testid="again" type="button">続けて申請する</button></div>
+<script>
+const $ = s => document.querySelector(`[data-testid="${s}"]`);
+fetch('/api/depts').then(r => r.json()).then(ds => {
+  $('dept').innerHTML = '<option value="">選択してください</option>' + ds.map(d => `<option value="${d.code}">${d.name}</option>`).join('');
+});
+$('form').onsubmit = async ev => {
+  ev.preventDefault();
+  if (!confirm('この内容で申請しますか？')) return;
+  $('submit').disabled = true; $('error').textContent = '送信中…';
+  const f = Object.fromEntries(new FormData($('form')));
+  const r = await fetch('/api/apply', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(f)});
+  const d = await r.json();
+  $('submit').disabled = false; $('error').textContent = d.ok ? '' : d.error;
+  if (d.ok) { $('result').textContent = `申請番号 ${d.no} で受け付けました`; $('form').hidden = true; $('done').hidden = false; }
+};
+$('again').onclick = () => { $('form').reset(); $('result').textContent = ''; $('done').hidden = true; $('form').hidden = false; };
+</script></body></html>

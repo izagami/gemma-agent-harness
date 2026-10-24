@@ -1,0 +1,12 @@
+{"violations": [
+ {"id": "in4-05", "kind": "shadowing", "detail": "accepts SSH/8443 from all of 10.40.0.0/16 before the jump-host-only rules in4-06/in4-07"},
+ {"id": "mon4", "kind": "wide_cidr", "detail": "monitoring set is 10.40.0.0/16 instead of 10.40.2.20"},
+ {"id": "in4-10", "kind": "debug_rule", "detail": "temporary vendor SSH access from 198.51.100.77 left in place"},
+ {"id": "in4-11", "kind": "ineffective_limit", "detail": "unlimited SMTP accept after the 20/sec rule passes the excess"},
+ {"id": "ip4:OUTPUT", "kind": "missing_state", "detail": "no ESTABLISHED,RELATED accept, replies to inbound connections are dropped"},
+ {"id": "out4-04", "kind": "rule_order", "detail": "udp/53 drop placed before the internal DNS accept blocks internal DNS"},
+ {"id": "ip6:INPUT", "kind": "default_accept", "detail": "IPv6 INPUT policy ACCEPT"},
+ {"id": "in6-07", "kind": "wrong_port", "detail": "node exporter is 9100, not 9010"},
+ {"id": "in6-08", "kind": "wrong_proto", "detail": "-p icmp never matches IPv6; must be ipv6-icmp"},
+ {"id": "ip6:OUTPUT", "kind": "missing_chain", "detail": "no OUTPUT chain in ip6, IPv6 output unfiltered"}
+]}

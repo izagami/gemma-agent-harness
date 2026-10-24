@@ -1,0 +1,18 @@
+# Release process
+
+## Overview
+
+Releases go out on Tuesdays.[^tz] Read the [checklist][hb].
+
+## Steps
+
+1. Freeze the branch
+2. Run `make release`[^make]
+
+### Rollback
+
+Use the previous tag.
+
+[^make]: Needs the release key.
+[^tz]: Tokyo time.
+[hb]: https://wiki.example/release-checklist

@@ -1,0 +1,6 @@
+# 2026-05-01
+C1  丸山茶舗          orders=2  items=26  total=107,679
+C2  喫茶みどり         orders=2  items=23  total=37,214
+C3  旅館さくら         orders=2  items=57  total=160,741
+C4  Cafe Lumen    orders=1  items=4  total=10,940
+TOTAL  orders=7  items=110  total=316,574

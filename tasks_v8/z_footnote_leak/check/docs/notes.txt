@@ -1,0 +1,15 @@
+# Notes
+
+Before any section.[^b]
+
+## Overview
+
+Text.[^a] More.[^b]
+
+### Errors
+
+Done.[^a]
+
+[^a]: First note.
+[^b]: Second note.
+[changelog]: https://notes.example/changes

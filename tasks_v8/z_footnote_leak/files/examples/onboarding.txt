@@ -1,0 +1,23 @@
+# Onboarding
+
+Welcome to the team! Read the [handbook][hb] first.[^who]
+
+## Accounts
+
+- Ask IT for a laptop[^it]
+- Set up **two-factor** authentication
+
+## First week
+
+### Day 1
+
+Meet your buddy.[^who]
+
+### Day 2
+
+Ship something small. See [the guide][guide].
+
+[^who]: Your manager assigns a buddy.
+[^it]: Tickets go to the #it-help channel.
+[hb]: https://wiki.example/handbook
+[guide]: https://wiki.example/first-pr

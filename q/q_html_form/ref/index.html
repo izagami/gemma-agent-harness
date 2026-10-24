@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>注文フォーム</title>
+<style>
+  body { font-family: sans-serif; margin: 16px; }
+  .row { margin: 8px 0; }
+  .error { color: #c00; font-size: 0.9em; min-height: 1em; }
+</style>
+</head>
+<body>
+<form id="order" novalidate>
+  <div class="row"><label for="name">お名前</label> <input type="text" id="name"><div id="name-error" class="error"></div></div>
+  <div class="row"><label for="email">メールアドレス</label> <input type="text" id="email"><div id="email-error" class="error"></div></div>
+  <div class="row"><label for="product">商品</label>
+    <select id="product">
+      <option value="">選択してください</option>
+      <option value="A">ノート（480円）</option>
+      <option value="B">ペン（120円）</option>
+      <option value="C">ファイル（330円）</option>
+    </select><div id="product-error" class="error"></div></div>
+  <div class="row"><label for="qty">数量</label> <input type="text" inputmode="numeric" id="qty"><div id="qty-error" class="error"></div></div>
+  <div class="row"><label for="coupon">クーポン</label> <input type="text" id="coupon"><div id="coupon-error" class="error"></div></div>
+  <p>小計 <span id="subtotal">0円</span> / 値引き <span id="discount">0円</span> / 消費税 <span id="tax">0円</span> / 合計 <span id="total">0円</span></p>
+  <button type="submit" id="submit" disabled>注文する</button>
+</form>
+<pre id="result"></pre>
+<script>
+const PRICE = { A: 480, B: 120, C: 330 };
+const $ = (id) => document.getElementById(id);
+const touched = {};
+const val = (id) => $(id).value.trim();
+
+function qtyValue() {
+  const s = val("qty").normalize("NFKC");
+  return /^[0-9]+$/.test(s) && +s >= 1 && +s <= 99 ? +s : null;
+}
+const rules = {
+  name: () => { const v = val("name"); return v === "" ? "お名前を入力してください" : [...v].length > 20 ? "お名前は20文字以内で入力してください" : ""; },
+  email: () => { const v = val("email"); return v === "" ? "メールアドレスを入力してください" : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? "" : "メールアドレスの形式が正しくありません"; },
+  product: () => (val("product") === "" ? "商品を選択してください" : ""),
+  qty: () => (val("qty") === "" ? "数量を入力してください" : qtyValue() === null ? "数量は1〜99の整数で入力してください" : ""),
+  coupon: () => { const v = val("coupon").toUpperCase(); return v === "" || v === "SAVE10" ? "" : "クーポンコードが無効です"; },
+};
+const yen = (n) => n.toLocaleString("ja-JP") + "円";
+
+function amounts() {
+  const p = PRICE[val("product")], q = qtyValue();
+  const subtotal = p && q ? p * q : 0;
+  const discount = val("coupon").toUpperCase() === "SAVE10" ? Math.floor(subtotal / 10) : 0;
+  const tax = Math.floor((subtotal - discount) / 10);
+  return { subtotal, discount, tax, total: subtotal - discount + tax };
+}
+
+function update() {
+  let allOk = true;
+  for (const id in rules) {
+    const msg = rules[id]();
+    if (msg) allOk = false;
+    $(id + "-error").textContent = touched[id] ? msg : "";
+  }
+  const a = amounts();
+  for (const k of ["subtotal", "discount", "tax", "total"]) $(k).textContent = yen(a[k]);
+  $("submit").disabled = !allOk;
+}
+
+for (const id in rules) {
+  $(id).addEventListener("input", update);
+  $(id).addEventListener("change", update);
+  $(id).addEventListener("blur", () => { touched[id] = true; update(); });
+}
+$("order").addEventListener("submit", (e) => {
+  e.preventDefault();
+  update();
+  if ($("submit").disabled) return;
+  const coupon = val("coupon").toUpperCase();
+  $("result").textContent = JSON.stringify({
+    name: val("name"), email: val("email"), product: val("product"), qty: qtyValue(),
+    coupon: coupon === "SAVE10" ? "SAVE10" : "", total: amounts().total,
+  });
+});
+update();
+</script>
+</body>
+</html>

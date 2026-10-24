@@ -1,0 +1,4 @@
+order_id,customer,item,qty,note
+1001,佐藤,"pen, blue",3,
+1002,鈴木,notebook,1,"gift ""wrapped"""
+1003,高橋,pen,10,urgent

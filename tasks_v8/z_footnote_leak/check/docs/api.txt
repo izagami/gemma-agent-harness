@@ -1,0 +1,27 @@
+# API guide
+
+Start with the [reference][Ref] and the [changelog][].[^1]
+
+## Overview
+
+Endpoints are versioned.[^note]
+
+## Overview
+
+A second overview section gets its own id.[^1]
+
+### Errors
+
+Errors return JSON.[^undefined]
+
+### Limits
+
+- 100 requests per minute[^note]
+- burst: 20
+
+[^1]: Requires an API key.
+[^note]: Per token.
+[^unused]: Never referenced.
+[ref]: https://docs.example/api/ref
+[changelog]: https://docs.example/api/changes
+[REF]: https://docs.example/should-not-win

@@ -1,0 +1,542 @@
+[
+ {
+  "no": "R-1",
+  "title": "ネットワーク機器",
+  "applicant": "鈴木 花子",
+  "amount": 262000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-2",
+  "title": "工具セット",
+  "applicant": "中村 優子",
+  "amount": 484000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-3",
+  "title": "工具セット",
+  "applicant": "田中 美咲",
+  "amount": 97000,
+  "status": "承認済",
+  "approver": "suzuki",
+  "comment": ""
+ },
+ {
+  "no": "R-4",
+  "title": "清掃用品",
+  "applicant": "山本 大輔",
+  "amount": 444000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-5",
+  "title": "名刺 印刷",
+  "applicant": "佐藤 一郎",
+  "amount": 713000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-6",
+  "title": "研修 外部講師",
+  "applicant": "田中 美咲",
+  "amount": 606000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-7",
+  "title": "清掃用品",
+  "applicant": "渡辺 さくら",
+  "amount": 32000,
+  "status": "差戻し",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-8",
+  "title": "梱包資材",
+  "applicant": "小林 拓也",
+  "amount": 10000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-9",
+  "title": "展示会 ブース備品",
+  "applicant": "田中 美咲",
+  "amount": 433000,
+  "status": "差戻し",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-10",
+  "title": "ソフトウェア ライセンス更新",
+  "applicant": "田中 美咲",
+  "amount": 783000,
+  "status": "承認済",
+  "approver": "suzuki",
+  "comment": ""
+ },
+ {
+  "no": "R-11",
+  "title": "椅子の入れ替え",
+  "applicant": "小林 拓也",
+  "amount": 239000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-12",
+  "title": "梱包資材",
+  "applicant": "田中 美咲",
+  "amount": 780000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-13",
+  "title": "検証用 サーバー",
+  "applicant": "佐藤 一郎",
+  "amount": 427000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-14",
+  "title": "ソフトウェア ライセンス更新",
+  "applicant": "鈴木 花子",
+  "amount": 191000,
+  "status": "承認済",
+  "approver": "suzuki",
+  "comment": ""
+ },
+ {
+  "no": "R-15",
+  "title": "研修 外部講師",
+  "applicant": "伊藤 翔",
+  "amount": 124000,
+  "status": "承認済",
+  "approver": "suzuki",
+  "comment": ""
+ },
+ {
+  "no": "R-16",
+  "title": "清掃用品",
+  "applicant": "小林 拓也",
+  "amount": 433000,
+  "status": "承認済",
+  "approver": "suzuki",
+  "comment": ""
+ },
+ {
+  "no": "R-17",
+  "title": "ソフトウェア ライセンス更新",
+  "applicant": "田中 美咲",
+  "amount": 311000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-18",
+  "title": "清掃用品",
+  "applicant": "中村 優子",
+  "amount": 867000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-19",
+  "title": "展示会 ブース備品",
+  "applicant": "加藤 由美",
+  "amount": 874000,
+  "status": "差戻し",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-20",
+  "title": "コピー用紙 年間契約",
+  "applicant": "山本 大輔",
+  "amount": 425000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-21",
+  "title": "書籍(技術書)",
+  "applicant": "小林 拓也",
+  "amount": 720000,
+  "status": "承認済",
+  "approver": "suzuki",
+  "comment": ""
+ },
+ {
+  "no": "R-22",
+  "title": "研修 外部講師",
+  "applicant": "渡辺 さくら",
+  "amount": 89000,
+  "status": "承認済",
+  "approver": "suzuki",
+  "comment": ""
+ },
+ {
+  "no": "R-23",
+  "title": "椅子の入れ替え",
+  "applicant": "小林 拓也",
+  "amount": 111000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-24",
+  "title": "ソフトウェア ライセンス更新",
+  "applicant": "山本 大輔",
+  "amount": 380000,
+  "status": "承認済",
+  "approver": "suzuki",
+  "comment": ""
+ },
+ {
+  "no": "R-25",
+  "title": "ノートPC 追加購入",
+  "applicant": "中村 優子",
+  "amount": 45000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-26",
+  "title": "ネットワーク機器",
+  "applicant": "加藤 由美",
+  "amount": 608000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-27",
+  "title": "梱包資材",
+  "applicant": "高橋 健",
+  "amount": 173000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-28",
+  "title": "ノートPC 追加購入",
+  "applicant": "田中 美咲",
+  "amount": 553000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-29",
+  "title": "ソフトウェア ライセンス更新",
+  "applicant": "田中 美咲",
+  "amount": 415000,
+  "status": "差戻し",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-30",
+  "title": "ネットワーク機器",
+  "applicant": "加藤 由美",
+  "amount": 362000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-31",
+  "title": "検証用 サーバー",
+  "applicant": "小林 拓也",
+  "amount": 624000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-32",
+  "title": "ノートPC 追加購入",
+  "applicant": "山本 大輔",
+  "amount": 803000,
+  "status": "差戻し",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-33",
+  "title": "清掃用品",
+  "applicant": "小林 拓也",
+  "amount": 829000,
+  "status": "承認済",
+  "approver": "suzuki",
+  "comment": ""
+ },
+ {
+  "no": "R-34",
+  "title": "工具セット",
+  "applicant": "小林 拓也",
+  "amount": 211000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-35",
+  "title": "ノートPC 追加購入",
+  "applicant": "中村 優子",
+  "amount": 891000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-36",
+  "title": "ソフトウェア ライセンス更新",
+  "applicant": "田中 美咲",
+  "amount": 517000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-37",
+  "title": "ネットワーク機器",
+  "applicant": "渡辺 さくら",
+  "amount": 425000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-38",
+  "title": "書籍(技術書)",
+  "applicant": "佐藤 一郎",
+  "amount": 552000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-39",
+  "title": "工具セット",
+  "applicant": "加藤 由美",
+  "amount": 340000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-40",
+  "title": "ノートPC 追加購入",
+  "applicant": "田中 美咲",
+  "amount": 651000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-41",
+  "title": "会議室用 プロジェクター",
+  "applicant": "小林 拓也",
+  "amount": 599000,
+  "status": "承認済",
+  "approver": "suzuki",
+  "comment": ""
+ },
+ {
+  "no": "R-42",
+  "title": "モニター 27インチ",
+  "applicant": "小林 拓也",
+  "amount": 817000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-43",
+  "title": "清掃用品",
+  "applicant": "伊藤 翔",
+  "amount": 34000,
+  "status": "承認済",
+  "approver": "suzuki",
+  "comment": ""
+ },
+ {
+  "no": "R-44",
+  "title": "梱包資材",
+  "applicant": "鈴木 花子",
+  "amount": 86000,
+  "status": "承認済",
+  "approver": "suzuki",
+  "comment": ""
+ },
+ {
+  "no": "R-45",
+  "title": "椅子の入れ替え",
+  "applicant": "佐藤 一郎",
+  "amount": 773000,
+  "status": "承認済",
+  "approver": "suzuki",
+  "comment": ""
+ },
+ {
+  "no": "R-46",
+  "title": "コピー用紙 年間契約",
+  "applicant": "伊藤 翔",
+  "amount": 113000,
+  "status": "承認済",
+  "approver": "suzuki",
+  "comment": ""
+ },
+ {
+  "no": "R-47",
+  "title": "会議室用 プロジェクター",
+  "applicant": "渡辺 さくら",
+  "amount": 298000,
+  "status": "承認済",
+  "approver": "suzuki",
+  "comment": ""
+ },
+ {
+  "no": "R-48",
+  "title": "会議室用 プロジェクター",
+  "applicant": "伊藤 翔",
+  "amount": 541000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-49",
+  "title": "梱包資材",
+  "applicant": "伊藤 翔",
+  "amount": 664000,
+  "status": "差戻し",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-50",
+  "title": "研修 外部講師",
+  "applicant": "伊藤 翔",
+  "amount": 466000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-51",
+  "title": "研修 外部講師",
+  "applicant": "渡辺 さくら",
+  "amount": 509000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-52",
+  "title": "椅子の入れ替え",
+  "applicant": "鈴木 花子",
+  "amount": 25000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-53",
+  "title": "検証用 サーバー",
+  "applicant": "山本 大輔",
+  "amount": 352000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-54",
+  "title": "展示会 ブース備品",
+  "applicant": "田中 美咲",
+  "amount": 265000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-55",
+  "title": "モニター 27インチ",
+  "applicant": "伊藤 翔",
+  "amount": 748000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-56",
+  "title": "ソフトウェア ライセンス更新",
+  "applicant": "田中 美咲",
+  "amount": 621000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-57",
+  "title": "展示会 ブース備品",
+  "applicant": "佐藤 一郎",
+  "amount": 231000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-58",
+  "title": "ノートPC 追加購入",
+  "applicant": "山本 大輔",
+  "amount": 150000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-59",
+  "title": "ノートPC 追加購入",
+  "applicant": "高橋 健",
+  "amount": 457000,
+  "status": "申請中",
+  "approver": "",
+  "comment": ""
+ },
+ {
+  "no": "R-60",
+  "title": "梱包資材",
+  "applicant": "山本 大輔",
+  "amount": 558000,
+  "status": "承認済",
+  "approver": "suzuki",
+  "comment": ""
+ }
+]

@@ -1,0 +1,1 @@
+{"image": "localhost/local-agent-cad", "mounts": ["{HERE}/cad:/opt/cad:ro,Z"]}

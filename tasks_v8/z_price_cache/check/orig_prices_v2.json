@@ -1,0 +1,9 @@
+[
+  {"sku": "TEA-100", "name": "煎茶 100g", "category": "regular", "price": 1380},
+  {"sku": "TEA-500", "name": "煎茶 500g 業務用", "category": "bulk", "price": 5800},
+  {"sku": "MAT-030", "name": "抹茶 30g", "category": "regular", "price": 1650},
+  {"sku": "HOJ-200", "name": "ほうじ茶 200g", "category": "sale", "price": 980},
+  {"sku": "GEN-1KG", "name": "玄米茶 1kg", "category": "bulk", "price": 3500},
+  {"sku": "CUP-SET", "name": "湯呑み 5客", "category": "regular", "price": 3900},
+  {"sku": "KYU-001", "name": "急須", "category": "regular", "price": 6800}
+]

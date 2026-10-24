@@ -1,0 +1,1 @@
+rm invtool/commands.py

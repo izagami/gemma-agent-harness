@@ -1,0 +1,9 @@
+item,category,unit_price,qty,discount_pct
+a,food,1450,1,7
+b, Food ,999,3,2.5
+c,EXEMPT,84,7,0
+d,Exempt,1000,1,50
+e,kitchen,1250,1,10
+f,FOOD,125,1,0
+g,toys,3333,3,33.3
+h,food,2500,2,1

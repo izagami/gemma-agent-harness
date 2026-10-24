@@ -1,0 +1,11 @@
+# 2026-05-01 の受注（午前の注文 → 喫茶みどりがゴールドに昇格 → 正午に価格改定 → 午後の注文）
+{"op": "order", "day": "2026-05-01", "customer": "C1", "items": [["TEA-500", 12], ["MAT-030", 5]]}
+{"op": "order", "day": "2026-05-01", "customer": "C2", "items": [["TEA-100", 6], ["HOJ-200", 4]]}
+{"op": "order", "day": "2026-05-01", "customer": "C3", "items": [["GEN-1KG", 20], ["CUP-SET", 2]]}
+{"op": "tier", "customer": "C2", "tier": "gold"}
+{"op": "order", "day": "2026-05-01", "customer": "C2", "items": [["TEA-100", 10], ["TEA-500", 3]]}
+{"op": "reload", "file": "prices_v2.json"}
+{"op": "order", "day": "2026-05-01", "customer": "C1", "items": [["TEA-500", 8], ["CUP-SET", 1]]}
+{"op": "order", "day": "2026-05-01", "customer": "C3", "items": [["GEN-1KG", 25], ["HOJ-200", 10]]}
+{"op": "order", "day": "2026-05-01", "customer": "C4", "items": [["TEA-100", 3], ["KYU-001", 1]]}
+{"op": "report", "day": "2026-05-01"}

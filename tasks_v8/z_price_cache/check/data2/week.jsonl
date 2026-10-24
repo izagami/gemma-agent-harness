@@ -1,0 +1,23 @@
+{"op": "order", "day": "2026-06-01", "customer": "K01", "items": [["A1", 4], ["B2", 30]]}
+{"op": "order", "day": "2026-06-01", "customer": "K02", "items": [["A2", 2], ["B1", 1]]}
+{"op": "order", "day": "2026-06-01", "customer": "K04", "items": [["A2", 21], ["C1", 1]]}
+{"op": "tier", "customer": "K02", "tier": "platinum"}
+{"op": "order", "day": "2026-06-01", "customer": "K02", "items": [["A2", 5], ["B1", 2], ["A1", 1]]}
+{"op": "tier", "customer": "K04", "tier": "silver"}
+{"op": "order", "day": "2026-06-01", "customer": "K04", "items": [["A2", 3], ["C1", 1]]}
+{"op": "order", "day": "2026-06-01", "customer": "K03", "items": [["A1", 10]]}
+{"op": "report", "day": "2026-06-01"}
+{"op": "reload", "file": "prices_b.json"}
+{"op": "order", "day": "2026-06-02", "customer": "K01", "items": [["A1", 4], ["B2", 30], ["B1", 1]]}
+{"op": "order", "day": "2026-06-02", "customer": "K03", "items": [["A1", 10], ["C1", 2]]}
+{"op": "tier", "customer": "K01", "tier": "gold"}
+{"op": "order", "day": "2026-06-02", "customer": "K01", "items": [["A1", 2], ["B2", 55]]}
+{"op": "tier", "customer": "K02", "tier": "standard"}
+{"op": "order", "day": "2026-06-02", "customer": "K02", "items": [["A2", 5], ["B1", 2]]}
+{"op": "reload", "file": "prices_c.json"}
+{"op": "tier", "customer": "K01", "tier": "silver"}
+{"op": "order", "day": "2026-06-02", "customer": "K01", "items": [["A1", 1], ["C1", 1]]}
+{"op": "order", "day": "2026-06-02", "customer": "K04", "items": [["C1", 1], ["B1", 3]]}
+{"op": "order", "day": "2026-06-02", "customer": "K05", "items": [["B2", 20]]}
+{"op": "report", "day": "2026-06-02"}
+{"op": "report", "day": "2026-06-01"}

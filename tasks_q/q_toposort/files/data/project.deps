@@ -1,0 +1,11 @@
+# main project
+app: core ui net
+ui: core widgets
+widgets: core
+net: core tls
+tls: crypto
+core: log
+crypto:
+log:
+docs: app
+tests: app net net

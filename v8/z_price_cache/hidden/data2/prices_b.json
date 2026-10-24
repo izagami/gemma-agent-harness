@@ -1,0 +1,7 @@
+[
+  {"sku": "A1", "name": "コーヒー豆 200g", "category": "regular", "price": 1590},
+  {"sku": "A2", "name": "コーヒー豆 1kg", "category": "bulk", "price": 6400},
+  {"sku": "B1", "name": "ドリッパー", "category": "regular", "price": 2750},
+  {"sku": "B2", "name": "ペーパーフィルター", "category": "sale", "price": 385},
+  {"sku": "C1", "name": "ミル", "category": "regular", "price": 8980}
+]

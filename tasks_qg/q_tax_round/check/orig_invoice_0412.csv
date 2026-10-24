@@ -1,0 +1,8 @@
+item,category,unit_price,qty,discount_pct
+notebook,stationery,385,4,0
+rice,Food,1980,1,5
+cup,kitchen,1250,1,10
+stamp,EXEMPT,84,10,0
+coffee,food,1290,3,12.5
+towel,household,725,2,7
+tea,food,325,2,0

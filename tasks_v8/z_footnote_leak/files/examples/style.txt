@@ -1,0 +1,11 @@
+# Style guide
+
+## Overview
+
+Prefer *short* sentences.[^why]
+
+## Accounts
+
+Write user names in `code`. Undefined links like [this][guide] stay as text.
+
+[^why]: Readers skim.

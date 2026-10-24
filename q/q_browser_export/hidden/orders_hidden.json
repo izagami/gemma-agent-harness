@@ -1,0 +1,224 @@
+{
+ "user": {
+  "name": "kensa",
+  "password": "Pa55-word!"
+ },
+ "orders": [
+  {
+   "id": "A-1004",
+   "customer": "さくら物流",
+   "amount": 18000,
+   "status": "出荷済",
+   "owner": "佐藤",
+   "note": "検収後に支払い"
+  },
+  {
+   "id": "A-1023",
+   "customer": "西日本パーツ",
+   "amount": 30000,
+   "status": "キャンセル",
+   "owner": "佐藤",
+   "note": "至急対応"
+  },
+  {
+   "id": "A-1002",
+   "customer": "東和精機",
+   "amount": 137500,
+   "status": "受付",
+   "owner": "高橋",
+   "note": ""
+  },
+  {
+   "id": "A-1015",
+   "customer": "青葉フーズ",
+   "amount": 156000,
+   "status": "受付",
+   "owner": "佐藤",
+   "note": "検収後に支払い"
+  },
+  {
+   "id": "A-1013",
+   "customer": "山田商事",
+   "amount": 46500,
+   "status": "保留",
+   "owner": "佐藤",
+   "note": "分納可"
+  },
+  {
+   "id": "A-1025",
+   "customer": "ひかり化成",
+   "amount": 21000,
+   "status": "出荷済",
+   "owner": "田中",
+   "note": "検収後に支払い"
+  },
+  {
+   "id": "A-1012",
+   "customer": "丸三建設",
+   "amount": 119500,
+   "status": "保留",
+   "owner": "高橋",
+   "note": "与信確認待ち"
+  },
+  {
+   "id": "A-1014",
+   "customer": "中央テック",
+   "amount": 127000,
+   "status": "保留",
+   "owner": "渡辺",
+   "note": "再見積もり中"
+  },
+  {
+   "id": "A-1011",
+   "customer": "西日本パーツ",
+   "amount": 53000,
+   "status": "キャンセル",
+   "owner": "渡辺",
+   "note": "検収後に支払い"
+  },
+  {
+   "id": "A-1020",
+   "customer": "ひかり化成",
+   "amount": 178500,
+   "status": "受付",
+   "owner": "佐藤",
+   "note": "分納可"
+  },
+  {
+   "id": "A-1018",
+   "customer": "丸三建設",
+   "amount": 178000,
+   "status": "保留",
+   "owner": "伊藤",
+   "note": "再見積もり中"
+  },
+  {
+   "id": "A-1017",
+   "customer": "さくら物流",
+   "amount": 10500,
+   "status": "受付",
+   "owner": "伊藤",
+   "note": "請求書は月末締め"
+  },
+  {
+   "id": "A-1007",
+   "customer": "北村工業",
+   "amount": 143000,
+   "status": "出荷済",
+   "owner": "高橋",
+   "note": "検収後に支払い"
+  },
+  {
+   "id": "A-1027",
+   "customer": "さくら物流",
+   "amount": 92000,
+   "status": "キャンセル",
+   "owner": "鈴木",
+   "note": "納期, 要相談"
+  },
+  {
+   "id": "A-1021",
+   "customer": "\"新\"東海物産",
+   "amount": 1234500,
+   "status": "キャンセル",
+   "owner": "高橋",
+   "note": "検収後に支払い"
+  },
+  {
+   "id": "A-1010",
+   "customer": "丸三建設",
+   "amount": 25000,
+   "status": "受付",
+   "owner": "伊藤",
+   "note": ""
+  },
+  {
+   "id": "A-1009",
+   "customer": "中央テック",
+   "amount": 175000,
+   "status": "出荷済",
+   "owner": "佐藤",
+   "note": "至急対応"
+  },
+  {
+   "id": "A-1026",
+   "customer": "中央テック",
+   "amount": 71500,
+   "status": "出荷済",
+   "owner": "田中",
+   "note": "分納可"
+  },
+  {
+   "id": "A-1019",
+   "customer": "西日本パーツ",
+   "amount": 117000,
+   "status": "受付",
+   "owner": "佐藤",
+   "note": "分納可"
+  },
+  {
+   "id": "A-1016",
+   "customer": "みなと電子",
+   "amount": 194000,
+   "status": "保留",
+   "owner": "鈴木",
+   "note": "再見積もり中"
+  },
+  {
+   "id": "A-1001",
+   "customer": "丸三建設",
+   "amount": 39000,
+   "status": "キャンセル",
+   "owner": "渡辺",
+   "note": ""
+  },
+  {
+   "id": "A-1024",
+   "customer": "青葉フーズ",
+   "amount": 33500,
+   "status": "出荷済",
+   "owner": "田中",
+   "note": "検収後に支払い"
+  },
+  {
+   "id": "A-1022",
+   "customer": "丸三建設",
+   "amount": 6000,
+   "status": "キャンセル",
+   "owner": "高橋",
+   "note": ""
+  },
+  {
+   "id": "A-1008",
+   "customer": "みなと電子",
+   "amount": 138500,
+   "status": "受付",
+   "owner": "伊藤",
+   "note": "分納可"
+  },
+  {
+   "id": "A-1005",
+   "customer": "北村工業",
+   "amount": 145000,
+   "status": "受付",
+   "owner": "鈴木",
+   "note": ""
+  },
+  {
+   "id": "A-1006",
+   "customer": "西日本パーツ",
+   "amount": 150000,
+   "status": "キャンセル",
+   "owner": "佐藤",
+   "note": "先方指定\"午前着\", 再配達不可"
+  },
+  {
+   "id": "A-1003",
+   "customer": "山田商事, 大阪支店",
+   "amount": -1500,
+   "status": "キャンセル",
+   "owner": "佐藤",
+   "note": "検収後に支払い"
+  }
+ ]
+}

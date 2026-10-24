@@ -1,0 +1,37 @@
+# srv-db01 firewall (10.0.20.10 / 2001:db8:20::10)
+# 2026-09-12 ito: vendor access for DB tuning
+
+set admin4 = 10.0.0.0/16
+set admin6 = 2001:db8:10::/64
+set app4 = 10.0.30.5
+set app6 = 2001:db8:30::5
+set dns4 = 10.0.0.53
+set dns6 = 2001:db8::53
+
+chain input4 family ip hook input policy drop
+rule in4-01: iif lo accept
+rule in4-02: ct invalid drop
+rule in4-03: ct established,related accept
+rule in4-04: proto icmp accept
+rule in4-05: proto icmp limit 5/second accept
+rule in4-06: proto tcp dport 22 saddr @admin4 accept
+rule in4-07: proto tcp dport {80,443} accept
+rule in4-08: proto tcp dport 5432 saddr @app4 accept
+rule in4-09: saddr 10.0.99.0/24 counter accept   # TEMP vendor debug
+
+chain output4 family ip hook output policy drop
+rule out4-01: oif lo accept
+rule out4-02: ct invalid drop
+rule out4-03: proto udp dport 53 daddr @dns4 ct new accept
+rule out4-04: proto tcp dport 53 daddr @dns4 ct new accept
+rule out4-05: proto udp dport 123 accept
+rule out4-06: proto tcp dport 443 ct new accept
+
+chain input6 family ip6 hook input policy drop
+rule in6-01: iif lo accept
+rule in6-02: ct invalid drop
+rule in6-03: ct established,related accept
+rule in6-04: proto icmpv6 limit 5/second accept
+rule in6-05: proto tcp dport {22,80,443} accept
+rule in6-06: proto tcp dport 22 saddr @admin6 accept
+rule in6-07: proto tcp dport 5432 saddr @app6 accept
