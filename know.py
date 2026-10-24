@@ -126,7 +126,9 @@ def detect(root, task):
         keys.append("sqlite")
     if any(f.endswith((".nft", ".rules")) for f in files) or re.search(r"firewall|iptables|nftables|ファイアウォール", task, re.I):
         keys.append("firewall")
-    if re.search(r"voxel|three\.js|webgl|\b3d\b|ボクセル|self-contained html", task, re.I):
+    # free-form art only: a spec'd three.js task (q_three_fix / q_three_scene: docs/SPEC.md, existing index.html)
+    # must keep the normal spec-test path, not get the voxel kit and the art finish gate (found 10-25)
+    if re.search(r"voxel|ボクセル", task, re.I) or (re.search(r"self-contained html", task, re.I) and not files):
         keys.append("webart")
     if any("expected" in os.path.basename(f).lower() for f in files) or "1 バイト" in task or "byte" in low:
         keys.append("textout")
