@@ -1,6 +1,18 @@
 // voxelkit: tested building blocks for voxel-art scenes in three.js (r160).
 // build.py inlines this file and your scene.js into ONE html file; in scene.js the globals are THREE and VK.
 //
+// RECIPES - which functions make which thing (use these; they are tested and look right):
+//   pagoda / temple      VK.building({storeys: 5, taper: 0.75}) + VK.torii + VK.lantern + VK.bridge + decorate({flora: "sakura"})
+//   castle               VK.wall x4 (one with gate: true) + VK.tower({roof: "cone"}) at the corners
+//                        + VK.building({roof: "battlement", wall: P.castle, pillar: P.castleD}) as the keep
+//   town / village       VK.town(x, z, {houses: 8-12}) (houses + market stalls) or several VK.house
+//   lighthouse + harbor  VK.sea() right after VK.island, VK.tower({roof: "lantern", stripes: [white, red]}),
+//                        VK.harbor(x, z) at a shore point (quay + piers + boats), extra VK.boat on the sea
+//   winter / snow        VK.island({snow: true}) + decorate({flora: "snow"}) + VK.start({snow: true, sky: "winter"})
+//   forest               decorate({flora: "conifer"}) or many VK.conifer / VK.blobTree
+//   house / cabin        VK.house (roof: P.snow for a snowy roof) - give it a yard: keep trees 4+ voxels away
+//   windmill, farm ...   VK.building / VK.house + your own VK.box / VK.cylinder details (see the example scene)
+//
 // World (integer coordinates, y is up; 1 unit = 1 voxel)
 //   VK.seed(n); VK.rand() -> [0,1); VK.noise(x, z) -> smooth [0,1)
 //   VK.set(x, y, z, color, opts)    opts: {jitter: 0.06 (per-voxel brightness variation), glow: true (emissive,
@@ -92,6 +104,7 @@
   const stats = (window.__vk = { voxels: 0, drawn: 0, labels: {}, bounds: null, started: false, frames: 0 });
   const pick = c => (Array.isArray(c) ? c[Math.floor(VK.rand() * c.length)] : c);
   VK.set = (x, y, z, color, o = {}) => {
+    if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z)) return;
     x = Math.round(x); y = Math.round(y); z = Math.round(z);
     const c = new THREE.Color(pick(color));
     const j = o.jitter ?? 0.06;
@@ -101,24 +114,38 @@
   VK.del = (x, y, z) => vox.delete(K(Math.round(x), Math.round(y), Math.round(z)));
   VK.has = (x, y, z) => vox.has(K(Math.round(x), Math.round(y), Math.round(z)));
   VK.get = (x, y, z) => vox.get(K(Math.round(x), Math.round(y), Math.round(z)));
+  // non-finite coordinates (a part placed off the island gets VK.H = -Infinity) would loop forever: skip + warn
+  stats.warnings = [];
+  const bad = (name, ...v) => {
+    if (v.every(Number.isFinite)) return false;
+    if (stats.warnings.length < 12) stats.warnings.push(`${name}(${v.map(n => Number.isFinite(n) ? Math.round(n) : String(n)).join(", ")}) skipped: `
+      + (v.some(n => n === -Infinity) ? "placed off the island (VK.H is -Infinity there)" : "a coordinate is NaN/undefined"));
+    return true;
+  };
+  VK.warn = msg => { if (stats.warnings.length < 12) stats.warnings.push(msg); };
   VK.box = (x0, y0, z0, x1, y1, z1, color, o) => {
+    if (bad("box", x0, y0, z0, x1, y1, z1)) return;
     for (let x = Math.min(x0, x1); x <= Math.max(x0, x1); x++) for (let y = Math.min(y0, y1); y <= Math.max(y0, y1); y++)
       for (let z = Math.min(z0, z1); z <= Math.max(z0, z1); z++) VK.set(x, y, z, color, o);
   };
   VK.shell = (x0, y0, z0, x1, y1, z1, color, o) => {
+    if (bad("shell", x0, y0, z0, x1, y1, z1)) return;
     for (let x = x0; x <= x1; x++) for (let y = y0; y <= y1; y++) for (let z = z0; z <= z1; z++)
       if (x === x0 || x === x1 || z === z0 || z === z1) VK.set(x, y, z, color, o);
   };
   VK.sphere = (cx, cy, cz, r, color, o = {}) => {
+    if (bad("sphere", cx, cy, cz, r)) return;
     const sq = o.squash ?? 1, fill = o.fill ?? 1;
     for (let x = -r; x <= r; x++) for (let y = -r; y <= r; y++) for (let z = -r; z <= r; z++)
       if (Math.hypot(x, y / sq, z) <= r && VK.rand() < fill) VK.set(cx + x, cy + y * sq, cz + z, color, o);
   };
   VK.cylinder = (cx, y0, cz, r, h, color, o) => {
+    if (bad("cylinder", cx, y0, cz, r, h)) return;
     for (let y = y0; y < y0 + h; y++) for (let x = -r; x <= r; x++) for (let z = -r; z <= r; z++)
       if (Math.hypot(x, z) <= r + 0.3) VK.set(cx + x, y, cz + z, color, o);
   };
   VK.line = (x0, y0, z0, x1, y1, z1, color, o) => {
+    if (bad("line", x0, y0, z0, x1, y1, z1)) return;
     const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0), Math.abs(z1 - z0), 1);
     for (let i = 0; i <= n; i++) VK.set(x0 + (x1 - x0) * i / n, y0 + (y1 - y0) * i / n, z0 + (z1 - z0) * i / n, color, o);
   };
@@ -146,6 +173,7 @@
   };
   // storeyed building: pagoda, castle keep, temple hall, tower house, lighthouse ... -> {top, base}
   VK.building = (cx, cz, o = {}) => {
+    if (o.y === undefined && VK.H(cx, cz) === -Infinity) { bad("building", cx, -Infinity, cz); return { base: 0, top: 0, light: [cx, 0, cz] }; }
     const L = o.label ?? "building", P = VK.PAL;
     const n = o.storeys ?? 3, w0 = o.halfW ?? 5, d0 = o.halfD ?? w0, taper = o.taper ?? 1;
     const wallC = o.wall ?? P.white, pillarC = o.pillar ?? P.red, trimC = o.trim ?? P.wood, winC = o.window ?? 0x3a2a1a;
@@ -226,6 +254,7 @@
   };
   // round tower: castle tower, watchtower, lighthouse. roof "cone" | "battlement" | "lantern" (glass room + light)
   VK.tower = (cx, cz, o = {}) => {
+    if (o.y === undefined && VK.H(cx, cz) === -Infinity) { bad("tower", cx, -Infinity, cz); return { base: 0, top: 0, light: [cx, 0, cz] }; }
     const L = o.label ?? "tower", r = o.r ?? 3, h = o.h ?? 14, g = o.y ?? VK.H(cx, cz) + 1;
     const stripes = o.stripes;                                   // e.g. [white, red] bands for a lighthouse
     for (let y = 0; y < h; y++) for (let x = -r; x <= r; x++) for (let z = -r; z <= r; z++) {
@@ -261,6 +290,7 @@
   };
   // small house: plaster or wood walls, timber frame, door, windows, gable roof, chimney. For towns and villages.
   VK.house = (cx, cz, o = {}) => {
+    if (o.y === undefined && VK.H(cx, cz) === -Infinity) { bad("house", cx, -Infinity, cz); return { base: 0, top: 0, light: [cx, 0, cz] }; }
     const L = o.label ?? "house", w = o.halfW ?? 3, d = o.halfD ?? 2, h = o.h ?? 4, g = VK.H(cx, cz) + 1;
     const wall = o.wall ?? VK.PAL.plaster, frame = o.frame ?? VK.PAL.timber;
     for (let y = 0; y < h; y++) for (let x = -w; x <= w; x++) for (let z = -d; z <= d; z++) {
@@ -302,6 +332,7 @@
   };
   // conifer (pine / fir / spruce): stacked shrinking discs, optional snow on top of each layer
   VK.conifer = (x, z, o = {}) => {
+    if (o.y === undefined && VK.H(x, z) === -Infinity) { bad("conifer", x, -Infinity, z); return { base: 0, top: 0, light: [x, 0, z] }; }
     const g = VK.H(x, z) + 1, h = o.h ?? 10, L = o.label ?? "conifer", colors = o.colors ?? VK.PAL.conifer;
     VK.box(x, g, z, x, g + 2, z, VK.PAL.bark, { label: L });
     for (let k = 0; k < h; k++) {
@@ -430,6 +461,7 @@
     }
   };
   VK.blobTree = (x, z, o = {}) => {
+    if (o.y === undefined && VK.H(x, z) === -Infinity) { bad("blobTree", x, -Infinity, z); return { base: 0, top: 0, light: [x, 0, z] }; }
     const h0 = VK.H(x, z) + 1, th = o.trunkH ?? 6, r = o.r ?? 4, colors = o.colors ?? VK.PAL.sakura;
     for (let y = 0; y < th; y++) {
       const dx = y > th * 0.6 ? 1 : 0;
@@ -444,6 +476,7 @@
     return [x + 1, h0 + th + 1, z];
   };
   VK.padTree = (x, z, o = {}) => {
+    if (o.y === undefined && VK.H(x, z) === -Infinity) { bad("padTree", x, -Infinity, z); return { base: 0, top: 0, light: [x, 0, z] }; }
     const h0 = VK.H(x, z) + 1, colors = o.colors ?? VK.PAL.pine;
     for (let y = 0; y < 7; y++) {
       const dx = (y > 3 ? 1 : 0) + (y > 5 ? 1 : 0);
@@ -474,7 +507,8 @@
       VK.claim(x, z, w + 1);
     }
   };
-  VK.torii = (x, z, o = {}) => {                         // shrine gate; o.alongX: true when the path runs along x
+  VK.torii = (x, z, o = {}) => {
+    if (o.y === undefined && VK.H(x, z) === -Infinity) { bad("torii", x, -Infinity, z); return { base: 0, top: 0, light: [x, 0, z] }; }                         // shrine gate; o.alongX: true when the path runs along x
     const L = o.label ?? "torii", h = VK.H(x, z) + 1, s = o.half ?? 4, ax = o.alongX ?? false;
     const P = (a, y, c) => VK.set(ax ? x : x + a, y, ax ? z + a : z, c, { label: L });
     for (const a of [-s, s]) for (let y = 0; y <= 8; y++) P(a, h + y, o.color ?? VK.PAL.red);
@@ -484,7 +518,8 @@
     P(0, h + 7, VK.PAL.gold); P(-s - 2, h + 10, 0x222222); P(s + 2, h + 10, 0x222222);
     VK.claim(x, z, s + 1);
   };
-  VK.lantern = (x, z, o = {}) => {                       // stone lantern (toro) that glows at night
+  VK.lantern = (x, z, o = {}) => {
+    if (o.y === undefined && VK.H(x, z) === -Infinity) { bad("lantern", x, -Infinity, z); return { base: 0, top: 0, light: [x, 0, z] }; }                       // stone lantern (toro) that glows at night
     const L = o.label ?? "lantern", h = VK.H(x, z) + 1, S = VK.PAL.stone, D = VK.PAL.stoneD;
     VK.box(x - 1, h, z - 1, x + 1, h, z + 1, D, { label: L }); VK.box(x, h + 1, z, x, h + 2, z, S, { label: L });
     VK.box(x - 1, h + 3, z - 1, x + 1, h + 3, z + 1, S, { label: L }); VK.set(x, h + 4, z, VK.PAL.lantern, { glow: true, jitter: 0, label: L });

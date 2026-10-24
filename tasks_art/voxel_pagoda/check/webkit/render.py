@@ -161,6 +161,8 @@ def main():
         labels = vk.get("labels") or {}
         print(f"voxelkit: {vk.get('voxels')} voxels, {vk.get('drawn')} drawn, labels {json.dumps(labels)}"
               + ("" if vk.get("started") else "  VK.start() was never reached"))
+        for w in (vk.get("warnings") or [])[:6]:
+            print("warning:", w)
         kinds = [k for k in labels if k not in ("island", "pond")]
         if len(kinds) < 8:
             print(f"parts: {len(kinds)} labelled kinds besides island/pond (a rich scene has 8+; give every part a label)")

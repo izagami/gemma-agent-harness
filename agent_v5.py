@@ -2051,10 +2051,22 @@ def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=N
                 if miss:
                     st.webart_fid = st.__dict__.get("webart_fid", 0) + 1
                     st.pending_image = shot
+                    # cycle 66: VK.harbor existed but no run used it - name the tested function for each missing thing
+                    hints = {"harbor": "VK.harbor(x, z) at a shore point (after VK.sea)", "harbour": "VK.harbor(x, z)", "port": "VK.harbor(x, z)",
+                             "boat": "VK.boat(x, z) on the sea or VK.harbor", "ship": "VK.boat(x, z, {len: 9})",
+                             "castle": "VK.wall x4 + VK.tower({roof: 'cone'}) corners + VK.building({roof: 'battlement'}) keep",
+                             "town": "VK.town(x, z, {houses: 10})", "village": "VK.town(x, z, {houses: 8})", "market": "VK.town (has market stalls)",
+                             "lighthouse": "VK.tower({roof: 'lantern', stripes: [0xf3ede1, 0xc0392b], h: 18})",
+                             "forest": "decorate({flora: 'conifer'}) or many VK.conifer", "pine": "VK.conifer", "snow": "VK.island({snow: true}) + VK.start({snow: true})",
+                             "cabin": "VK.house (keep trees 4+ voxels away so it is visible)", "pagoda": "VK.building({storeys: 5, taper: 0.75})",
+                             "cape": "a hill at the island edge (VK.island hill) with rocks", "mountain": "VK.island({hill: [x, z, 18, 14]}) - a big hill",
+                             "garden": "VK.decorate + VK.pond + VK.path + VK.lantern"}
+                    tips = [f"{t}: {next(v for k, v in hints.items() if k in t.lower())}" for t in miss if any(k in t.lower() for k in hints)]
                     return ("[harness] Not accepted yet: looking at the screenshot (next message), these things the task asks for "
                             "are NOT recognizable at a glance: " + ", ".join(miss) + ". Make each one clearly what it is and big "
                             "enough to see from the default camera (right shape, typical details and colors, placed where it is "
-                            "visible), then build, render and call finish again.")
+                            "visible), then build, render and call finish again."
+                            + ("\nTested kit functions for them:\n" + "\n".join("- " + t for t in tips) if tips else ""))
             except Exception as e:
                 if st.log:
                     st.log({"fidelity_error": repr(e)[:200]})
