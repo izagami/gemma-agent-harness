@@ -122,6 +122,9 @@ def main():
     print("errors:", "none" if not errors else "")
     for e in errors[:8]:
         print("  -", e)
+    if any("CORS" in e and "vendor" in e for e in errors) or ".agent/webkit/vendor" in open(html, encoding="utf-8", errors="replace").read():
+        print("  - the page loads .agent/webkit/vendor files directly: browsers block that for file:// pages. Do not write "
+              "the html yourself - write scene.js and run build.py, which makes the right import map")
     for u in BLOCKED[:4]:
         print("  - external resource blocked (no network here; the page must work offline except three.js):", u)
     print(f"blank: {'YES - nothing visible (black/empty screen or camera pointing away)' if blank else 'no'}"
