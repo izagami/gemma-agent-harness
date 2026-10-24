@@ -2014,7 +2014,29 @@ def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=N
                     "the right way (for example a fuselage along X, wheels outside the body, windows visible). Fix anything "
                     "that is wrong, run cadtool again, then call finish.")
         checks += "\ncadtool report:\n" + rep[:1500]
-    if st.spec:
+    webart = "webart" in (getattr(st, "know_keys", None) or [])
+    if webart and os.path.isdir(os.path.join(st.workdir, ".agent", "webkit")):
+        # voxel / 3D page: the render report is the test (a spec_test.py of asserts says nothing about a picture)
+        code, out, err = box.sh("test -f index.html || exit 99; python3 .agent/webkit/render.py index.html .agent/shot.png", timeout=90)
+        rep = (out + err).strip()
+        if code == 99:
+            return "[harness] Not accepted: index.html does not exist. Build it: python3 .agent/webkit/build.py scene.js index.html"
+        if code != 0:
+            return ("[harness] Not accepted: the page does not render cleanly. render.py says:\n" + base.clip(rep, 1500)
+                    + "\nFix scene.js, build and render again, then call finish.")
+        if not st.__dict__.get("webart_review"):
+            # cycle 53: the first kit scene was clean but thin (3 trees, the pagoda standing in the pond, 100 lines)
+            st.webart_review = True
+            return ("[harness] Not accepted yet - the page renders; now make it rich. render.py says:\n" + base.clip(rep, 1200)
+                    + "\nIn a think call, check each point and then improve scene.js:\n"
+                    "1. The hero structure: is it big (it should dominate the picture) and detailed (several tiers/levels, "
+                    "pillars, trims, ornaments, a top piece), and does it stand on solid ground (not in water)?\n"
+                    "2. Count the supporting element kinds (labels above): a rich scene has 8 or more (water, bridge, gate, "
+                    "lanterns, path, 2-3 tree kinds, shrubs, flowers, rocks, fence...). Add the missing ones, placed so they "
+                    "do not overlap each other.\n3. Life: petals / animals / lights that move.\n"
+                    "Then build and render again, and call finish.")
+        checks += "\nrender report:\n" + rep[:1200]
+    if st.spec and not webart:
         code, out, err = isolated(st, box, "test -f .agent/spec_test.py || exit 99; PYTHONPATH=. python3 .agent/spec_test.py", 60)
         if code == 99:
             if st.finish_tries == 1:
@@ -2508,6 +2530,24 @@ def run_task(task_text, workdir, profile, log):
                         kmsg += (f"\n\n[harness] {rel} is in the project: a TESTED helper module - use it instead of "
                                  f"writing these parts yourself. Import it {how} Its API:\n" + know.kit_api(mod))
                         log({"kit": rel})
+                if "webart" in keys:
+                    # voxel / three.js scenes: tested voxel kit + one-file builder + headless render report
+                    # (vLLM runs text-only here, so render.py describes the picture in numbers)
+                    dst = os.path.join(workdir, ".agent", "webkit")
+                    shutil.copytree(os.path.join(here, "webkit"), dst, dirs_exist_ok=True,
+                                    ignore=shutil.ignore_patterns("__pycache__"))
+                    api = open(os.path.join(here, "webkit", "voxelkit.js"), encoding="utf-8").read().split("(() => {")[0]
+                    kmsg += ("\n\n[harness] .agent/webkit has a TESTED voxel kit. Write only scene.js (globals THREE and VK; "
+                             "first line `// title: ...`), then run\n  python3 .agent/webkit/build.py scene.js index.html && "
+                             "python3 .agent/webkit/render.py index.html\nbuild.py makes the single self-contained html "
+                             "(three.js import map + kit + your scene); render.py reports errors (scene.js line numbers), "
+                             "blank screen, framing, colors, animation, parts standing in water, how many labelled part "
+                             "kinds. The kit API:\n" + api.replace("// ", "")
+                             + "\n\nAn EXAMPLE scene made with the kit (a different subject: use its techniques - layout plan, "
+                             "free()/claim() so parts never overlap, a big detailed hero, many labelled parts, movers - not its "
+                             "content):\n```js\n" + open(os.path.join(here, "webkit", "example_scene.js"), encoding="utf-8").read()
+                             + "```")
+                    log({"kit": ".agent/webkit"})
             if kmsg:
                 messages[-1]["content"] = task_text + "\n\n" + kmsg
             log({"know": keys, "chars": len(kmsg)})

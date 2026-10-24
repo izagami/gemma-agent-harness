@@ -80,7 +80,8 @@ def main():
     errors = []
     with sync_playwright() as p:
         b = p.chromium.launch(args=["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"])
-        page = b.new_page(viewport={"width": 1280, "height": 800})
+        w, h = (int(v) for v in os.environ.get("RENDER_SIZE", "1280x800").split("x"))
+        page = b.new_page(viewport={"width": w, "height": h})
         page.route("**/*", vendor_route)
         page.on("pageerror", lambda e: errors.append(str(e).splitlines()[0][:300]))
         page.on("console", lambda m: m.type == "error" and errors.append(m.text[:300]))
@@ -114,8 +115,16 @@ def main():
     print(f"colors: {a['colors']}" + ("  (few: add color variation / more materials)" if a["colors"] < 25 else ""))
     print(f"animation: {anim:.3f}" + ("  (static picture)" if anim < 0.002 else ""))
     if vk:
-        print(f"voxelkit: {vk.get('voxels')} voxels, {vk.get('drawn')} drawn, labels {json.dumps(vk.get('labels'))}"
+        labels = vk.get("labels") or {}
+        print(f"voxelkit: {vk.get('voxels')} voxels, {vk.get('drawn')} drawn, labels {json.dumps(labels)}"
               + ("" if vk.get("started") else "  VK.start() was never reached"))
+        kinds = [k for k in labels if k not in ("island", "pond")]
+        if len(kinds) < 8:
+            print(f"parts: {len(kinds)} labelled kinds besides island/pond (a rich scene has 8+; give every part a label)")
+        ow = {k: n for k, n in (vk.get("overWater") or {}).items() if "bridge" not in k and "lily" not in k and n >= 20}
+        if ow:
+            print("over the pond: " + ", ".join(f"{k} {n} voxels" for k, n in ow.items())
+                  + "  (standing in the water? move it onto ground: check VK.inPond(x, z) before building)")
     sys.exit(0 if not errors and not blank else 1)
 
 

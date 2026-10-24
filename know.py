@@ -87,6 +87,19 @@ Firewall rule audits (nftables/iptables style, first match wins) - check every o
 - Check with the provided simulator/tool on a handful of packets (a disallowed SSH source, a reply ct=established on
   output, one ip6 output packet) - keep it small: fixing the rules matters more than a big test.""",
 
+    "webart": """\
+3D / voxel scenes as one self-contained HTML file - how strong results are made:
+- Plan the scene before code (think): a base (floating island / terrain), ONE hero structure that is big and detailed
+  (layers, trims, contrasting materials, ornaments, a tall silhouette), 6-10 supporting elements around it (water,
+  bridge, gate, lanterns, paths, several tree types, shrubs, flowers, rocks), and life (falling petals / koi / birds /
+  fireflies), a sky gradient, soft shadows, warm light, a title overlay and controls (orbit, day/night).
+- Rich = many small varied parts: every material gets per-voxel brightness variation; use 3-4 shades per color;
+  scatter details (flowers, fallen petals, rim stones). Thousands of voxels are normal (40k is fine with instancing).
+- Keep everything in the one html file (inline <script type="module">; three.js only through an import map to one CDN
+  version). Place parts on a plan so they do not overlap and nothing important stands in water.
+- If the harness provides a kit (.agent/webkit, described below), use it and its render report instead.
+- Common failures: a variable used before it is defined or never defined (the whole page stays black), mixing three.js
+  versions/CDNs (use only the import map the kit writes), the camera inside or far away from the scene.""",
     "textout": """\
 Exact output files - facts that decide a byte-for-byte match:
 - Find out the expected encoding and line ends from a provided expected file (bytes: b"\\r\\n" vs b"\\n", BOM, cp932 vs
@@ -113,6 +126,8 @@ def detect(root, task):
         keys.append("sqlite")
     if any(f.endswith((".nft", ".rules")) for f in files) or re.search(r"firewall|iptables|nftables|ファイアウォール", task, re.I):
         keys.append("firewall")
+    if re.search(r"voxel|three\.js|webgl|\b3d\b|ボクセル|self-contained html", task, re.I):
+        keys.append("webart")
     if any("expected" in os.path.basename(f).lower() for f in files) or "1 バイト" in task or "byte" in low:
         keys.append("textout")
     return keys

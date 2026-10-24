@@ -121,7 +121,7 @@
     }
     return VK.H;
   };
-  const ponds = [];
+  const ponds = [], waterY = new Map();
   VK.inPond = (x, z) => ponds.some(([cx, cz, rx, rz]) => ((x - cx) / rx) ** 2 + ((z - cz) / rz) ** 2 < 1);
   VK.pond = (cx, cz, rx, rz) => {
     ponds.push([cx, cz, rx, rz]);
@@ -131,7 +131,7 @@
       if (VK.inPond(x, z)) {
         VK.del(x, h, z); VK.del(x, h - 1, z);
         VK.set(x, h - 2, z, VK.PAL.sandD, { label: "pond" });
-        VK.set(x, h - 1, z, VK.PAL.water, { jitter: 0.03, water: true, label: "pond" });
+        VK.set(x, h - 1, z, VK.PAL.water, { jitter: 0.03, water: true, label: "pond" }); waterY.set(x + "," + z, h - 1);
       } else if ([[1, 0], [-1, 0], [0, 1], [0, -1]].some(([a, b]) => VK.inPond(x + a, z + b)) && VK.rand() < 0.55)
         VK.set(x, h + 1, z, [VK.PAL.stone, VK.PAL.stoneD], { jitter: 0.1, label: "pond" });
     }
@@ -179,6 +179,13 @@
       if (VK.has(x + 1, y, z) && VK.has(x - 1, y, z) && VK.has(x, y + 1, z) && VK.has(x, y - 1, z) && VK.has(x, y, z + 1) && VK.has(x, y, z - 1)) continue;
       groups[v.water ? "water" : v.glow ? "glow" : "solid"].push([x, y, z, v.c]);
     }
+    // parts built over a pond (a building standing in the water is a placement mistake; bridges are fine)
+    stats.overWater = {};
+    for (const [k, v] of vox) {
+      if (v.water || v.label === "pond" || v.label === "island") continue;
+      const [x, y, z] = k.split(",").map(Number), wy = waterY.get(x + "," + z);
+      if (wy !== undefined && (y === wy + 1 || y === wy + 2)) { const l = v.label || "unlabelled"; stats.overWater[l] = (stats.overWater[l] || 0) + 1; }
+    }
     if (!stats.voxels) throw new Error("VK.start(): no voxels were set - build the world before calling VK.start()");
     const mk = (list, mat, cast) => {
       if (!list.length) return null;
@@ -205,11 +212,13 @@
     // camera framed on the bounding sphere of everything built
     const radius = size.length() / 2;
     const camera = new THREE.PerspectiveCamera(42, innerWidth / innerHeight, 0.5, radius * 20);
-    const fitDist = radius / Math.sin(THREE.MathUtils.degToRad(42) / 2) * (innerWidth < innerHeight ? 1.5 : 1.0);
-    const dir = new THREE.Vector3(0.62, 0.42, 0.66).normalize();
-    camera.position.copy(center).addScaledVector(dir, fitDist);
+    // frame what is above ground mostly (the rocky underside of an island should not push the camera away)
+    const focus = center.clone(); focus.y = bb.min.y + size.y * 0.6;
+    const fitDist = radius / Math.sin(THREE.MathUtils.degToRad(42) / 2) * (innerWidth < innerHeight ? 1.25 : 0.78);
+    const dir = new THREE.Vector3(0.62, 0.36, 0.66).normalize();
+    camera.position.copy(focus).addScaledVector(dir, fitDist);
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.target.copy(center); controls.enableDamping = true;
+    controls.target.copy(focus); controls.enableDamping = true;
     controls.autoRotate = o.autoRotate !== false; controls.autoRotateSpeed = 0.45;
     controls.maxPolarAngle = Math.PI * 0.6; controls.minDistance = radius * 0.4; controls.maxDistance = radius * 6;
 
