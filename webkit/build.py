@@ -54,6 +54,43 @@ def build(scene_path, out_path):
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(html)
     print(f"built {out_path} ({len(html) // 1024} KB, scene {scene.count(chr(10)) + 1} lines)")
+    for w in use_before_declaration(scene):
+        print("WARNING:", w)
+
+
+def use_before_declaration(scene):
+    """top-level const/let/class names used on an earlier line that runs immediately (top level or inside for/if
+    blocks, not inside a function body): the page throws 'Cannot access X before initialization'
+    (cycles 57/58: app.add(...) inside a for loop above `const app = VK.start(...)`)"""
+    import re
+    lines = scene.split("\n")
+    # for every line: is it inside a function body? (track a stack of '{' kinds)
+    in_fn, stack = [], []
+    for line in lines:
+        t = re.sub(r"//.*", "", line)
+        t = re.sub(r"(['\"`])(?:\\.|(?!\1).)*\1", '""', t)
+        in_fn.append("f" in stack)
+        for k, ch in enumerate(t):
+            if ch == "{":
+                stack.append("f" if re.search(r"(=>|\bfunction\b[^{]*|\b(?:class|get|set)\b[^{]*|^\s*(?!(?:for|if|while|switch|catch|with)\b)\w+\s*\([^)]*\)\s*)$", t[:k].rstrip() + " ") else "b")
+            elif ch == "}" and stack:
+                stack.pop()
+    out = []
+    for i, line in enumerate(lines):
+        m = re.match(r"(?:const|let|class)\s+([A-Za-z_$][\w$]*)", line)
+        if not m:
+            continue
+        name = m.group(1)
+        for j in range(i):
+            if in_fn[j]:
+                continue
+            t = re.sub(r"//.*", "", lines[j])
+            t = re.sub(r"(['\"`])(?:\\.|(?!\1).)*\1", '""', t)
+            if re.search(r"(?<![\w$.])" + re.escape(name) + r"(?![\w$])", t):
+                out.append(f"scene.js line {j + 1} uses `{name}` before line {i + 1} declares it - this throws at run time. "
+                           f"Move the declaration up, or the use below it (for meshes use VK.add / VK.mover).")
+                break
+    return out[:5]
 
 
 if __name__ == "__main__":

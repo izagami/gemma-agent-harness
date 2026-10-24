@@ -46,7 +46,9 @@
 //     builds meshes (hidden voxels culled, one instanced draw per material), sun + soft shadows + sky gradient + fog,
 //     camera framed automatically on everything you built, orbit controls, title overlay, Day/Night + Rotate
 //     buttons, animation loop. Returns {scene, camera, renderer, controls, add(object3d)}.
+//   VK.add(object3d)   add your own three.js mesh/group to the scene - works before AND after VK.start
 //   VK.mover(object3d, fn(t)) animate your own meshes (koi, birds, a turning wheel...): fn sets its position/rotation
+//                      (use VK.add / VK.mover, not app.add before `const app = VK.start(...)` - that line throws)
 // Checks: window.__vk = {voxels, drawn, labels: {name: count}, bounds, started, frames}
 (() => {
   let s = 7;
@@ -305,8 +307,10 @@
     VK.scatter(o.flowers ?? 150, (x, z, h) => { if (!VK.free(x, z, 0)) return false; VK.set(x, h + 1, z, VK.PAL.flowers, { label: "flowers" }); });
     return out;                                          // out.trees: canopy centers for VK.start({petals: {from: out.trees}})
   };
-  const movers = [];
+  const movers = [], pending = [];
+  let liveScene = null;
   VK.mover = (obj, fn) => movers.push([obj, fn]);
+  VK.add = obj => { if (liveScene) liveScene.add(obj); else pending.push(obj); return obj; };   // works before or after VK.start
 
   VK.start = (o = {}) => {
     const scene = new THREE.Scene();
@@ -486,8 +490,11 @@
       controls.update(); renderer.render(scene, camera); stats.frames++;
       requestAnimationFrame(loop);
     };
+    liveScene = scene; pending.forEach(o => scene.add(o));
     stats.started = true;
-    loop();
+    // first frame on the next tick: the rest of scene.js (movers, meshes declared below VK.start) runs first
+    // (cycle 57: a mover touched `koiMeshes`, declared after VK.start, during a synchronous first frame)
+    requestAnimationFrame(loop);
     return { scene, camera, renderer, controls, add: obj => (scene.add(obj), obj) };
   };
 })();
