@@ -82,7 +82,7 @@ def main():
     errors = []
     with sync_playwright() as p:
         b = p.chromium.launch(args=["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"])
-        w, h = (int(v) for v in os.environ.get("RENDER_SIZE", "960x600").split("x"))
+        w, h = (int(v) for v in os.environ.get("RENDER_SIZE", "800x500").split("x"))
         page = b.new_page(viewport={"width": w, "height": h})
         page.route("**/*", vendor_route)
         page.on("pageerror", lambda e: errors.append(str(e).splitlines()[0][:300]))

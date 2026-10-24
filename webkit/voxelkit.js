@@ -521,21 +521,25 @@
       const [x, y, z] = k.split(",").map(Number), wy = waterY.get(x + "," + z);
       if (wy !== undefined && (y === wy + 1 || y === wy + 2)) { const l = v.label || "unlabelled"; stats.overWater[l] = (stats.overWater[l] || 0) + 1; }
     }
-    // floating parts: voxels not touching (26-neighbour) anything connected to the island / ground
-    stats.floating = {};
+    // floating parts: non-island voxels not touching (26-neighbour) anything connected to the island / ground.
+    // Only the (few thousand) non-island voxels are walked; island voxels count as ground.
+    stats.floating = {}; stats.floatSample = {};
     {
+      const N26 = []; for (let a = -1; a <= 1; a++) for (let b = -1; b <= 1; b++) for (let c = -1; c <= 1; c++) if (a || b || c) N26.push([a, b, c]);
+      const ground = v => v && (v.label === "island" || v.label === "sea" || v.label === "beach");
+      const rest = []; for (const [k, v] of vox) if (!ground(v)) rest.push(k);
       const seen = new Set(), queue = [];
-      for (const [k, v] of vox) if (v.label === "island") { seen.add(k); queue.push(k); }
-      if (!queue.length) { let lowest = null; for (const k of vox.keys()) { const y = +k.split(",")[1]; if (lowest === null || y < lowest[1]) lowest = [k, y]; } if (lowest) { seen.add(lowest[0]); queue.push(lowest[0]); } }
+      const hasGround = ground([...vox.values()].find(ground));
+      for (const k of rest) {
+        const [x, y, z] = k.split(",").map(Number);
+        if (!hasGround || N26.some(([a, b, c]) => ground(vox.get(K(x + a, y + b, z + c))))) { seen.add(k); queue.push(k); }
+      }
+      if (!hasGround && rest.length) { seen.clear(); queue.length = 0; let low = null; for (const k of rest) { const y = +k.split(",")[1]; if (low === null || y < low[1]) low = [k, y]; } seen.add(low[0]); queue.push(low[0]); }
       while (queue.length) {
         const [x, y, z] = queue.pop().split(",").map(Number);
-        for (let a = -1; a <= 1; a++) for (let b = -1; b <= 1; b++) for (let c = -1; c <= 1; c++) {   // touching at an edge or corner counts
-          const n = K(x + a, y + b, z + c);
-          if (vox.has(n) && !seen.has(n)) { seen.add(n); queue.push(n); }
-        }
+        for (const [a, b, c] of N26) { const n = K(x + a, y + b, z + c); if (!seen.has(n) && vox.has(n) && !ground(vox.get(n))) { seen.add(n); queue.push(n); } }
       }
-      stats.floatSample = {};
-      for (const [k, v] of vox) if (!seen.has(k)) { const l = v.label || "unlabelled"; stats.floating[l] = (stats.floating[l] || 0) + 1; if (!stats.floatSample[l]) stats.floatSample[l] = k; }
+      for (const k of rest) if (!seen.has(k)) { const v = vox.get(k), l = v.label || "unlabelled"; stats.floating[l] = (stats.floating[l] || 0) + 1; if (!stats.floatSample[l]) stats.floatSample[l] = k; }
     }
     if (!stats.voxels) throw new Error("VK.start(): no voxels were set - build the world before calling VK.start()");
     const mk = (list, mat, cast) => {
@@ -680,7 +684,8 @@
       for (const [obj, fn] of movers) fn.call(obj, t, dt);
       if (o.onFrame) o.onFrame(t, dt);
       controls.update(); renderer.render(scene, camera); stats.frames++;
-      requestAnimationFrame(loop);
+      // low-cost mode (headless check renders on the CPU): ~6 frames per second is enough for two screenshots
+      if (low) setTimeout(() => requestAnimationFrame(loop), 160); else requestAnimationFrame(loop);
     };
     liveScene = scene; pending.forEach(o => scene.add(o));
     stats.started = true;
