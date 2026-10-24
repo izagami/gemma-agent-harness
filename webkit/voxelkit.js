@@ -23,6 +23,15 @@
 //                                 finial on top. Five storeys + taper 0.75 = a five-storey pagoda; roof "flat" + storeys 3
 //                                 = a tower house; wall/pillar colors make temples, castles, lighthouses. Use it for the
 //                                 hero, then add your own details around it.
+//   Garden parts (TESTED; each claims its footprint, so call the big ones first):
+//   VK.claim(x, z, r) / VK.free(x, z, r) -> bool    reserve ground / is the ground free (not pond, not claimed)
+//   VK.bridge(x0, z0, x1, z1, {arch: 3, halfWidth: 1, deck, rail, post})  arched bridge across a pond
+//   VK.torii(x, z, {half: 4, alongX: false, color})  shrine gate on the path
+//   VK.lantern(x, z)                                 stone lantern, glows at night
+//   VK.path([[x, z], [x, z], ...])                   stepping-stone path (skips water)
+//   VK.fence(x0, z0, x1, z1)                         low wooden fence
+//   VK.decorate({trees: 4, pines: 2, shrubs: 25, rocks: 12, flowers: 150}) -> {trees: canopy centers for petals}
+//                                                    fills the remaining free ground - call it LAST, before VK.start
 //   VK.island({radius: 30, top: 4, hill: [x, z, r, h], depthScale}) -> floating island with grass/dirt/stone
 //                                                         layers and a rocky underside; afterwards VK.H(x, z)
 //                                                         gives the ground top (or -Infinity off the island)
@@ -157,6 +166,7 @@
       VK.set(cx, y + sh + 1, cz, P.lantern, { glow: true, label: L });
       y += sh + 2;
     }
+    VK.claim(cx, cz, Math.max(w0, d0) + 4);
     return { base: g, top: y };
   };
   const height = new Map();
@@ -226,6 +236,75 @@
         if (Math.hypot(dx, dz) < r - dy * 0.6) VK.set(x + ox + dx, h0 + oy + dy, z + oz + dz, colors, { jitter: 0.08, label: "tree" });
   };
 
+  // ---- placement bookkeeping: claim footprints so parts never overlap
+  const claims = [];
+  VK.claim = (x, z, r) => { claims.push([x, z, r]); };
+  VK.free = (x, z, r = 0) => VK.H(x, z) > -Infinity && !VK.inPond(x, z) && claims.every(([a, b, c]) => Math.hypot(x - a, z - b) > r + c);
+  // ---- garden parts (each claims its footprint)
+  VK.bridge = (x0, z0, x1, z1, o = {}) => {             // arched bridge with railings between two points (across a pond)
+    const L = o.label ?? "bridge", n = Math.max(Math.abs(x1 - x0), Math.abs(z1 - z0), 1), w = o.halfWidth ?? 1;
+    const along = Math.abs(x1 - x0) >= Math.abs(z1 - z0), y0 = Math.max(VK.H(x0, z0), VK.H(x1, z1));
+    for (let i = 0; i <= n; i++) {
+      const x = Math.round(x0 + (x1 - x0) * i / n), z = Math.round(z0 + (z1 - z0) * i / n);
+      const y = y0 + Math.round(Math.sin(i / n * Math.PI) * (o.arch ?? 3));
+      for (let k = -w; k <= w; k++) VK.set(along ? x : x + k, y, along ? z + k : z, o.deck ?? VK.PAL.woodL, { label: L });
+      for (const k of [-w - 1, w + 1]) {
+        VK.set(along ? x : x + k, y + 1, along ? z + k : z, o.rail ?? VK.PAL.red, { label: L });
+        if (i % 3 === 0) VK.set(along ? x : x + k, y + 2, along ? z + k : z, o.post ?? VK.PAL.redD, { label: L });
+      }
+      VK.claim(x, z, w + 1);
+    }
+  };
+  VK.torii = (x, z, o = {}) => {                         // shrine gate; o.alongX: true when the path runs along x
+    const L = o.label ?? "torii", h = VK.H(x, z) + 1, s = o.half ?? 4, ax = o.alongX ?? false;
+    const P = (a, y, c) => VK.set(ax ? x : x + a, y, ax ? z + a : z, c, { label: L });
+    for (const a of [-s, s]) for (let y = 0; y <= 8; y++) P(a, h + y, o.color ?? VK.PAL.red);
+    for (let a = -s - 2; a <= s + 2; a++) P(a, h + 9, 0x222222);
+    for (let a = -s - 1; a <= s + 1; a++) P(a, h + 8, o.color ?? VK.PAL.red);
+    for (let a = -s; a <= s; a++) P(a, h + 6, o.color ?? VK.PAL.red);
+    P(0, h + 7, VK.PAL.gold); P(-s - 2, h + 10, 0x222222); P(s + 2, h + 10, 0x222222);
+    VK.claim(x, z, s + 1);
+  };
+  VK.lantern = (x, z, o = {}) => {                       // stone lantern (toro) that glows at night
+    const L = o.label ?? "lantern", h = VK.H(x, z) + 1, S = VK.PAL.stone, D = VK.PAL.stoneD;
+    VK.box(x - 1, h, z - 1, x + 1, h, z + 1, D, { label: L }); VK.box(x, h + 1, z, x, h + 2, z, S, { label: L });
+    VK.box(x - 1, h + 3, z - 1, x + 1, h + 3, z + 1, S, { label: L }); VK.set(x, h + 4, z, VK.PAL.lantern, { glow: true, jitter: 0, label: L });
+    VK.box(x - 2, h + 5, z - 2, x + 2, h + 5, z + 2, D, { label: L }); VK.box(x - 1, h + 6, z - 1, x + 1, h + 6, z + 1, S, { label: L });
+    VK.set(x, h + 7, z, S, { label: L }); VK.claim(x, z, 2);
+  };
+  VK.path = (points, o = {}) => {                        // stepping-stone path through [[x, z], ...]
+    const L = o.label ?? "path";
+    for (let p = 0; p + 1 < points.length; p++) {
+      const [ax, az] = points[p], [bx, bz] = points[p + 1], n = Math.max(Math.abs(bx - ax), Math.abs(bz - az), 1);
+      for (let i = 0; i <= n; i += 2) {
+        const x = Math.round(ax + (bx - ax) * i / n), z = Math.round(az + (bz - az) * i / n);
+        if (VK.H(x, z) === -Infinity || VK.inPond(x, z)) continue;
+        for (const [a, b] of [[0, 0], [1, 0], [0, 1], [1, 1]]) VK.set(x + a, VK.H(x + a, z + b) + 1, z + b, [VK.PAL.stone, VK.PAL.stoneD], { label: L });
+        VK.claim(x, z, 1);
+      }
+    }
+  };
+  VK.fence = (x0, z0, x1, z1, o = {}) => {               // low wooden fence along a line
+    const L = o.label ?? "fence", n = Math.max(Math.abs(x1 - x0), Math.abs(z1 - z0), 1);
+    for (let i = 0; i <= n; i++) {
+      const x = Math.round(x0 + (x1 - x0) * i / n), z = Math.round(z0 + (z1 - z0) * i / n);
+      if (VK.H(x, z) === -Infinity || VK.inPond(x, z)) continue;
+      const h = VK.H(x, z) + 1;
+      VK.set(x, h + 1, z, o.color ?? VK.PAL.woodL, { label: L }); if (i % 2 === 0) VK.set(x, h, z, o.color ?? VK.PAL.wood, { label: L });
+    }
+  };
+  VK.decorate = (o = {}) => {                            // fill the free ground: shrubs, flowers, rocks, extra trees
+    const out = { trees: [] };
+    VK.scatter(o.trees ?? 4, (x, z) => { if (!VK.free(x, z, 4)) return false;
+      out.trees.push(VK.blobTree(x, z, { colors: VK.rand() < 0.6 ? VK.PAL.sakura : VK.PAL.maple, r: 3 + Math.round(VK.rand()), label: "tree" })); VK.claim(x, z, 4); });
+    VK.scatter(o.pines ?? 2, (x, z) => { if (!VK.free(x, z, 4)) return false; VK.padTree(x, z); VK.claim(x, z, 4); });
+    VK.scatter(o.shrubs ?? 25, (x, z, h) => { if (!VK.free(x, z, 1)) return false;
+      VK.sphere(x, h + 1, z, VK.rand() < 0.5 ? 1 : 2, VK.rand() < 0.35 ? VK.PAL.azalea : [VK.PAL.moss, VK.PAL.leaf], { jitter: 0.12, label: "shrub" }); VK.claim(x, z, 1); });
+    VK.scatter(o.rocks ?? 12, (x, z, h) => { if (!VK.free(x, z, 1)) return false;
+      VK.box(x, h + 1, z, x + 1, h + 1 + Math.round(VK.rand()), z + Math.round(VK.rand()), [VK.PAL.stone, VK.PAL.stoneD], { label: "rocks" }); VK.claim(x, z, 1); });
+    VK.scatter(o.flowers ?? 150, (x, z, h) => { if (!VK.free(x, z, 0)) return false; VK.set(x, h + 1, z, VK.PAL.flowers, { label: "flowers" }); });
+    return out;                                          // out.trees: canopy centers for VK.start({petals: {from: out.trees}})
+  };
   const movers = [];
   VK.mover = (obj, fn) => movers.push([obj, fn]);
 
