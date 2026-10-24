@@ -23,7 +23,8 @@ Waiting
     wait_text(scope, selector, text)          until text_content() == text (exact, stripped)
     wait_text_change(scope, selector, old)    until text_content() != old
     wait_count(scope, selector, n)            until exactly n elements
-    wait_attr(scope, selector, attr, value)   until the attribute equals value (e.g. aria-busy "false")
+    wait_attr(scope, selector, attr, value=None)  until the attribute equals value (e.g. aria-busy "false");
+                                              no value: until the element has the attribute (e.g. "hidden")
     wait_options(scope, select_selector)      until a <select> has a real (non-empty value) option
     click_and_wait_change(page, click_sel, watch_sel, scope=None)   click_sel: a selector or a Locator (tabs.nth(i))
                                               remembers watch_sel's text, clicks, waits until it changed: use for
@@ -72,11 +73,17 @@ def _where(scope):
 
 
 # ---------------------------------------------------------------- selectors / discovery
-def sel_testid(name):
+def sel_testid(name, *rest):
+    """'[data-testid="name"]'; called as sel_testid(page, name) it returns page.locator(that) (cycle 69 did so)"""
+    if rest:
+        return name.locator(f'[data-testid="{rest[0]}"]')
     return f'[data-testid="{name}"]'
 
 
-def sel_label(text):
+def sel_label(text, *rest):
+    """'[aria-label="text"]'; called as sel_label(page, text) it returns page.locator(that)"""
+    if rest:
+        return text.locator(f'[aria-label="{rest[0]}"]')
     return f'[aria-label="{text}"]'
 
 
@@ -207,11 +214,12 @@ def wait_count(scope, selector, n):
     return _poll(lambda: (_loc(scope, selector).count() == n, _loc(scope, selector).count()), f"{n} x {selector}", scope)
 
 
-def wait_attr(scope, selector, attr, value):
+def wait_attr(scope, selector, attr, value=None):
+    """until the attribute equals value; without value: until the element HAS the attribute (e.g. 'hidden')"""
     def c():
         v = _loc(scope, selector).first.get_attribute(attr)
-        return v == value, v
-    return _poll(c, f"{selector}[{attr}={value!r}]", scope)
+        return (v is not None if value is None else v == value), v
+    return _poll(c, f"{selector}[{attr}{'' if value is None else '=' + repr(value)}]", scope)
 
 
 def wait_options(scope, select_selector):
