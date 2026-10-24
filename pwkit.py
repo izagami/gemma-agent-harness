@@ -25,6 +25,7 @@ Waiting
     click_and_wait_change(page, click_sel, watch_sel, scope=None)
                                               remembers watch_sel's text, clicks, waits until it changed: use for
                                               "next page", tabs, filters, search - anything that replaces content
+                                              (a tab that is already selected: clicks and returns at once)
 Reading
     text(scope, selector)                     exact text_content() ('' if missing)
     read_rows(scope, row_selector, cell_selector="td")  every row's cell texts in ONE call: list of lists
@@ -182,8 +183,12 @@ def _content(scope, selector):
 def click_and_wait_change(page, click_sel, watch_sel, scope=None):
     """click click_sel, then wait until watch_sel's HTML differs from before (content replaced, not just 'loading')"""
     scope = scope or page
+    target = _loc(scope, click_sel).first
+    if any(target.get_attribute(a) in ("true", "page") for a in ("aria-selected", "aria-current", "aria-pressed")):
+        target.click()          # already the current tab / page: its content will not change, nothing to wait for
+        return None
     before = _content(scope, watch_sel)
-    _loc(scope, click_sel).first.click()
+    target.click()
     return _poll(lambda: ((c := _content(scope, watch_sel)) is not None and c != before, None), f"{watch_sel} to change")
 
 
