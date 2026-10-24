@@ -1899,31 +1899,38 @@ def failing_tests(box, st=None):
     return "\n\n".join(reports) or None
 
 
+def lint_unresolved(st):
+    """LINT: findings of know.lint still present in the .py files the agent wrote or changed -> list of '- file: msg'"""
+    try:
+        import know
+        left, now = [], snapshot(st.workdir)
+        for dp, dns, fns in os.walk(st.workdir):
+            dns[:] = [d for d in dns if not d.startswith(".") and d != "__pycache__"]
+            for fn in fns:
+                rel = os.path.relpath(os.path.join(dp, fn), st.workdir)
+                if not fn.endswith(".py") or rel == "vbcompat.py" or (rel in st.seed and st.seed.get(rel) == now.get(rel)):
+                    continue
+                text = open(os.path.join(dp, fn), encoding="utf-8", errors="replace").read()
+                left += [f"- {rel}: {m}" for _, m in know.lint(st.know_keys, rel, text)]
+        return left
+    except Exception as e:
+        if st.log:
+            st.log({"lint_unresolved_error": repr(e)[:200]})
+        return []
+
+
 def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=None):
     if os.environ.get("LINT") == "1" and getattr(st, "know_keys", None) and not st.__dict__.get("lint_finish_done"):
         # cycle 49 h_vba_kintai: the tx-crcr finding was shown once and ignored; the final code still wrote \r\r\n.
         # At the first finish, every finding still present in the code goes back once.
         st.lint_finish_done = True
-        try:
-            import know
-            left, now = [], snapshot(st.workdir)
-            for dp, dns, fns in os.walk(st.workdir):
-                dns[:] = [d for d in dns if not d.startswith(".") and d not in ("__pycache__",)]
-                for fn in fns:
-                    rel = os.path.relpath(os.path.join(dp, fn), st.workdir)
-                    if not fn.endswith(".py") or rel == "vbcompat.py" or (rel in st.seed and st.seed.get(rel) == now.get(rel)):
-                        continue
-                    text = open(os.path.join(dp, fn), encoding="utf-8", errors="replace").read()
-                    left += [f"- {rel}: {m}" for _, m in know.lint(st.know_keys, rel, text)]
-            if left:
-                if st.log:
-                    st.log({"lint_finish": len(left)})
-                return ("[harness] Not accepted yet: these problems are still in your code (each was reported when you wrote "
-                        "the file). Fix each one, or if a finding does not apply, say why in one line; then call finish again.\n"
-                        + "\n".join(left[:8]))
-        except Exception as e:
+        left = lint_unresolved(st)
+        if left:
             if st.log:
-                st.log({"lint_finish_error": repr(e)[:200]})
+                st.log({"lint_finish": len(left)})
+            return ("[harness] Not accepted yet: these problems are still in your code (each was reported when you wrote "
+                    "the file). Fix each one, or if a finding does not apply, say why in one line; then call finish again.\n"
+                    + "\n".join(left[:8]))
     if st.hard_tests and st.test_gate_tries < 4:
         rep = failing_tests(box, st)
         if rep:
@@ -2263,6 +2270,12 @@ def midgate_tick(st, task, workdir, messages, log):
         bad, facts, t = mg["result"]
         mg["result"] = None
         log({"midgate_result": mg["done"], "bad": bad, "seconds": t})
+        left = lint_unresolved(st) if os.environ.get("LINT") == "1" and getattr(st, "know_keys", None) else []
+        if left:
+            # cycle 50: a run that never calls finish never saw its ignored findings again
+            messages.append({"role": "user", "content": "[harness] These problems found when you wrote your files are still "
+                             "in the code - fix them now:\n" + "\n".join(left[:8])})
+            log({"midgate_lint": len(left)})
         if bad:
             messages.append({"role": "user", "content": "[harness] While you worked, the harness ran your current files "
                              "on a fresh copy and collected these facts:\n<facts>\n" + facts[:5000] + "\n</facts>\n"

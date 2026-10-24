@@ -243,6 +243,10 @@ def lint(keys, path, text):
         if re.search(r"[\w\)\]]\s*//\s*[\w\(]", text) or re.search(r"[\w\)\]]\s*%\s*\d", text):
             out.append(("vba-intdiv", "Python // and % floor (-7 // 12 = -1, -7 % 12 = 5); VBA \\ and Mod truncate toward "
                         "zero (-7 \\ 12 = 0, -7 Mod 12 = -7). Use a truncating helper wherever a value can be negative."))
+        if re.search(r"\bstr\(\s*(val|cdbl|float|vb_round)\(|f[\"'][^\"']*\{\s*(val|cdbl|float)\(", text):
+            # cycle 50 h_vba_kintai: str(val("45")) -> "45.0" where the macro's "& Val(...)" prints "45"
+            out.append(("vba-cstr", "str() / f-strings print a float as '45.0'; VBA's string concatenation of a number "
+                        "prints '45' (and 1E+15 style for big ones). Use cstr(x) from vbcompat (or the same rule)."))
         if re.search(r"\bsorted\(|\.sort\(", text):
             out.append(("vba-sort", "sorted()/.sort() order ties differently from the macro's own sort loop (a bubble sort "
                         "that swaps on <= reverses equal neighbours). Reproduce the macro's loop."))
