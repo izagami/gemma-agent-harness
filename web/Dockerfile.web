@@ -1,0 +1,6 @@
+# Sandbox/check image for HTML and three.js tasks: Python 3.12 + Playwright + headless Chromium (software WebGL), CJK fonts.
+FROM docker.io/library/python:3.12-slim
+RUN pip install --no-cache-dir playwright==1.64.0 && \
+    PLAYWRIGHT_BROWSERS_PATH=/opt/pw playwright install --with-deps chromium-headless-shell && \
+    apt-get install -y --no-install-recommends fonts-noto-cjk && rm -rf /var/lib/apt/lists/* && chmod -R a+rX /opt/pw
+ENV PLAYWRIGHT_BROWSERS_PATH=/opt/pw

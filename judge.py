@@ -2,9 +2,36 @@
 a few tokens of output, probability from logprobs. Typical server time ~0.2 s."""
 import json, math, os, time, urllib.request
 
-API = os.environ.get("AGENT_API", "http://127.0.0.1:8085/v1/chat/completions")
+API = os.environ.get("AGENT_API", "http://127.0.0.1:8185/v1/chat/completions")
 MODEL = os.environ.get("AGENT_MODEL", "local")
 HEADERS = {"Content-Type": "application/json", "Authorization": "Bearer " + os.environ.get("AGENT_API_KEY", "none")}
+
+
+JEV_LOG = os.environ.get("JEV_LOG", os.path.join(os.path.dirname(os.path.abspath(__file__)), "runs", "jev.jsonl"))
+
+
+def conf(ch):
+    """probability of the value token; only tokens after the ':' count (a key such as "violated" contains "ted")"""
+    after = False
+    for tok in (ch.get("logprobs") or {}).get("content") or []:
+        t = tok["token"].strip()
+        if not after:
+            after = ":" in t
+            t = t.split(":", 1)[1].strip() if after else ""
+        if after and t[:1] in ("t", "f"):
+            return math.exp(tok["logprob"])
+    return 1.0
+
+
+def log(key, val, p, t0):
+    """every judgment goes to runs/jev.jsonl so the watchdog can see stuck or broken judgments while a run goes on"""
+    try:
+        with open(JEV_LOG, "a") as f:
+            pt = p if val else 1 - p if val is False else 0.5   # ask() returns the confidence of its answer; log p(true)
+            f.write(json.dumps({"t": round(time.time(), 1), "pid": os.getpid(), "key": key, "val": val, "p": round(pt, 3),
+                                "ms": int((time.time() - t0) * 1000)}) + "\n")
+    except OSError:
+        pass
 
 
 def ask(question, key, max_tokens=24):
@@ -22,10 +49,8 @@ def ask(question, key, max_tokens=24):
         val = json.loads(ch["message"]["content"]).get(key)
     except Exception:
         return None, 0.0, int((time.time() - t0) * 1000)
-    p = 1.0
-    for tok in (ch.get("logprobs") or {}).get("content") or []:
-        if tok["token"].strip()[:1] in ("t", "f"):
-            p = math.exp(tok["logprob"]); break
+    p = conf(ch)
+    log(key, val, p, t0)
     return val, p, int((time.time() - t0) * 1000)
 
 
@@ -64,8 +89,6 @@ def ask_in_context(messages, tools, question, key, max_tokens=24):
         val = json.loads(ch["message"]["content"]).get(key)
     except Exception:
         return None, 0.0, int((time.time() - t0) * 1000)
-    p = 1.0
-    for tok in (ch.get("logprobs") or {}).get("content") or []:
-        if tok["token"].strip()[:1] in ("t", "f"):
-            p = math.exp(tok["logprob"]); break
+    p = conf(ch)
+    log(key, val, p, t0)
     return val, p, int((time.time() - t0) * 1000)

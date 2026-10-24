@@ -1,0 +1,646 @@
+{
+ "source": "runs/ trajectories, 158 primary-cause classifications over 157 failed runs + ~43 passed runs (2026-10-21)",
+ "categories": {
+  "THRASH": {
+   "count": 36,
+   "name": "Thrashing / no progress",
+   "description": "loops of probes, re-reads or identical rewrites until the step cap"
+  },
+  "REQ_MISS": {
+   "count": 19,
+   "name": "Skipped or misread requirement",
+   "description": "an explicit rule (often a 'do not' rule, or one in a docstring/comment) never implemented or checked"
+  },
+  "EDGE": {
+   "count": 14,
+   "name": "Only simple cases tested",
+   "description": "missed interaction/adjacency/look-alike cases the spec implies"
+  },
+  "TOOLCALL_DEGEN": {
+   "count": 13,
+   "name": "Oversized or malformed tool calls",
+   "description": "huge write_file/think/todo arguments that fail JSON parsing, todo storms"
+  },
+  "BROKE": {
+   "count": 12,
+   "name": "Broke existing behaviour",
+   "description": "regression of existing tests/API/output"
+  },
+  "SPEC_WRONG": {
+   "count": 11,
+   "name": "Own test encoded a misreading",
+   "description": "spec_test guessed expectations, was edited to match the code, or compared new code with itself"
+  },
+  "INPUT_CLOBBER": {
+   "count": 11,
+   "name": "Real inputs/outputs overwritten",
+   "description": "test data written into the task's input/output files or tests; cleanup deleted the real output"
+  },
+  "EDIT_MECH": {
+   "count": 11,
+   "name": "Edit mechanics / destroyed source",
+   "description": "retyped code from memory, whole-file rewrite dropped names, missing path, source deleted before the move"
+  },
+  "STUCK_APPROACH": {
+   "count": 8,
+   "name": "Kept a failing approach",
+   "description": "same fix/hypothesis re-tried; unverified belief never checked"
+  },
+  "HARNESS_INFRA": {
+   "count": 6,
+   "name": "Infrastructure",
+   "description": "HTTP 500, context overflow, container lost (not a process failure)"
+  },
+  "SHELL_QUOTING": {
+   "count": 5,
+   "name": "Shell-mangled probe input",
+   "description": "backticks/$ inside python3 -c \"...\" were executed by bash; agent debugged corrupted output"
+  },
+  "OUTPUT_FMT": {
+   "count": 5,
+   "name": "Output format drift",
+   "description": "field order, prefixes, extra attributes, separators differ from the task"
+  },
+  "DATA_MISREAD": {
+   "count": 3,
+   "name": "Misread data display",
+   "description": "counted by eye; took read_file line-number prefixes or cat -A markers as content"
+  },
+  "PREMATURE": {
+   "count": 2,
+   "name": "Finished despite visible failure",
+   "description": "own output showed a traceback / over-limit time, finished anyway"
+  },
+  "EXPLORE": {
+   "count": 1,
+   "name": "Wrote before reading",
+   "description": "tests/code written before reading the wiring and existing tests (secondary in 3 more)"
+  },
+  "PATHS": {
+   "count": 1,
+   "name": "cwd / path assumptions",
+   "description": "output path relative to cwd; spec_test import needing PYTHONPATH (secondary in >=14 runs)"
+  }
+ },
+ "lessons": [
+  {
+   "id": "L01",
+   "text": "After two probes give the same result, stop probing: edit the code or change the hypothesis.",
+   "categories": [
+    "THRASH",
+    "STUCK_APPROACH"
+   ],
+   "task_types": [
+    "bugfix",
+    "investigate",
+    "feature"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L02",
+   "text": "As soon as you can name the cause, make the edit in the next step; do not re-confirm it with more debug scripts.",
+   "categories": [
+    "THRASH"
+   ],
+   "task_types": [
+    "bugfix",
+    "investigate"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L03",
+   "text": "For a long spec, finish one subsection completely (code, its asserts, existing tests green) before starting the next.",
+   "categories": [
+    "THRASH",
+    "REQ_MISS",
+    "BROKE"
+   ],
+   "task_types": [
+    "feature"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L04",
+   "text": "Write one named assert per sentence of the task, including every 'do not', 'only one', 'keep X' rule and rules stated in docstrings, comments or docs.",
+   "categories": [
+    "REQ_MISS",
+    "SPEC_WRONG"
+   ],
+   "task_types": [
+    "feature",
+    "scratch",
+    "bugfix",
+    "refactor"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L05",
+   "text": "Passing the visible tests is not done: check each written requirement the tests do not cover with its own command.",
+   "categories": [
+    "REQ_MISS",
+    "PREMATURE"
+   ],
+   "task_types": [
+    "bugfix",
+    "investigate",
+    "feature"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L06",
+   "text": "Test interactions, not just single features: constructs adjacent with no separator, nested items, duplicates, empty input, values that differ but look alike, repeated and reordered calls.",
+   "categories": [
+    "EDGE"
+   ],
+   "task_types": [
+    "scratch",
+    "feature",
+    "bugfix"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L07",
+   "text": "Take expected values only from the task text or from running the original code, never from the code you are writing.",
+   "categories": [
+    "SPEC_WRONG"
+   ],
+   "task_types": [
+    "scratch",
+    "feature",
+    "refactor",
+    "bugfix"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L08",
+   "text": "When your test and your code disagree, quote the task line that decides it before changing either; never edit a test or its data just to make it pass.",
+   "categories": [
+    "SPEC_WRONG",
+    "STUCK_APPROACH"
+   ],
+   "task_types": [
+    "scratch",
+    "feature",
+    "refactor",
+    "bugfix"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L09",
+   "text": "Run the existing test suite after every edit to an existing module, not only before finish; a newly failing existing test means your change is wrong.",
+   "categories": [
+    "BROKE",
+    "EDIT_MECH"
+   ],
+   "task_types": [
+    "bugfix",
+    "feature",
+    "refactor"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L10",
+   "text": "Change existing files with small edit_file edits; before any unavoidable whole-file rewrite, cp the file to /tmp/<name>.orig and afterwards check every def/class it had still exists.",
+   "categories": [
+    "BROKE",
+    "EDIT_MECH",
+    "THRASH"
+   ],
+   "task_types": [
+    "bugfix",
+    "feature",
+    "refactor"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L11",
+   "text": "Copy code by line range (sed -n 'A,Bp' or Python slicing), never retype it, and delete the old code only after the new location imports and passes the tests.",
+   "categories": [
+    "EDIT_MECH",
+    "BROKE"
+   ],
+   "task_types": [
+    "refactor"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L12",
+   "text": "For 'behaviour must not change': copy the original code to /tmp/orig and save its output once before the first edit; never regenerate the baseline; diff after every change on several inputs.",
+   "categories": [
+    "BROKE",
+    "SPEC_WRONG"
+   ],
+   "task_types": [
+    "refactor"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L13",
+   "text": "When you swap an algorithm or data structure, keep the original's order, tie and duplicate rules; test with inputs that contain duplicates and ties.",
+   "categories": [
+    "BROKE"
+   ],
+   "task_types": [
+    "refactor"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L14",
+   "text": "Put `import sys; sys.path.insert(0, '/work')` at the top of .agent/spec_test.py; the harness runs it without your PYTHONPATH or cd.",
+   "categories": [
+    "PATHS",
+    "THRASH"
+   ],
+   "task_types": [
+    "scratch",
+    "feature",
+    "bugfix",
+    "refactor",
+    "investigate"
+   ],
+   "contexts": [
+    "v7e"
+   ]
+  },
+  {
+   "id": "L15",
+   "text": "Make spec_test side-effect free: build fixtures in tempfile.mkdtemp(), never write to, regenerate or delete the task's real input, output or test files; the harness re-runs it at finish.",
+   "categories": [
+    "INPUT_CLOBBER"
+   ],
+   "task_types": [
+    "scratch",
+    "feature",
+    "investigate"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L16",
+   "text": "Keep test data and scratch files in /tmp; as the last action run the program on the real inputs and cat the real output.",
+   "categories": [
+    "INPUT_CLOBBER",
+    "OUTPUT_FMT"
+   ],
+   "task_types": [
+    "scratch",
+    "investigate",
+    "feature"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L17",
+   "text": "Run the program exactly the way the task says it is graded (other cwd, PYTHONPATH, python3 -m pkg); resolve file paths from argv or the script's location, not the cwd.",
+   "categories": [
+    "PATHS"
+   ],
+   "task_types": [
+    "scratch",
+    "feature"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L18",
+   "text": "Put test input that contains backticks, $ or quotes in a file or a quoted heredoc (<<'EOF'), never inside python3 -c \"...\"; 'command not found' in stderr means the probe was corrupted.",
+   "categories": [
+    "SHELL_QUOTING",
+    "THRASH"
+   ],
+   "task_types": [
+    "scratch",
+    "feature",
+    "bugfix"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L19",
+   "text": "Keep each tool call small: write files longer than about 80 lines in parts (write, then mode=append), keep todo items to a few words, keep reasoning short.",
+   "categories": [
+    "TOOLCALL_DEGEN"
+   ],
+   "task_types": [
+    "scratch",
+    "feature",
+    "refactor",
+    "bugfix",
+    "investigate"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L20",
+   "text": "After a tool call fails, change the method (smaller call, edit_file, heredoc), not resend it, then ls the exact file name to confirm it exists.",
+   "categories": [
+    "EDIT_MECH",
+    "TOOLCALL_DEGEN",
+    "THRASH"
+   ],
+   "task_types": [
+    "scratch",
+    "feature",
+    "refactor",
+    "bugfix",
+    "investigate"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L21",
+   "text": "If the same fix fails twice, re-read the relevant source and the task from the top and pick a different approach.",
+   "categories": [
+    "STUCK_APPROACH",
+    "THRASH"
+   ],
+   "task_types": [
+    "bugfix",
+    "investigate",
+    "refactor"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L22",
+   "text": "Check every belief about a library, an API name or a hand-computed number with a one-line python3 -c before acting on it; import only names you have seen in the code.",
+   "categories": [
+    "STUCK_APPROACH",
+    "THRASH"
+   ],
+   "task_types": [
+    "bugfix",
+    "investigate",
+    "feature"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L23",
+   "text": "Before editing a multi-module project, read the entry point, the wiring (main, router, __init__), the modules you will touch and the existing tests, batched in a few commands.",
+   "categories": [
+    "EXPLORE",
+    "BROKE"
+   ],
+   "task_types": [
+    "bugfix",
+    "feature",
+    "refactor",
+    "investigate"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L24",
+   "text": "Fix a bug where the bad value or state is produced, not in one of its callers; then test the requirement from the caller's side.",
+   "categories": [
+    "REQ_MISS",
+    "STUCK_APPROACH"
+   ],
+   "task_types": [
+    "bugfix",
+    "investigate"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L25",
+   "text": "Compare your output with the task's format character by character (field order, separators, prefixes, rounding, exact tags); print with repr() when whitespace matters.",
+   "categories": [
+    "OUTPUT_FMT",
+    "REQ_MISS"
+   ],
+   "task_types": [
+    "scratch",
+    "feature",
+    "investigate"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L26",
+   "text": "Count and measure with code (wc -l, len(), a script), never by eye; read_file line numbers and cat -A markers are not file content.",
+   "categories": [
+    "DATA_MISREAD"
+   ],
+   "task_types": [
+    "investigate",
+    "scratch"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L27",
+   "text": "Treat any traceback, non-zero exit or over-limit number in your own output as a failure to fix, and test the real function, not a wrapper that catches exceptions.",
+   "categories": [
+    "PREMATURE",
+    "EDGE"
+   ],
+   "task_types": [
+    "scratch",
+    "bugfix",
+    "feature"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L28",
+   "text": "When a task changes files or state, check the resulting state (ls -R, diff -r, cat) for every mode, and run it twice to see that the second run changes nothing.",
+   "categories": [
+    "EDGE",
+    "REQ_MISS"
+   ],
+   "task_types": [
+    "scratch",
+    "feature"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L29",
+   "text": "Once every requirement is checked green, call finish; do not rewrite working files late in the run or spend the remaining steps re-checking.",
+   "categories": [
+    "BROKE",
+    "THRASH"
+   ],
+   "task_types": [
+    "feature",
+    "bugfix",
+    "refactor",
+    "scratch"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  },
+  {
+   "id": "L30",
+   "text": "Copy edit_file old_text from the file without read_file's line-number prefixes, and re-read the changed lines once to confirm the edit really changed something.",
+   "categories": [
+    "EDIT_MECH",
+    "THRASH"
+   ],
+   "task_types": [
+    "bugfix",
+    "feature",
+    "refactor"
+   ],
+   "contexts": [
+    "bare",
+    "v7e"
+   ]
+  }
+ ],
+ "playbooks": {
+  "bugfix": "Bug fix in an existing codebase\n1. Read the entry point, the modules on the failing path and the existing tests in 2-4 batched commands (cat a b c).\n2. Run the failing test or command once and save the output: ... > /tmp/before.txt 2>&1.\n3. Write the smallest reproduction (one or two records) in /tmp/repro.py; work out the correct result from the task text.\n4. Name the cause in one short think, then edit in the NEXT step with edit_file. No more debug scripts first.\n5. Fix where the bad value is produced, not in a caller. Expect more than one bug.\n6. After each edit: run /tmp/repro.py and the full existing test suite. A newly failing old test means your edit is wrong.\n7. Same result after two probes, or same fix failing twice: re-read the source and pick another hypothesis.\n8. Check beliefs about libraries or numbers with one python3 -c line before relying on them.\n9. Tests green is not done: add one assert per task requirement the tests do not cover (repeat calls, mutation, order).\nHarness already does: compile check on every edit, project tests gate at finish, spec_test gate at finish. It does NOT run tests between edits - you must.",
+  "feature": "Feature addition with a long spec\n1. Read the spec, the entry point, the wiring (main/router/__init__), the modules to change and the existing tests. Run the existing tests once.\n2. todo: one short item per spec subsection (a few words each).\n3. Work one subsection at a time: asserts for it in .agent/spec_test.py, then the code, then spec_test + existing tests. Next subsection only when green.\n4. Asserts: one per spec sentence, including 'do not', 'only', 'keep' rules and examples; expected values from the spec, never from your output.\n5. Add interaction asserts: features combined, items adjacent, empty input, overrides and precedence.\n6. Change existing modules with edit_file. Before a whole-file rewrite: cp f /tmp/f.orig, then check every def/class is still there.\n7. If your assert fails, quote the spec line before changing code or assert. Never edit an assert to match the output.\n8. Run the CLI the way it is graded: cd /tmp && PYTHONPATH=/work python3 -m pkg ...; compare with the spec character by character.\n9. Re-check that the old behaviour (existing commands, error messages, exit codes) is unchanged.\nHarness already does: todo prompt, spec_test must exist and pass at finish, existing tests gate at finish, compile check. These fire only at finish; most failed runs never got there.",
+  "refactor": "Refactor / migration preserving behaviour\n1. Read all modules, scripts and tests involved. Run the tests and every script once.\n2. Freeze the baseline ONCE: cp -r the package to /tmp/orig; save outputs to .agent/before_*.txt. Never regenerate them later.\n3. Make baselines for new inputs by running /tmp/orig, never the code you are changing.\n4. Move code by line range: sed -n 'A,Bp' old.py >> new.py (or Python slicing). Never retype it. Then fix imports.\n5. Delete or shrink the old module only after the new one imports and the tests pass.\n6. When you swap a loop for a dict/set/sort, keep the order, tie and duplicate rules (first vs last wins). Test with duplicates.\n7. After every file: run the tests, the scripts and diff against before_*.txt. Any diff: fix it before going on.\n8. Check structural rules with code (grep -c 'def name', an ast scan), not by reading.\n9. If it must be faster: time it, profile (python3 -m cProfile -s cumtime) if still over the limit, do not guess.\nHarness already does: prompt rules 12-13 (copy line ranges, save before.txt), tests gate at finish, compile check on edit.",
+  "investigate": "Investigation (find the cause in code, logs or data; then fix or report)\n1. List and read the relevant code and a sample of the data (head, wc -l). Read the whole module, not one function.\n2. Run the failing command or tests once and save the output in /tmp.\n3. Pick the smallest input that shows the problem and work out the right answer by hand from the task.\n4. Follow it through each stage (parse, store, query, output); print the value after each stage with a short script in /tmp.\n5. The first stage that differs from your hand result has the bug. Edit there in the next step.\n6. Count and compare with code (wc -l, len, sort | uniq -c), never by eye; line numbers from read_file are not data.\n7. Two probes with the same output: stop probing, change the code or the hypothesis. Do not rename debug scripts to vary them.\n8. Expect several causes. After each fix, re-run everything and repeat 3-5 for what still fails.\n9. Then check each requirement the visible tests do not cover. Write reports from the real inputs and cat them.\nHarness already does: debug rules 15-18 only in v7i (not v7e); stagnation nudge after 10 steps with no file change.",
+  "scratch": "New script / CLI from scratch\n1. ls the work dir and read every provided input file (head, wc -l). Note exact names, formats and output wording.\n2. Write .agent/spec_test.py first. Line 1: import sys; sys.path.insert(0, '/work'). One assert per example and rule.\n3. Add interaction asserts: mixed input, constructs adjacent without separators, duplicates, empty input, error cases.\n4. Fixtures only in tempfile.mkdtemp(). spec_test must never write or delete the real input or output files.\n5. Put test strings with backticks, $ or quotes in a file or a <<'EOF' heredoc, never inside python3 -c \"...\".\n6. Write the program; if it is long, write it in parts (write, then mode=append). Resolve paths from argv, not the cwd.\n7. Run spec_test. On a failure decide from the task text whether the code or the assert is wrong.\n8. Run the real command from another dir (cd /tmp && python3 /work/prog.py ...); check the resulting files and run it twice.\n9. Last: run on the real inputs, cat the real output, compare its format with the task character by character.\nHarness already does: spec_test must exist and pass at finish (run from .agent/, so the sys.path line matters), restores modified inputs once, compile check."
+ },
+ "playbooks_bare": {
+  "bugfix": "Bug fix in an existing codebase (bare loop: bash, read_file, write_file, edit_file, finish)\n1. ls -R, then read the entry point, the modules on the failing path and the tests (cat a b c in one command).\n2. Run the tests or the failing command once; save the output: ... > /tmp/before.txt 2>&1.\n3. Write /tmp/repro.py with the smallest failing input and the correct result from the task text.\n4. Edit as soon as you can name the cause. old_text is file text without the line-number prefix.\n5. After each edit: python3 /tmp/repro.py and the full test suite. Never run the same command twice in a row unchanged.\n6. Same output twice: change the code or the hypothesis, not the probe. Same fix failed twice: re-read the source.\n7. Fix where the bad value is produced, not in a caller. Expect more than one bug.\n8. Tests green is not done: check each task requirement the tests do not cover with one command each.\n9. Then call finish. Do not use up the remaining steps.\nWith v7e: tests and spec_test are also gated at finish; repeats are refused; edits are compile-checked.",
+  "feature": "Feature addition with a long spec (bare loop)\n1. Read the spec, the entry point, the wiring (main/router/__init__), the modules to change and the tests. Run the tests once.\n2. Write /tmp/req.txt: one line per spec sentence, including every 'do not', 'only' and 'keep' rule.\n3. Work one subsection at a time: asserts in /tmp/test_new.py, then the code, then that file + the existing tests.\n4. Expected values come from the spec text, never from your program's output. Add combined and adjacent cases.\n5. Change existing files with small edit_file edits. Before a whole-file rewrite: cp f /tmp/f.orig; afterwards grep that every def/class is still there.\n6. Write long files in parts (first part with write_file, then append with cat >> f <<'EOF'). One huge call can crash the run.\n7. A failing assert: quote the spec line before changing code or assert.\n8. Run the CLI the way it is graded: cd /tmp && PYTHONPATH=/work python3 -m pkg ...; compare with the spec character by character.\n9. Re-run the existing tests and the old commands last; then call finish.\nWith v7e: write the asserts as .agent/spec_test.py (it is gated at finish) and use todo for step 2.",
+  "refactor": "Refactor / migration preserving behaviour (bare loop)\n1. Read all modules, scripts and tests involved. Run the tests and every script once.\n2. Freeze the baseline ONCE: cp -r the package /tmp/orig; save each output to /tmp/before_*.txt. Never regenerate it.\n3. New inputs: make their expected output by running /tmp/orig, never the code you are changing.\n4. Move code by line range: sed -n 'A,Bp' old.py >> new.py. Never retype it. Then fix imports.\n5. Remove the old code only after the new module imports and the tests pass.\n6. Swapping a loop for a dict/set/sort: keep order, tie and duplicate rules. Test with duplicates.\n7. After every file: tests, scripts, diff against /tmp/before_*.txt. Fix any diff before going on.\n8. Check structure rules with code (grep -c, an ast scan). Speed limits: time it; profile if still slow.\n9. Call finish when the diffs are empty and the tests pass.\nWith v7e: the prompt already asks for line-range copies and .agent/before.txt; tests are gated at finish.",
+  "investigate": "Investigation (find the cause, then fix or report) (bare loop)\n1. Read the relevant code (whole modules) and a sample of the data (head, wc -l).\n2. Run the failing command once; save the output in /tmp.\n3. Pick the smallest input that shows the problem; work out the right answer by hand from the task.\n4. Print the value after each stage (parse, store, query, output) with a short script in /tmp.\n5. The first stage that differs from the hand result has the bug. Edit there in the next step.\n6. Count with code (wc -l, len, sort | uniq -c), never by eye. Line numbers from read_file are not data.\n7. Never send the same probe twice; never vary only a file name or a comment. Change code or hypothesis.\n8. After each fix re-run everything; repeat 3-5 for what still fails.\n9. Write reports from the real inputs; cat them; call finish.\nWith v7e: a nudge fires after 10 steps with no file change; that is too late - follow step 7 yourself.",
+  "scratch": "New script / CLI from scratch (bare loop)\n1. ls and read every input file (head, wc -l). Note exact file names, formats and output wording.\n2. Write /tmp/test_prog.py first: one assert per example and rule; mixed, adjacent, duplicate, empty and error cases.\n3. Fixtures only in tempfile.mkdtemp(). Never write test data into the task's input or output files.\n4. Test strings with backticks, $ or quotes go in a file or a <<'EOF' heredoc, never in python3 -c \"...\".\n5. Write the program; long files in parts. Resolve paths from argv, not the cwd.\n6. Run the tests after every change. Exact same command twice in a row means stop and change something.\n7. A failing assert: decide from the task text whether the code or the assert is wrong.\n8. Run the real command from another dir; check the resulting files; run it twice.\n9. Last: run on the real inputs, cat the output, compare its format with the task character by character, call finish.\nWith v7e: put the tests in .agent/spec_test.py with sys.path.insert(0, '/work') at the top; it is re-run at finish."
+ },
+ "before_finish": "Before finish (universal)\n1. The last edit was followed by a run of: the full existing test suite, .agent/spec_test.py, and the real program on the real inputs.\n2. Each requirement sentence of the task has an assert or a command whose output you read, including the 'do not' rules.\n3. The real output files exist, came from the real inputs, and match the task's format character by character (cat them).\n4. Run it the way the grader does (other cwd, PYTHONPATH, python3 -m) at least once.\n5. No test data, scratch configs or debug scripts left in the project; inputs and tests unchanged; spec_test has no side effects on /work.\n6. Every public def/class that existed before still exists (if you rewrote files).\n7. No traceback, non-zero exit or over-limit number in your last outputs.\nHarness already runs at finish: compileall, the project's tests (rejects if failing), spec_test (rejects if missing/failing), input-restore check, an LLM judge. Do not spend steps duplicating those; spend them on items 2-6, which no gate checks.",
+ "before_finish_bare": "Before finish (bare loop - nothing checks for you)\n1. After the last edit you ran: the full test suite, your own asserts, and the real program on the real inputs.\n2. Every requirement sentence of the task has a check whose output you read, including the 'do not' rules.\n3. Output files exist, come from the real inputs, and match the task format character by character.\n4. Inputs, provided tests and unrelated files are unchanged; no test data or scratch files left in /work.\n5. Every def/class that existed before still exists.\n6. No traceback, non-zero exit or over-limit number in your last outputs.\n7. Call finish now. Do not spend the remaining steps re-running the same checks.",
+ "bare_vs_harnessed": {
+  "fail_rate_same_35_tasks": {
+   "v0_bare": "8/35 (22.9%)",
+   "v1_prompt_only": "5/20 (25.0%)",
+   "v3_v6": "69/506 (13.6%)",
+   "v7e": "24/595 (4.0%)"
+  },
+  "primary_bare_and_prompt_only_13": {
+   "THRASH": 4,
+   "TOOLCALL_DEGEN": 4,
+   "EDIT_MECH": 2,
+   "SHELL_QUOTING": 1,
+   "OUTPUT_FMT": 1,
+   "EDGE": 1
+  },
+  "primary_harnessed_v3_v7_145": {
+   "THRASH": 32,
+   "REQ_MISS": 19,
+   "EDGE": 13,
+   "BROKE": 12,
+   "SPEC_WRONG": 11,
+   "INPUT_CLOBBER": 11,
+   "TOOLCALL_DEGEN": 9,
+   "EDIT_MECH": 9,
+   "STUCK_APPROACH": 8,
+   "HARNESS_INFRA": 6,
+   "SHELL_QUOTING": 4,
+   "OUTPUT_FMT": 4,
+   "DATA_MISREAD": 3,
+   "PREMATURE": 2,
+   "EXPLORE": 1,
+   "PATHS": 1
+  },
+  "bare_behaviour_35_runs": {
+   "three_identical_calls_in_a_row": "37% of passes and of fails (v7 passes 9%)",
+   "ran_something_after_last_write": "59% of passes",
+   "wrote_or_ran_any_test": "29% of passes, 25% of fails (v7 passes 99%)",
+   "passes_that_never_called_finish": "12/27",
+   "runs_killed_by_invalid_tool_call_or_HTTP500": "3/35"
+  }
+ }
+}

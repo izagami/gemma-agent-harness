@@ -6,7 +6,7 @@ The harness (prompt, loop control, verification) is configured by a profile so v
 """
 import json, os, re, subprocess, time, urllib.error, urllib.request, uuid
 
-API = os.environ.get("AGENT_API", "http://127.0.0.1:8085/v1/chat/completions")
+API = os.environ.get("AGENT_API", "http://127.0.0.1:8185/v1/chat/completions")
 IMAGE = os.environ.get("SANDBOX_IMAGE", "docker.io/library/python:3.12-slim")
 EXTRA_MOUNTS = [m for m in os.environ.get("SANDBOX_MOUNTS", "").split(";") if m]  # "host:container:ro,Z" entries, ";"-separated
 OBS_LIMIT = 6000
@@ -49,9 +49,23 @@ def make_sandbox(workdir, image=None, mounts=()):
     return HttpSandbox(workdir) if os.environ.get("SANDBOX_URL") else Sandbox(workdir, image, mounts)
 
 
+LIVE = set()  # names of running sandbox containers, removed by eval.py when the run is killed
+SANDBOX_FOR = {}  # directory prefix -> (image, mounts): per-task sandbox set by eval.py (tasks with a sandbox.json)
+
+
+def sandbox_for(workdir):
+    for prefix, v in SANDBOX_FOR.items():
+        if os.path.abspath(workdir).startswith(prefix.rstrip("/") + "/"):
+            return v
+    return None, ()
+
+
 class Sandbox:
     def __init__(self, workdir, image=None, mounts=()):
         self.name = "agent-" + uuid.uuid4().hex[:8]
+        LIVE.add(self.name)
+        img, mnt = sandbox_for(workdir)
+        image, mounts = image or img, list(mounts) or list(mnt)
         mounts = list(mounts) or EXTRA_MOUNTS
         subprocess.run(["podman", "run", "-d", "--rm", "--name", self.name, "--network", "none", "--userns=keep-id",
                         "-v", f"{workdir}:/work:Z", *[a for m in mounts for a in ("-v", m)], "-w", "/work", image or IMAGE,
@@ -69,6 +83,7 @@ class Sandbox:
 
     def close(self):
         subprocess.run(["podman", "rm", "-f", "-t", "0", self.name], capture_output=True)
+        LIVE.discard(self.name)
 
 
 def clip(s, n=OBS_LIMIT):
@@ -79,7 +94,9 @@ def clip(s, n=OBS_LIMIT):
 
 
 def safe_path(p):
-    p = p.strip()
+    # 10-24 cycle 44 db_migrate: the model sent path "\".agent/spec_test.py\"" (quotes inside the string) and a
+    # directory named '".agent' was made; its own test then never ran. Surrounding quotes/backticks are not part of a path.
+    p = p.strip().strip("\"'`").strip()
     if p.startswith("/work/"):
         p = p[6:]
     if p.startswith("/") or ".." in p.split("/"):
@@ -166,11 +183,13 @@ class BrokenToolCall(Exception):
 
 MODEL = os.environ.get("AGENT_MODEL", "local")
 API_KEY = os.environ.get("AGENT_API_KEY", "none")
+THINK = os.environ.get("AGENT_THINK") == "1"  # model's built-in reasoning before every reply; needs room for the thoughts
 
 
-def chat(messages, tools, max_tokens=2048, temperature=0.3):
-    body = {"model": MODEL, "messages": messages, "tools": tools, "max_tokens": max_tokens, "temperature": temperature,
-            "chat_template_kwargs": {"enable_thinking": False}}
+def chat(messages, tools, max_tokens=2048, temperature=0.3, extra=None):
+    messages = [{k: v for k, v in m.items() if k != "notes_len"} for m in messages]  # harness bookkeeping only
+    body = {"model": MODEL, "messages": messages, "tools": tools, "max_tokens": max(max_tokens, 12288) if THINK else max_tokens,
+            "temperature": temperature, "chat_template_kwargs": {"enable_thinking": THINK}, **(extra or {})}
     req = urllib.request.Request(API, json.dumps(body).encode(), {"Content-Type": "application/json", "Authorization": "Bearer " + API_KEY})
     try:
         with urllib.request.urlopen(req, timeout=900) as r:
@@ -200,6 +219,12 @@ def run_task(task_text, workdir, profile, log):
             msgs = hp.view(messages, prof)
             try:
                 ch = chat(msgs, TOOLS, max_tokens=prof.get("max_tokens", 2048), temperature=hp.temperature(state, prof))
+                for _ in range(3 if prof.get("retry_empty") else 0):
+                    # an empty reply (Gemma 4 sometimes emits only a stray "<tool_call|>") is a format glitch, not a decision to stop
+                    if ch["message"].get("content") or ch["message"].get("tool_calls"):
+                        break
+                    log({"empty_reply_retry": True})
+                    ch = chat(msgs, TOOLS, max_tokens=prof.get("max_tokens", 2048), temperature=0.9)
             except BrokenToolCall as e:
                 if not prof.get("robust_api"):
                     raise

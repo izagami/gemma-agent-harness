@@ -37,7 +37,7 @@ def on_no_call(state, prof, content):
     if not prof.get("nudge"):
         return None
     state.no_call += 1
-    if state.no_call > 3:
+    if state.no_call > prof.get("nudge_max", 3):
         return None
     return ("Continue working with the tools. If the task is complete and verified, call the finish tool. "
             "Do not ask the user questions; make reasonable choices and proceed.")
@@ -100,6 +100,10 @@ PROFILES = {
     "v4": {"system": V1_SYSTEM, "max_steps": 30, "temperature": 0.3, "max_tokens": 4096, "nudge": True, "judge_finish": True,
            "loop_guard": True, "skip_repeats": True, "robust_api": True, "smart_edit": True, "break_loops": True, "progress_every": 8},
     "v0": {"system": V0_SYSTEM, "max_steps": 30, "temperature": 0.3},
+    # v0pb / v0pb80: the bare loop plus the mined playbooks and lessons only (no loop or verification hooks)
+    "v0pb": {"system": V0_SYSTEM + __import__("playbook").text("bare"), "max_steps": 30, "temperature": 0.3},
+    "v080": {"system": V0_SYSTEM, "max_steps": 80, "temperature": 0.3, "retry_empty": True, "nudge": True, "nudge_max": 20},
+    "v0pb80": {"system": V0_SYSTEM + __import__("playbook").text("bare"), "max_steps": 80, "temperature": 0.3, "retry_empty": True, "nudge": True, "nudge_max": 20},
     "v1": {"system": V1_SYSTEM, "max_steps": 30, "temperature": 0.3, "nudge": True, "verify_finish": True, "loop_guard": True},
 }
 

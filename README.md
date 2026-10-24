@@ -52,6 +52,31 @@ Without Docker: `SANDBOX_URL` unset makes the server use a local podman sandbox 
 Task suite: `make_tasks.py`, `tasks_hard.py`, `tasks_xhard.py`, `tasks_xxhard.py`; every hidden check fails on the
 seed and passes with the reference solution (`refs.py`). Run: `python3 eval.py v6f`.
 
+## Harness v9 (2026-10, Gemma 4 26B-A4B, vLLM on 3× Intel Arc Pro B70)
+
+Current best configuration (profile `v7o` plus environment flags; run through `cycle.py` / `run_vllm.sh`):
+
+    THINK_SCHEMA=3 THINK_LEARNED=800 THINK_NEXT=400 AGENT_TEMP=0 EDIT2=1 MIDGATE=1 KNOW=1 LINT=1 EDIT3=1
+
+| Flag | What it does |
+|---|---|
+| `THINK_SCHEMA=3` … | the `think` tool is a short typed answer (last result / learned / next) fused with the next action |
+| `AGENT_TEMP=0` | greedy decoding: fewer random failures and less run-to-run noise |
+| `EDIT2` | edits survive misremembered `old_text` (line alignment, never deleting lines the model did not know about), show the file's current text on failure, catch no-op edits, refuse a third blind rewrite of the same file |
+| `MIDGATE` | the finish gate (`evidence.py`: run the task's commands on a fresh copy, then judge every requirement with a fast logprob judge) also runs in the background at 35 % / 65 % of the time limit and reports violations |
+| `KNOW` | `know.py`: domain sheets (VBA port, browser automation, SQLite, firewall audit, exact output files) plus all docs/code in the first message. The sheets are the facts a strong model used to solve the tasks this model failed - general facts of each domain, not answers |
+| `LINT` | the sheets as checks on every written file (e.g. `executescript` inside `BEGIN`, `open(..., "w")` without `newline=""`, `//` for VBA `\`, `time.sleep` in Playwright) |
+| `EDIT3` | stops tool calls that turn into reasoning in code comments or prose (they used to run to the token limit), writes path-less test/CAD files to their usual path, warns when a rewrite drops a function |
+
+Evaluation: `tasks_qg/` (25 tasks with graded hidden checks), `tasks_v8/` (12), and `tasks_h/` (7 held-out tasks in the
+same domains, written by separate agents that never saw `know.py`; reference solutions in `tasks_h_ref/`).
+`score_task.py TASKDIR WORKDIR` scores a work directory exactly like `eval.py`. `cycle.py BASE CAND [tasks]` runs two
+configurations side by side on the same tasks and prints a paired comparison.
+
+Measured on tasks never used to build the sheets (`tasks_h`, 4 runs per task per configuration):
+mean graded score 0.291 → 0.418 (VBA inventory valuation 0.01 → 0.53, browser inventory export 0.00 → 0.47,
+firewall audit 0.42 → 0.70). On the 9 tasks the sheets came from: 0.30 → 0.54, 4 passes vs 0.
+
 ## Security notes
 
 - Treat the model as untrusted: it only runs commands inside the sandbox container, which has no network.
