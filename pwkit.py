@@ -39,7 +39,18 @@ Reading
     collect_pages(page, read_page, next_sel, watch_sel)
                                               read_page() on every page; clicks next_sel and waits for watch_sel to change;
                                               stops when next is missing, hidden or disabled. Returns the concatenated list
+    search_and_wait(scope, input_sel, query, rows_sel, table_sel=None)
+                                              types query into a search box and waits until the result is for THIS query
+                                              (table not aria-busy, its data-query == query if it has one, every row
+                                              contains the query); returns the rows Locator. The old result stays on
+                                              screen while the new one loads - never read right after typing
+    find_row(scope, rows_sel, key, col=0)     the row whose cell col is exactly key (not R-12 for R-125), or None
 Acting
+    modal_submit(page, values, submit_sel, dialog_sel='[role="dialog"]')
+                                              for a form that opens in a dialog after a click: waits for the dialog,
+                                              fill_form(values) inside it, clicks submit_sel ONCE (a confirm() is accepted
+                                              by open_browser's handler), waits until the dialog is gone. Click the row's
+                                              button only after the previous dialog is gone (an open overlay eats clicks)
     submit_once(scope, page, submit_sel, done_sel, error_sel=None)
                                               clicks ONCE and waits until done_sel is visible or error_sel has text;
                                               returns ("ok", text) / ("error", text). Never clicks again (no double records)
@@ -260,6 +271,56 @@ def read_rows(scope, row_selector, cell_selector="td"):
     """every row's cell texts (exact text_content) in one round trip"""
     loc = _loc(scope, row_selector)
     return loc.evaluate_all(_ROWS_JS, cell_selector)
+
+
+def search_and_wait(scope, input_sel, query, rows_sel, table_sel=None):
+    """fill the search box, then wait until the shown result belongs to this query (cycle 70 h_browser_approve: scripts
+    read the previous query's rows, or clicked before the table reloaded)"""
+    query = str(query)
+    _loc(scope, input_sel).first.fill(query)
+    q = query.lower()
+
+    def c():
+        if table_sel:
+            t = _loc(scope, table_sel).first
+            if t.get_attribute("aria-busy") == "true":
+                return False, "table busy"
+            dq = t.get_attribute("data-query")
+            if dq is not None and dq != query:
+                return False, f"table shows query {dq!r}"
+        texts = [x.lower() for x in _loc(scope, rows_sel).all_text_contents()]
+        return all(q in x for x in texts), f"{len(texts)} rows"
+    _poll(c, f"rows of {rows_sel} for search {query!r}", scope)
+    time.sleep(0.2)                 # one more look: a slow older response may still overwrite the table
+    _poll(c, f"rows of {rows_sel} for search {query!r}", scope)
+    return _loc(scope, rows_sel)
+
+
+def find_row(scope, rows_sel, key, col=0):
+    """the row Locator whose cell number col (td/th) is exactly key, else None"""
+    rows = _loc(scope, rows_sel)
+    cells = rows.evaluate_all("(rs, col) => rs.map(r => { const c = r.querySelectorAll('td,th')[col]; "
+                              "return c ? c.textContent.trim() : null; })", col)
+    for i, t in enumerate(cells):
+        if t == str(key).strip():
+            return rows.nth(i)
+    return None
+
+
+def modal_submit(page, values, submit_sel, dialog_sel='[role="dialog"]'):
+    """dialog form: wait for it, fill it, click submit ONCE, wait until it is gone; returns the dialog's last text"""
+    dlg = page.locator(dialog_sel).first
+    _wait_state(page, dialog_sel, "visible")
+    fill_form(dlg, values)
+    last = (dlg.text_content() or "").strip()
+    dlg.locator(submit_sel).first.click()
+
+    def c():
+        if page.locator(dialog_sel).count() == 0 or not page.locator(dialog_sel).first.is_visible():
+            return True, None
+        return False, (page.locator(dialog_sel).first.text_content() or "").strip()[:200]
+    _poll(c, f"the dialog {dialog_sel} to close after clicking {submit_sel} once", page)
+    return last
 
 
 def open_and_read(page, click_locator, wait_sel, expect_text, read_sels, scope=None):
