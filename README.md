@@ -82,6 +82,11 @@ firewall audit 0.42 → 0.70). On the 9 tasks the sheets came from: 0.30 → 0.5
 Tested helper modules beat explained knowledge: VBA ports 1/10 → 4/10 passes with `VBC` (score 0.44 → 0.64);
 browser/SQLite tasks 0/18 → 1/18 and 0/18 → 2/18 with `KIT` in two runs (score +0.10 both times).
 
+How a helper fails matters as much as what it does: pwkit v2 (15 s waits whose errors say which URL the page is on
+and what it has, `login()` that returns only after the login page is gone, `fill_form` that handles `<select>`/checkboxes,
+natural misuse accepted) took the 4 browser tasks from 0/12 to 6/12 and 0/12 to 5/12 passes in two runs (score
+0.06 → 0.56 and 0.05 → 0.68), with the first full pass on a held-out task (h_browser_inventory).
+
 ## Security notes
 
 - Treat the model as untrusted: it only runs commands inside the sandbox container, which has no network.
