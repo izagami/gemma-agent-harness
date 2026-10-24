@@ -192,7 +192,7 @@ def message(root, task):
         # cycle 44: tasks with no sheet (cad_*, paginate) lost with the long brief + "list every rule first" alone;
         # the gains came where a sheet applied (browser_fix first pass, vba_sales 0.57 -> 0.95)
         return keys, ""
-    sheets = "\n\n".join(SHEETS[k] for k in keys)
+    sheets = "\n\n".join(SHEETS[k] + (SQLITE2 if k == "sqlite" and os.environ.get("KNOW2") == "1" else "") for k in keys)
     out = ("[harness] Before you start: the project's documents and code are below in full (you do not need to read them "
            "again), followed by facts about this kind of task that decide whether the result is right.\n\n" + brief(root, task, keys))
     if sheets:
@@ -233,6 +233,22 @@ def _page_ids(root):
     return ids, testids, others
 
 
+# KNOW2 (cycle 72): data-access facts behind the h_sqlite_timetrack_repo / q_db_repo failures of cycle 68 - general SQL
+# behaviour, not answers
+SQLITE2 = """
+- A LEFT JOIN row with no match still counts in COUNT(*): count the child's column (COUNT(e.id)) for "how many".
+  SUM/AVG/MIN over no rows give NULL: COALESCE(SUM(x), 0) when a number is expected.
+- Money / rates: do the multiplication before the division and round where the spec says (minutes * rate / 60.0, then
+  ROUND or the spec's rule); integer division truncates.
+- Timestamps stored in UTC but grouped by a local day: date(ts, '+9 hours') (or the spec's offset), never date(ts).
+- NULL means "not set": a running timer has ended_at IS NULL; "= NULL" never matches; filter durations of 0 explicitly.
+- One query instead of one per row (N+1): JOIN + GROUP BY, or WHERE id IN (...) with one ? per id.
+- Deleting a parent: delete its child rows yourself in the same transaction unless the spec guarantees
+  PRAGMA foreign_keys=ON on that connection.
+- Every ? needs a value: con.execute(sql, (x,)) - a one-value tuple needs the comma."""
+
+
+
 def lint(keys, path, text, root=None):
     """-> list of (rule id, message) for Python code written under the sheets in keys"""
     if not path.endswith(".py") or path.startswith((".agent/", "app/")) or "/tests/" in "/" + path:
@@ -246,6 +262,16 @@ def lint(keys, path, text, root=None):
         if re.search(r"\bBEGIN\b", text) and "sqlite3.connect" in text and "isolation_level=None" not in text:
             out.append(("sq-isolation", "you issue BEGIN yourself, but sqlite3.connect() without isolation_level=None also "
                         "opens/commits transactions on its own; connect with isolation_level=None."))
+        # cycle 68 q_db_repo: "... WHERE c.name = ?" executed with no parameters in both runs (find_customer 0/120)
+        for m in (re.finditer(r"\.execute(?:many)?\(\s*(?:[rRuU]?)(\"\"\"|'''|\"|')(.*?)\1\s*(\)|,)", text, re.S) if os.environ.get("KNOW2") == "1" else ()):
+            sql = re.sub(r"'[^']*'", "''", m.group(2))      # ? inside SQL string literals is not a placeholder
+            n = sql.count("?") + len(re.findall(r"(?<![:\w]):[A-Za-z_]\w*", sql))
+            if n and m.group(3) == ")":
+                ln = text[:m.start()].count("\n") + 1
+                out.append(("sq-params", f"line {ln}: this SQL has {n} placeholder(s) (? / :name) but execute() gets no "
+                            "parameters - it fails with 'Incorrect number of bindings supplied'. Pass them: "
+                            "con.execute(sql, (value,)) - note the comma for one value."))
+                break
         lines = text.split("\n")
         for i, l in enumerate(lines):
             if ".commit()" in l:
