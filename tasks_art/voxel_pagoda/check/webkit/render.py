@@ -91,6 +91,24 @@ def main():
         page.wait_for_timeout(1500)
         shot2 = page.screenshot(path=png)
         vk = page.evaluate("window.__vk || null")
+        syntax = None
+        src = open(html, encoding="utf-8", errors="replace").read()
+        if errors and "/*SCENE-BEGIN*/" in src:
+            # a syntax error stops the whole module before any line mapping runs: compile the scene alone as a classic
+            # script, where window.onerror gets the line number
+            scene = src.split("/*SCENE-BEGIN*/\n", 1)[1].split("\n/*SCENE-END*/", 1)[0]
+            syntax = page.evaluate("""(code) => new Promise(res => {
+                const prev = window.onerror; let got = null;
+                window.onerror = (msg, url, line, col) => { got = [String(msg), line, col]; return true; };
+                const s = document.createElement('script'); s.textContent = '(function(){\\n' + code + '\\n})';
+                document.head.appendChild(s); window.onerror = prev; res(got);
+            })""", scene)
+            if syntax and syntax[0].startswith(("SyntaxError", "Uncaught SyntaxError")):
+                n = syntax[1] - 1
+                lines = scene.split("\n")
+                ctx = "\n".join(f"      {i + 1}| {lines[i]}" for i in range(max(0, n - 3), min(len(lines), n + 2)))
+                msg = re.sub(r"^(Uncaught )?SyntaxError: (Failed to execute 'appendChild' on 'Node': )?", "", syntax[0])
+                errors.insert(0, f"SYNTAX ERROR in scene.js line {n}, column {syntax[2]}: {msg}\n{ctx}")
         a = page.evaluate(ANALYZE_JS, base64.b64encode(shot2).decode())
         anim = page.evaluate(DIFF_JS, [base64.b64encode(shot1).decode(), base64.b64encode(shot2).decode()])
         b.close()

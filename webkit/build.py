@@ -48,9 +48,9 @@ def build(scene_path, out_path):
             title = line.split(":", 1)[1].strip()
             break
     head = HEAD.format(title=title.replace("<", "&lt;"))
-    pre = head + kit + "\ntry {\n"
+    pre = head + kit + "\ntry {\n/*SCENE-BEGIN*/\n"
     start = pre.count("\n") + 1                     # first line of the scene code in the html
-    html = pre.replace("__SCENE_START__", str(start)) + scene + "\n} catch (e) { __vkFail(e); }\n</script>\n</body>\n</html>\n"
+    html = pre.replace("__SCENE_START__", str(start)) + scene + "\n/*SCENE-END*/\n} catch (e) { __vkFail(e); }\n</script>\n</body>\n</html>\n"
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(html)
     print(f"built {out_path} ({len(html) // 1024} KB, scene {scene.count(chr(10)) + 1} lines)")
