@@ -263,3 +263,10 @@ def vbc_api():
     """the docstring of vbcompat.py (its API list), for the start message"""
     import vbcompat
     return vbcompat.__doc__.split("\n", 3)[-1].strip()
+
+
+def kit_api(module_file):
+    """the docstring (API list) of a helper module next to know.py: pwkit.py / sqlkit.py"""
+    import importlib
+    mod = importlib.import_module(module_file[:-3])
+    return mod.__doc__.split("\n", 2)[-1].strip()

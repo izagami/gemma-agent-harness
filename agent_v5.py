@@ -1908,7 +1908,7 @@ def lint_unresolved(st):
             dns[:] = [d for d in dns if not d.startswith(".") and d != "__pycache__"]
             for fn in fns:
                 rel = os.path.relpath(os.path.join(dp, fn), st.workdir)
-                if not fn.endswith(".py") or rel == "vbcompat.py" or (rel in st.seed and st.seed.get(rel) == now.get(rel)):
+                if not fn.endswith(".py") or fn in ("vbcompat.py", "pwkit.py", "sqlkit.py") or (rel in st.seed and st.seed.get(rel) == now.get(rel)):
                     continue
                 text = open(os.path.join(dp, fn), encoding="utf-8", errors="replace").read()
                 left += [f"- {rel}: {m}" for _, m in know.lint(st.know_keys, rel, text)]
@@ -2488,6 +2488,26 @@ def run_task(task_text, workdir, profile, log):
                          "like the VBA one, including the cases where VBA differs from Python. Keep vbcompat.py next to your "
                          "script. Its API:\n" + know.vbc_api())
                 log({"vbcompat": True})
+            if os.environ.get("KIT") == "1":
+                # KIT: tested helper modules for the other domains, same idea as vbcompat (call, do not re-derive):
+                # pwkit (Playwright waits on state, read-after-open, collect pages, submit once) and sqlkit (all-or-
+                # nothing transactions, executescript replacement). Ports of q_browser_export / q_browser_fix /
+                # q_db_migrate on them pass the hidden checks.
+                here = os.path.dirname(os.path.abspath(__file__))
+                for key, mod, where, how in (
+                        ("browser", "pwkit.py", "automation" if (os.path.isdir(os.path.join(workdir, "automation"))
+                                                                 or "automation/" in task_text) else "",
+                         "next to your script: `sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))` then "
+                         "`from pwkit import *`. Keep `from playwright.sync_api import sync_playwright` in your script too."),
+                        ("sqlite", "sqlkit.py", "", "`from sqlkit import *` (run from the project root; inside a package you "
+                         "may copy it into the package and use `from .sqlkit import *`).")):
+                    if key in keys:
+                        rel = os.path.join(where, mod) if where else mod
+                        os.makedirs(os.path.join(workdir, where or "."), exist_ok=True)
+                        shutil.copy(os.path.join(here, mod), os.path.join(workdir, rel))
+                        kmsg += (f"\n\n[harness] {rel} is in the project: a TESTED helper module - use it instead of "
+                                 f"writing these parts yourself. Import it {how} Its API:\n" + know.kit_api(mod))
+                        log({"kit": rel})
             if kmsg:
                 messages[-1]["content"] = task_text + "\n\n" + kmsg
             log({"know": keys, "chars": len(kmsg)})
