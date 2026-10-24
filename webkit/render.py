@@ -10,12 +10,14 @@ copy), wait, take a screenshot and print a report you can act on:
   animation   share of pixels that change within 1.5 s (0 = static)
   voxelkit    voxel counts per label (pages built with build.py)
 
-Exit code 0 when there are no errors and the picture is not blank.
+Exit code 0 when there are no errors and the picture is not blank. Exit code 137 / "command killed" means the
+machine was busy and the renderer ran out of time - NOT a problem in your scene: just run it again.
 """
 import json
 import os
 import re
 import sys
+import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 VENDOR = os.path.join(HERE, "vendor")
@@ -80,15 +82,17 @@ def main():
     errors = []
     with sync_playwright() as p:
         b = p.chromium.launch(args=["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"])
-        w, h = (int(v) for v in os.environ.get("RENDER_SIZE", "1280x800").split("x"))
+        w, h = (int(v) for v in os.environ.get("RENDER_SIZE", "960x600").split("x"))
         page = b.new_page(viewport={"width": w, "height": h})
         page.route("**/*", vendor_route)
         page.on("pageerror", lambda e: errors.append(str(e).splitlines()[0][:300]))
         page.on("console", lambda m: m.type == "error" and errors.append(m.text[:300]))
+        page.add_init_script("window.__vkLowCost = true")   # voxelkit: smaller shadow map, pixel ratio 1
+        t0 = time.time()
         page.goto("file://" + html)
-        page.wait_for_timeout(4000)
+        page.wait_for_timeout(2500)
         shot1 = page.screenshot()
-        page.wait_for_timeout(1500)
+        page.wait_for_timeout(1000)
         shot2 = page.screenshot(path=png)
         vk = page.evaluate("window.__vk || null")
         syntax = None
@@ -114,7 +118,7 @@ def main():
         b.close()
     errors = list(dict.fromkeys(e for e in errors if "net::ERR" not in e or "three" in e))
     blank = a["sd"] < 4 or a["detail"] < 0.004 or (a["mean"] < 25 and a["detail"] < 0.02)
-    print(f"screenshot: {png} ({a['W']}x{a['H']})")
+    print(f"screenshot: {png} ({a['W']}x{a['H']}, rendered in {time.time() - t0:.0f} s)")
     print("errors:", "none" if not errors else "")
     for e in errors[:8]:
         print("  -", e)

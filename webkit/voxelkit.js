@@ -364,7 +364,8 @@
     stats.bounds = { min: bb.min.toArray(), max: bb.max.toArray() };
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    const low = !!window.__vkLowCost;                   // headless check renders: cheaper settings, same picture
+    renderer.setPixelRatio(low ? 1 : Math.min(devicePixelRatio, 2));
     renderer.setSize(innerWidth, innerHeight);
     renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -391,7 +392,7 @@
     const sun = new THREE.DirectionalLight(0xffe2c0, 2.4);
     sun.position.copy(center).add(new THREE.Vector3(radius * 0.9, radius * 1.4, radius * 0.5));
     sun.target.position.copy(center); scene.add(sun.target);
-    sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0004;
+    sun.castShadow = true; sun.shadow.mapSize.set(low ? 1024 : 2048, low ? 1024 : 2048); sun.shadow.bias = -0.0004;
     Object.assign(sun.shadow.camera, { left: -radius, right: radius, top: radius, bottom: -radius, near: 1, far: radius * 4 });
     scene.add(sun);
     const glowPts = groups.glow.slice(0, 6).map(([x, y, z]) => { const l = new THREE.PointLight(0xffa64d, 0, 18, 1.6); l.position.set(x, y, z); scene.add(l); return l; });

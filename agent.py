@@ -137,7 +137,8 @@ def closest_lines(s, old):
 
 def run_tool(box, workdir, name, args):
     if name == "bash":
-        code, out, err = box.sh(args["command"])
+        # headless WebGL renders run on the CPU and take long when several agents render at once
+        code, out, err = box.sh(args["command"], timeout=150 if "render.py" in args["command"] else 60)
         return clip(f"exit code: {code}\n--- stdout ---\n{out}\n--- stderr ---\n{err}")
     if name == "read_file":
         p = os.path.join(workdir, safe_path(args["path"]))

@@ -131,6 +131,7 @@ THINK_ABORT = int(os.environ.get("THINK_ABORT", "1000"))
 THINK_CUT = " [... cut off by the harness at the length limit]"
 CONTENT_ABORT = int(os.environ.get("CONTENT_ABORT", "1500"))
 EDIT3 = os.environ.get("EDIT3") == "1"   # kept content on a missing path, comment-reasoning stop
+VISION = os.environ.get("VISION") == "1"   # the model server accepts images (vllm_lane.sh VISION=1)
 TEXT_CUT = " [... cut off by the harness: plain text is not run or saved]"
 
 
@@ -2034,6 +2035,9 @@ def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=N
                     "island). Do not shrink the scene to get rid of an error - fix the reported line instead. Build the "
                     "hero and 8+ labelled supporting parts again, then build, render and call finish.\n" + base.clip(rep, 800))
         if not st.__dict__.get("webart_review"):
+            if VISION and os.path.exists(os.path.join(st.workdir, ".agent", "shot.png")):
+                st.pending_image = os.path.join(st.workdir, ".agent", "shot.png")
+                rep = "(the screenshot is shown in the next message - judge the PICTURE first)\n" + rep
             # cycle 53: the first kit scene was clean but thin (3 trees, the pagoda standing in the pond, 100 lines)
             st.webart_review = True
             return ("[harness] Not accepted yet - the page renders; now make it rich. render.py says:\n" + base.clip(rep, 1200)
@@ -2493,7 +2497,7 @@ def run_task(task_text, workdir, profile, log):
     tools = TOOLS + [THINK_TOOL] if think else TOOLS
     if "unified" in F:
         tools = [t for t in tools if t["function"]["name"] != "todo"]
-    if "cad" in F:
+    if "cad" in F or (VISION and re.search(r"voxel|three\.js|webgl|\b3d\b|ボクセル|self-contained html", task_text, re.I)):
         tools = tools + [VIEW_IMAGE_TOOL]
     sys0 = SYSTEM
     if "unified" in F:  # no todo tool: the checklist lives in the notes the harness asks for before every action
@@ -2553,7 +2557,9 @@ def run_task(task_text, workdir, profile, log):
                              "python3 .agent/webkit/render.py index.html\nbuild.py makes the single self-contained html "
                              "(three.js import map + kit + your scene); render.py reports errors (scene.js line numbers), "
                              "blank screen, framing, colors, animation, parts standing in water, how many labelled part "
-                             "kinds. The kit API:\n" + api.replace("// ", "")
+                             "kinds" + (" - and the screenshot is shown to you after every render" if VISION else "")
+                             + ". Exit code 137 / 'command killed' from render.py = the machine was busy, not your scene: "
+                             "run it again, do NOT shrink the scene. The kit API:\n" + api.replace("// ", "")
                              + "\n\nAn EXAMPLE scene made with the kit (a different subject: use its techniques - layout plan, "
                              "free()/claim() so parts never overlap, a big detailed hero, many labelled parts, movers - not its "
                              "content):\n```js\n" + open(os.path.join(here, "webkit", "example_scene.js"), encoding="utf-8").read()
@@ -2900,6 +2906,15 @@ def run_task(task_text, workdir, profile, log):
                             obs = f"error: {type(e).__name__}: {e}"
                     if os.environ.get("THINK_AUTOCHECK") == "1" and a is not None:
                         obs = autocheck(box, st, name, a, obs, log)
+                    if VISION and name == "bash" and a is not None and "render.py" in str(a.get("command", "")):
+                        # VISION: every render is also SHOWN (vLLM lanes now accept images): the model judges the
+                        # picture itself, not only render.py's numbers
+                        m_png = re.search(r"^screenshot: (\S+)", obs, re.M)
+                        png = m_png and os.path.join(workdir, os.path.relpath(m_png.group(1), "/work") if m_png.group(1).startswith("/work") else m_png.group(1))
+                        if png and os.path.exists(png):
+                            st.pending_image = png
+                            obs += ("\n[harness] The screenshot is shown in the next message. Look at it: is the hero big and "
+                                    "detailed, is the garden full, is anything floating, cut off, in the water or ugly? Fix what you see.")
                     if name not in ("todo",) if "force_act" in F else name not in ("todo", "think"):
                         st.ran[akey(name, a, "semantic_repeat" in F)] = (1, one_line(obs))
                     if "write_dedupe" in F and name == "write_file" and a is not None and isinstance(a.get("content"), str) \
