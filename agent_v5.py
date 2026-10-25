@@ -2577,7 +2577,8 @@ def run_task(task_text, workdir, profile, log):
                 kmsg += ("\n\n[harness] vbcompat.py is in the project: a TESTED module that reproduces the VBA runtime. Use it "
                          "(`from vbcompat import *`) instead of writing these functions yourself - every function behaves exactly "
                          "like the VBA one, including the cases where VBA differs from Python. Keep vbcompat.py next to your "
-                         "script. Its API:\n" + know.vbc_api())
+                         "script. " + ("Its API (how to use it):\n" + know.skill_index(know.vbc_api(), "vbcompat.py")
+                                       if os.environ.get("SKILLS") == "1" else "Its API:\n" + know.vbc_api()))
                 log({"vbcompat": True})
             if os.environ.get("KIT") == "1":
                 # KIT: tested helper modules for the other domains, same idea as vbcompat (call, do not re-derive):
@@ -2599,7 +2600,9 @@ def run_task(task_text, workdir, profile, log):
                         src = os.environ.get("PWKIT_SRC", mod) if mod == "pwkit.py" else mod
                         shutil.copy(os.path.join(here, src), os.path.join(workdir, rel))
                         kmsg += (f"\n\n[harness] {rel} is in the project: a TESTED helper module - use it instead of "
-                                 f"writing these parts yourself. Import it {how} Its API:\n" + know.kit_api(src))
+                                 f"writing these parts yourself. Import it {how} "
+                                 + (know.skill_index(know.kit_api(src), rel) if os.environ.get("SKILLS") == "1"
+                                    else "Its API:\n" + know.kit_api(src)))
                         log({"kit": rel})
                 if "webart" in keys:
                     # voxel / three.js scenes: tested voxel kit + one-file builder + headless render report

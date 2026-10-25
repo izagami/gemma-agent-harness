@@ -369,6 +369,19 @@ def vbc_api():
     return vbcompat.__doc__.split("\n", 3)[-1].strip()
 
 
+def skill_index(api, path):
+    """SKILLS=1 (after 'single agent + skills, load details on demand', 10-25): instead of the whole API text, only
+    the function names and where to read the details when needed"""
+    names = []
+    for m in re.finditer(r"^\s{0,8}(?:with\s+|\w+\s*=\s*)?([a-z_][a-z0-9_]*)\(", api, re.M):
+        if m.group(1) not in names and m.group(1) not in ("print", "open", "with"):
+            names.append(m.group(1))
+    n = api.count("\n") + 1
+    return (f"Functions: {', '.join(names)}.\nThe exact signatures and notes are the docstring at the top of {path} "
+            f"({n} lines): read them with `sed -n 1,{n + 4}p {path}` (or grep -n 'def NAME' {path}) BEFORE you call a "
+            "function you have not used yet - do not guess arguments.")
+
+
 def kit_api(module_file):
     """the docstring (API list) of a helper module next to know.py: pwkit.py / sqlkit.py"""
     import importlib
