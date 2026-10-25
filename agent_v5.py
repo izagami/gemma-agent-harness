@@ -1500,6 +1500,12 @@ def end_guard(st, box, log):
                 fh.write(st.seed_bytes[p])
     if not getattr(st, "best", None):
         return
+    if os.environ.get("NOENDGUARD") == "1":
+        # A/B (10-26): cycle 90 showed a state failing the tests can still beat the restored one on the hidden check;
+        # keep the end state, only log whether the guard would have restored
+        code, _, _ = box.sh(END_CHECK, timeout=120)
+        log({"end_guard_skipped": {"end_state_failed": code != 0}})
+        return
     # with the seed as the fallback, judge the end state by the PROVIDED tests only: a broken test of the model's
     # own must not throw away its work
     check = ("export PYTHONPATH=/work; python3 -m unittest discover -s tests" if st.__dict__.get("best_is_seed")
