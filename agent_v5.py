@@ -1944,6 +1944,21 @@ def lint_unresolved(st):
 
 
 def on_finish(box, st, task, messages, args, in_context=False, cf=False, tools=None):
+    if (os.environ.get("EDGEPASS") == "1" and getattr(st, "deadline", None) and not st.__dict__.get("edge_pass_done")
+            and (st.deadline - time.time()) > 0.4 * float(os.environ.get("TASK_DEADLINE", "540"))):
+        # cycle 88 tasks_v8: runs declared done with half the time unused and failed only the boundary cases the docs
+        # describe (billing: mid-cycle plan change counted 15 instead of 16 days, 24/28; footnote_leak: state leaking
+        # between documents in one batch run, 13/40). Once, and only when finishing early: spend the spare time there.
+        st.edge_pass_done = True
+        left_min = int((st.deadline - time.time()) // 60)
+        if st.log:
+            st.log({"edge_pass": left_min})
+        return ("[harness] Not accepted yet - you still have about %d minutes, use them on the cases that usually break: "
+                "re-read the task and docs, list 5 concrete edge cases they imply (boundaries and inclusive/exclusive "
+                "ranges, a change in the middle of a period, empty or missing input, ordering and ties, running the same "
+                "thing twice or several items in one run, error/timeout paths), write them as checks in "
+                ".agent/edge_test.py with the expected result taken from the docs, run it, fix the code where it fails, "
+                "then call finish again." % left_min)
     if os.environ.get("LINT") == "1" and getattr(st, "know_keys", None) and not st.__dict__.get("lint_finish_done"):
         # cycle 49 h_vba_kintai: the tx-crcr finding was shown once and ignored; the final code still wrote \r\r\n.
         # At the first finish, every finding still present in the code goes back once.
