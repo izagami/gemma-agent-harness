@@ -2597,6 +2597,10 @@ def run_task(task_text, workdir, profile, log):
         shutil.rmtree(st.seed_dir, ignore_errors=True)
         shutil.copytree(workdir, st.seed_dir, symlinks=True)
     st.seed = snapshot(workdir, st.seed_bytes)
+    if os.environ.get("FIX91", "1") == "1" and "keep_orig" not in feats(profile):
+        # cycle 91 z_expense_report: the model overwrote exp/cli.py with a broken version and re-read it 9 times; the
+        # v7i read-only originals in .agent/orig/ (pointed to when it repeats itself) let it copy the file back
+        keep_originals(st, log)
     if os.environ.get("ENDSEED") == "1" and os.path.isdir(os.path.join(workdir, "tests")):
         # cycle 88 z_cmd_registry: a refactor whose provided tests pass on the seed (hidden check 88/97) ended at the
         # deadline half-done (1-2/97); end_guard had no passing state to go back to. The seed becomes that state.
@@ -2918,6 +2922,15 @@ def run_task(task_text, workdir, profile, log):
                     if newer:
                         notes.append(f"{describe(name, a)} already ran {n} time(s) and nothing has changed since, so it was not run again. "
                                      f"Its result was:\n{base.clip(full, 2500)}")
+                        if n >= 2 and os.environ.get("FIX91", "1") == "1":
+                            now = snapshot(st.workdir)
+                            broken = [r for r, h in st.seed.items() if now.get(r) != h and not r.startswith(".agent/")
+                                      and os.path.exists(os.path.join(st.workdir, ".agent", "orig", r))]
+                            hint = ("Running it again will not show anything new - act on what you have. " +
+                                    ("The files as originally given are kept in .agent/orig/. You changed: " + ", ".join(broken[:6]) +
+                                     ". If you broke one, restore it with `cp .agent/orig/PATH PATH` and redo the change in smaller "
+                                     "edits; otherwise write the next fix now." if broken else "Write the next fix or test now."))
+                            notes[-1] += "\n[harness] " + hint
                     else:
                         notes.append(f"{describe(name, a)} was already run {n} time(s) with result: {res}. It was not run again.")
                 else:
