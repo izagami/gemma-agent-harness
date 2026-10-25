@@ -234,12 +234,17 @@ def think_tokens(schema):
     return max(400, 150 + sum(v.get("maxLength", 20) for v in schema["properties"].values()) // 2)  # base: 400 as before
 
 
+THINK_SCALE = 1.0
+
+
 def with_caps(schema):
     """THINK_LEARNED / THINK_NEXT: caps of the typed think's conclusion fields (defaults 200 / 160). 10-24, 797 typed
     thinks: learned hit its 200-character cap in 43% (cut mid-sentence by the grammar), next its 160 in 11%"""
     caps = {"learned": os.environ.get("THINK_LEARNED"), "next": os.environ.get("THINK_NEXT")}
     if not any(caps.values()):
         return schema
+    if THINK_SCALE != 1.0:      # TIMEAWARE: little time left -> shorter thinking
+        caps = {k: (str(max(80, int(int(v) * THINK_SCALE))) if v else v) for k, v in caps.items()}
     props = {k: (dict(v, maxLength=int(caps[k])) if caps.get(k) else v) for k, v in schema["properties"].items()}
     return dict(schema, properties=props)
 
@@ -2333,6 +2338,51 @@ def get_probes(st, wait=180):
     return st.__dict__.get("probes") or None
 
 
+def time_tick(st, workdir, messages, log, steps):
+    """TIMEAWARE=1 (10-25, user: 'the harness should adapt to how fast the model runs'): at 1/3, 2/3 and 85% of the
+    deadline tell the model the time left and the steps that fit at the measured speed; past 1/3 with no deliverable
+    written, ask for a complete first version (cycle 78 kintai wrote kintai.py first at step 20 of 29); when few steps
+    are left, halve the thinking caps"""
+    global THINK_SCALE
+    if not getattr(st, "deadline", None):
+        return
+    total = float(os.environ.get("TASK_DEADLINE", "540"))
+    left = st.deadline - time.time()
+    used = 1 - left / total
+    done = st.__dict__.setdefault("time_marks", set())
+    hist = st.__dict__.setdefault("step_secs", [])
+    per = (sum(hist[-4:]) / len(hist[-4:])) if hist else 30.0
+    steps_left = max(0, int(left / max(per, 1)))
+    if steps_left <= 6 and THINK_SCALE == 1.0:
+        THINK_SCALE = 0.5
+        log({"timeaware_think": 0.5, "steps_left": steps_left})
+    for mark, label in ((0.33, "1/3"), (0.66, "2/3"), (0.85, "85%")):
+        if used >= mark and mark not in done:
+            done.add(mark)
+            wrote = False
+            for dp, dns, fns in os.walk(workdir):
+                dns[:] = [d for d in dns if not d.startswith(".") and d not in ("tests", "__pycache__")]
+                for fn in fns:
+                    rel = os.path.relpath(os.path.join(dp, fn), workdir)
+                    if rel.endswith((".py", ".js", ".html", ".bas", ".sql", ".ps1", ".sh")) and fn not in (
+                            "vbcompat.py", "pwkit.py", "sqlkit.py") and st.seed_bytes.get(rel) != open(os.path.join(dp, fn), "rb").read():
+                        wrote = True
+                        break
+                if wrote:
+                    break
+            msg = (f"[harness] {label} of the time is used: about {int(left)} s left, at the current speed about "
+                   f"{steps_left} more steps.")
+            if not wrote and mark < 0.85:
+                msg += (" You have not written the program the task asks for yet. Write a complete first version of it "
+                        "NOW, then run it on the provided input and fix what differs.")
+            if mark == 0.85:
+                msg += (" Stop exploring: make sure the deliverable is in place and runs on the provided input; call "
+                        "finish as soon as it works.")
+            messages.append({"role": "user", "content": msg})
+            log({"timeaware": label, "left": int(left), "steps_left": steps_left, "wrote": wrote})
+            break
+
+
 def midgate_tick(st, task, workdir, messages, log):
     """MIDGATE=1: the finish gate's facts + Jev judgment, run in a background thread at fractions of the deadline
     (MIDGATE_AT, default 0.35/0.65; "/" because cycle.py splits variant env on ",") while the model keeps working; violated requirements are handed over at the next
@@ -3021,6 +3071,10 @@ def run_task(task_text, workdir, profile, log):
             if st.files_snap is not None and snap_now != st.files_snap:
                 st.ran, st.full = {}, {}
             st.files_snap = snap_now
+            if os.environ.get("TIMEAWARE") == "1":
+                st.__dict__.setdefault("step_secs", []).append(time.time() - st.__dict__.get("t_step_prev", t0))
+                st.t_step_prev = time.time()
+                time_tick(st, workdir, messages, log, steps)
             if os.environ.get("MIDGATE") == "1" and st.seed_dir and getattr(st, "deadline", None):
                 midgate_tick(st, task_text, workdir, messages, log)
             if "midfacts" in F and steps in (30, 55) and st.seed_dir:
