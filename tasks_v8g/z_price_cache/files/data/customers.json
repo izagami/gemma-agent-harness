@@ -1,0 +1,6 @@
+[
+  {"id": "C1", "name": "丸山茶舗", "tier": "gold"},
+  {"id": "C2", "name": "喫茶みどり", "tier": "standard"},
+  {"id": "C3", "name": "旅館さくら", "tier": "silver"},
+  {"id": "C4", "name": "Cafe Lumen", "tier": "standard"}
+]

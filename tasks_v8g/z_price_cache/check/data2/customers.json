@@ -1,0 +1,7 @@
+[
+  {"id": "K01", "name": "珈琲館あおば", "tier": "silver"},
+  {"id": "K02", "name": "Bean Lab", "tier": "standard"},
+  {"id": "K03", "name": "ホテル港", "tier": "platinum"},
+  {"id": "K04", "name": "カフェ森", "tier": "gold"},
+  {"id": "K05", "name": "山の上ベーカリー", "tier": "standard"}
+]

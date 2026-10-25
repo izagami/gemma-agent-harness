@@ -1,0 +1,1144 @@
+{"ts": 1789323000598, "level": "INFO", "rid": "gw-1a00a9", "event": "checkout.start", "order_id": "O-10200"}
+{"ts": 1789323000611, "level": "INFO", "rid": "gw-1a00a9", "event": "payments.call", "payment_ref": "pr-000101", "attempt": 1}
+{"ts": 1789323000654, "level": "INFO", "rid": "gw-1a00a9", "event": "payments.response", "payment_ref": "pr-000101", "attempt": 1, "status": 200}
+{"ts": 1789323000659, "level": "INFO", "rid": "gw-1a00a9", "event": "checkout.done", "order_id": "O-10200"}
+{"ts": 1789323001964, "level": "INFO", "rid": "gw-fc91df", "event": "order.get", "order_id": "O-10200"}
+{"ts": 1789323004323, "level": "INFO", "rid": "gw-3eff86", "event": "order.get", "order_id": "O-10200"}
+{"ts": 1789323006304, "level": "INFO", "rid": "gw-6d1e97", "event": "checkout.start", "order_id": "O-10201"}
+{"ts": 1789323006317, "level": "INFO", "rid": "gw-6d1e97", "event": "payments.call", "payment_ref": "pr-000102", "attempt": 1}
+{"ts": 1789323006348, "level": "INFO", "rid": "gw-6d1e97", "event": "payments.response", "payment_ref": "pr-000102", "attempt": 1, "status": 200}
+{"ts": 1789323006353, "level": "INFO", "rid": "gw-6d1e97", "event": "checkout.done", "order_id": "O-10201"}
+{"ts": 1789323008431, "level": "INFO", "rid": "gw-fbe040", "event": "order.get", "order_id": "O-10200"}
+{"ts": 1789323011302, "level": "INFO", "rid": "gw-5c1977", "event": "order.get", "order_id": "O-10200"}
+{"ts": 1789323013803, "level": "INFO", "rid": "gw-4807a4", "event": "order.get", "order_id": "O-10200"}
+{"ts": 1789323016999, "level": "INFO", "rid": "gw-29a1ef", "event": "checkout.start", "order_id": "O-10202"}
+{"ts": 1789323017008, "level": "INFO", "rid": "gw-29a1ef", "event": "payments.call", "payment_ref": "pr-000103", "attempt": 1}
+{"ts": 1789323017074, "level": "INFO", "rid": "gw-29a1ef", "event": "payments.response", "payment_ref": "pr-000103", "attempt": 1, "status": 200}
+{"ts": 1789323017079, "level": "INFO", "rid": "gw-29a1ef", "event": "checkout.done", "order_id": "O-10202"}
+{"ts": 1789323018329, "level": "INFO", "rid": "gw-c919ab", "event": "order.get", "order_id": "O-10201"}
+{"ts": 1789323020074, "level": "INFO", "rid": "gw-261f9c", "event": "order.get", "order_id": "O-10200"}
+{"ts": 1789323023072, "level": "INFO", "rid": "gw-08779b", "event": "checkout.start", "order_id": "O-10203"}
+{"ts": 1789323023086, "level": "INFO", "rid": "gw-08779b", "event": "payments.call", "payment_ref": "pr-000104", "attempt": 1}
+{"ts": 1789323023126, "level": "INFO", "rid": "gw-08779b", "event": "payments.response", "payment_ref": "pr-000104", "attempt": 1, "status": 200}
+{"ts": 1789323023131, "level": "INFO", "rid": "gw-08779b", "event": "checkout.done", "order_id": "O-10203"}
+{"ts": 1789323023830, "level": "INFO", "rid": "gw-c0f18f", "event": "checkout.start", "order_id": "O-10204"}
+{"ts": 1789323023845, "level": "INFO", "rid": "gw-c0f18f", "event": "payments.call", "payment_ref": "pr-000105", "attempt": 1}
+{"ts": 1789323023933, "level": "INFO", "rid": "gw-c0f18f", "event": "payments.response", "payment_ref": "pr-000105", "attempt": 1, "status": 200}
+{"ts": 1789323023938, "level": "INFO", "rid": "gw-c0f18f", "event": "checkout.done", "order_id": "O-10204"}
+{"ts": 1789323025683, "level": "INFO", "rid": "gw-0221b6", "event": "checkout.start", "order_id": "O-10205"}
+{"ts": 1789323025697, "level": "INFO", "rid": "gw-0221b6", "event": "payments.call", "payment_ref": "pr-000106", "attempt": 1}
+{"ts": 1789323025737, "level": "INFO", "rid": "gw-0221b6", "event": "payments.response", "payment_ref": "pr-000106", "attempt": 1, "status": 200}
+{"ts": 1789323025742, "level": "INFO", "rid": "gw-0221b6", "event": "checkout.done", "order_id": "O-10205"}
+{"ts": 1789323027364, "level": "INFO", "rid": "gw-348da6", "event": "checkout.start", "order_id": "O-10206"}
+{"ts": 1789323027372, "level": "INFO", "rid": "gw-348da6", "event": "payments.call", "payment_ref": "pr-000107", "attempt": 1}
+{"ts": 1789323027405, "level": "INFO", "rid": "gw-348da6", "event": "payments.response", "payment_ref": "pr-000107", "attempt": 1, "status": 200}
+{"ts": 1789323027410, "level": "INFO", "rid": "gw-348da6", "event": "checkout.done", "order_id": "O-10206"}
+{"ts": 1789323029902, "level": "INFO", "rid": "gw-9668e1", "event": "order.get", "order_id": "O-10205"}
+{"ts": 1789323034264, "level": "INFO", "rid": "gw-6b4212", "event": "order.get", "order_id": "O-10204"}
+{"ts": 1789323039429, "level": "INFO", "rid": "gw-50672a", "event": "order.get", "order_id": "O-10202"}
+{"ts": 1789323042965, "level": "INFO", "rid": "gw-0919d4", "event": "order.get", "order_id": "O-10205"}
+{"ts": 1789323043743, "level": "INFO", "rid": "gw-477a49", "event": "checkout.start", "order_id": "O-10207"}
+{"ts": 1789323043750, "level": "INFO", "rid": "gw-477a49", "event": "payments.call", "payment_ref": "pr-000108", "attempt": 1}
+{"ts": 1789323043823, "level": "INFO", "rid": "gw-477a49", "event": "payments.response", "payment_ref": "pr-000108", "attempt": 1, "status": 200}
+{"ts": 1789323043828, "level": "INFO", "rid": "gw-477a49", "event": "checkout.done", "order_id": "O-10207"}
+{"ts": 1789323045484, "level": "INFO", "rid": "gw-4e47f7", "event": "order.get", "order_id": "O-10203"}
+{"ts": 1789323049668, "level": "INFO", "rid": "gw-111a24", "event": "checkout.start", "order_id": "O-10208"}
+{"ts": 1789323049679, "level": "INFO", "rid": "gw-111a24", "event": "payments.call", "payment_ref": "pr-000109", "attempt": 1}
+{"ts": 1789323049725, "level": "INFO", "rid": "gw-111a24", "event": "payments.response", "payment_ref": "pr-000109", "attempt": 1, "status": 200}
+{"ts": 1789323049730, "level": "INFO", "rid": "gw-111a24", "event": "checkout.done", "order_id": "O-10208"}
+{"ts": 1789323051317, "level": "INFO", "rid": "gw-5c4ee6", "event": "order.get", "order_id": "O-10207"}
+{"ts": 1789323052601, "level": "INFO", "rid": "gw-88e1ba", "event": "order.get", "order_id": "O-10207"}
+{"ts": 1789323054610, "level": "INFO", "rid": "gw-23060b", "event": "order.get", "order_id": "O-10207"}
+{"ts": 1789323057942, "level": "INFO", "rid": "gw-0ce016", "event": "checkout.start", "order_id": "O-10209"}
+{"ts": 1789323057951, "level": "INFO", "rid": "gw-0ce016", "event": "payments.call", "payment_ref": "pr-000110", "attempt": 1}
+{"ts": 1789323058034, "level": "INFO", "rid": "gw-0ce016", "event": "payments.response", "payment_ref": "pr-000110", "attempt": 1, "status": 200}
+{"ts": 1789323058039, "level": "INFO", "rid": "gw-0ce016", "event": "checkout.done", "order_id": "O-10209"}
+{"ts": 1789323062950, "level": "INFO", "rid": "gw-11560d", "event": "checkout.start", "order_id": "O-10210"}
+{"ts": 1789323062959, "level": "INFO", "rid": "gw-11560d", "event": "payments.call", "payment_ref": "pr-000111", "attempt": 1}
+{"ts": 1789323063010, "level": "INFO", "rid": "gw-11560d", "event": "payments.response", "payment_ref": "pr-000111", "attempt": 1, "status": 200}
+{"ts": 1789323063015, "level": "INFO", "rid": "gw-11560d", "event": "checkout.done", "order_id": "O-10210"}
+{"ts": 1789323064379, "level": "INFO", "rid": "gw-303f46", "event": "checkout.start", "order_id": "O-10211"}
+{"ts": 1789323064393, "level": "INFO", "rid": "gw-303f46", "event": "payments.call", "payment_ref": "pr-000112", "attempt": 1}
+{"ts": 1789323064454, "level": "INFO", "rid": "gw-303f46", "event": "payments.response", "payment_ref": "pr-000112", "attempt": 1, "status": 200}
+{"ts": 1789323064459, "level": "INFO", "rid": "gw-303f46", "event": "checkout.done", "order_id": "O-10211"}
+{"ts": 1789323069136, "level": "INFO", "rid": "gw-2d3d37", "event": "checkout.start", "order_id": "O-10212"}
+{"ts": 1789323069142, "level": "INFO", "rid": "gw-2d3d37", "event": "payments.call", "payment_ref": "pr-000113", "attempt": 1}
+{"ts": 1789323069231, "level": "INFO", "rid": "gw-2d3d37", "event": "payments.response", "payment_ref": "pr-000113", "attempt": 1, "status": 200}
+{"ts": 1789323069236, "level": "INFO", "rid": "gw-2d3d37", "event": "checkout.done", "order_id": "O-10212"}
+{"ts": 1789323070654, "level": "INFO", "rid": "gw-3c11cb", "event": "order.get", "order_id": "O-10208"}
+{"ts": 1789323072774, "level": "INFO", "rid": "gw-87058c", "event": "order.get", "order_id": "O-10207"}
+{"ts": 1789323073711, "level": "INFO", "rid": "gw-40f85d", "event": "checkout.start", "order_id": "O-10213"}
+{"ts": 1789323073723, "level": "INFO", "rid": "gw-40f85d", "event": "payments.call", "payment_ref": "pr-000114", "attempt": 1}
+{"ts": 1789323073775, "level": "INFO", "rid": "gw-40f85d", "event": "payments.response", "payment_ref": "pr-000114", "attempt": 1, "status": 200}
+{"ts": 1789323073780, "level": "INFO", "rid": "gw-40f85d", "event": "checkout.done", "order_id": "O-10213"}
+{"ts": 1789323076159, "level": "INFO", "rid": "gw-154288", "event": "order.get", "order_id": "O-10208"}
+{"ts": 1789323078833, "level": "INFO", "rid": "gw-8ec449", "event": "order.get", "order_id": "O-10201"}
+{"ts": 1789323081523, "level": "INFO", "rid": "gw-3f834c", "event": "checkout.start", "order_id": "O-10214"}
+{"ts": 1789323081528, "level": "INFO", "rid": "gw-3f834c", "event": "payments.call", "payment_ref": "pr-000115", "attempt": 1}
+{"ts": 1789323081589, "level": "INFO", "rid": "gw-3f834c", "event": "payments.response", "payment_ref": "pr-000115", "attempt": 1, "status": 200}
+{"ts": 1789323081594, "level": "INFO", "rid": "gw-3f834c", "event": "checkout.done", "order_id": "O-10214"}
+{"ts": 1789323084425, "level": "INFO", "rid": "gw-b2ee23", "event": "order.get", "order_id": "O-10207"}
+{"ts": 1789323085486, "level": "INFO", "rid": "gw-ce0346", "event": "order.get", "order_id": "O-10210"}
+{"ts": 1789323087304, "level": "INFO", "rid": "gw-42e848", "event": "checkout.start", "order_id": "O-10215"}
+{"ts": 1789323087314, "level": "INFO", "rid": "gw-42e848", "event": "payments.call", "payment_ref": "pr-000116", "attempt": 1}
+{"ts": 1789323087370, "level": "INFO", "rid": "gw-42e848", "event": "payments.response", "payment_ref": "pr-000116", "attempt": 1, "status": 200}
+{"ts": 1789323087375, "level": "INFO", "rid": "gw-42e848", "event": "checkout.done", "order_id": "O-10215"}
+{"ts": 1789323091958, "level": "INFO", "rid": "gw-f99c12", "event": "checkout.start", "order_id": "O-10216"}
+{"ts": 1789323091972, "level": "ERROR", "rid": "gw-f99c12", "event": "inventory.reserve_failed", "order_id": "O-10216", "msg": "out of stock sku=SKU-4471"}
+{"ts": 1789323093489, "level": "INFO", "rid": "gw-a866ed", "event": "order.get", "order_id": "O-10207"}
+{"ts": 1789323094743, "level": "INFO", "rid": "gw-3593e8", "event": "checkout.start", "order_id": "O-10217"}
+{"ts": 1789323094754, "level": "INFO", "rid": "gw-3593e8", "event": "payments.call", "payment_ref": "pr-000117", "attempt": 1}
+{"ts": 1789323094815, "level": "INFO", "rid": "gw-3593e8", "event": "payments.response", "payment_ref": "pr-000117", "attempt": 1, "status": 200}
+{"ts": 1789323094820, "level": "INFO", "rid": "gw-3593e8", "event": "checkout.done", "order_id": "O-10217"}
+{"ts": 1789323097555, "level": "INFO", "rid": "gw-762235", "event": "order.get", "order_id": "O-10200"}
+{"ts": 1789323100995, "level": "INFO", "rid": "gw-99334b", "event": "order.get", "order_id": "O-10204"}
+{"ts": 1789323103045, "level": "INFO", "rid": "gw-a4c37d", "event": "order.get", "order_id": "O-10205"}
+{"ts": 1789323105720, "level": "INFO", "rid": "gw-52b4df", "event": "order.get", "order_id": "O-10206"}
+{"ts": 1789323107473, "level": "INFO", "rid": "gw-75bd4a", "event": "checkout.start", "order_id": "O-10218"}
+{"ts": 1789323107479, "level": "INFO", "rid": "gw-75bd4a", "event": "payments.call", "payment_ref": "pr-000118", "attempt": 1}
+{"ts": 1789323107568, "level": "INFO", "rid": "gw-75bd4a", "event": "payments.response", "payment_ref": "pr-000118", "attempt": 1, "status": 200}
+{"ts": 1789323107573, "level": "INFO", "rid": "gw-75bd4a", "event": "checkout.done", "order_id": "O-10218"}
+{"ts": 1789323108358, "level": "INFO", "rid": "gw-f5d502", "event": "checkout.start", "order_id": "O-10219"}
+{"ts": 1789323108369, "level": "INFO", "rid": "gw-f5d502", "event": "payments.call", "payment_ref": "pr-000119", "attempt": 1}
+{"ts": 1789323108459, "level": "INFO", "rid": "gw-f5d502", "event": "payments.response", "payment_ref": "pr-000119", "attempt": 1, "status": 200}
+{"ts": 1789323108464, "level": "INFO", "rid": "gw-f5d502", "event": "checkout.done", "order_id": "O-10219"}
+{"ts": 1789323110182, "level": "INFO", "rid": "gw-5686ed", "event": "order.get", "order_id": "O-10217"}
+{"ts": 1789323112746, "level": "INFO", "rid": "gw-24b88b", "event": "checkout.start", "order_id": "O-10220"}
+{"ts": 1789323112752, "level": "INFO", "rid": "gw-24b88b", "event": "payments.call", "payment_ref": "pr-000120", "attempt": 1}
+{"ts": 1789323112832, "level": "INFO", "rid": "gw-24b88b", "event": "payments.response", "payment_ref": "pr-000120", "attempt": 1, "status": 200}
+{"ts": 1789323112837, "level": "INFO", "rid": "gw-24b88b", "event": "checkout.done", "order_id": "O-10220"}
+{"ts": 1789323114037, "level": "INFO", "rid": "gw-264bbe", "event": "checkout.start", "order_id": "O-10221"}
+{"ts": 1789323114051, "level": "INFO", "rid": "gw-264bbe", "event": "payments.call", "payment_ref": "pr-000121", "attempt": 1}
+{"ts": 1789323114098, "level": "INFO", "rid": "gw-264bbe", "event": "payments.response", "payment_ref": "pr-000121", "attempt": 1, "status": 200}
+{"ts": 1789323114103, "level": "INFO", "rid": "gw-264bbe", "event": "checkout.done", "order_id": "O-10221"}
+{"ts": 1789323119509, "level": "INFO", "rid": "gw-dc4522", "event": "checkout.start", "order_id": "O-10222"}
+{"ts": 1789323119515, "level": "INFO", "rid": "gw-dc4522", "event": "payments.call", "payment_ref": "pr-000122", "attempt": 1}
+{"ts": 1789323119556, "level": "INFO", "rid": "gw-dc4522", "event": "payments.response", "payment_ref": "pr-000122", "attempt": 1, "status": 200}
+{"ts": 1789323119561, "level": "INFO", "rid": "gw-dc4522", "event": "checkout.done", "order_id": "O-10222"}
+{"ts": 1789323122614, "level": "INFO", "rid": "gw-c1d27a", "event": "checkout.start", "order_id": "O-10223"}
+{"ts": 1789323122627, "level": "INFO", "rid": "gw-c1d27a", "event": "payments.call", "payment_ref": "pr-000123", "attempt": 1}
+{"ts": 1789323123427, "level": "WARN", "rid": "gw-c1d27a", "event": "payments.timeout", "payment_ref": "pr-000123", "attempt": 1, "timeout_ms": 800}
+{"ts": 1789323123429, "level": "INFO", "rid": "gw-c1d27a", "event": "payments.call", "payment_ref": "pr-000123", "attempt": 2}
+{"ts": 1789323123466, "level": "INFO", "rid": "gw-c1d27a", "event": "payments.response", "payment_ref": "pr-000123", "attempt": 2, "status": 200}
+{"ts": 1789323123471, "level": "INFO", "rid": "gw-c1d27a", "event": "checkout.done", "order_id": "O-10223"}
+{"ts": 1789323124407, "level": "INFO", "rid": "gw-d69ac1", "event": "order.get", "order_id": "O-10211"}
+{"ts": 1789323126280, "level": "INFO", "rid": "gw-2c5617", "event": "checkout.start", "order_id": "O-10224"}
+{"ts": 1789323126290, "level": "INFO", "rid": "gw-2c5617", "event": "payments.call", "payment_ref": "pr-000124", "attempt": 1}
+{"ts": 1789323126378, "level": "INFO", "rid": "gw-2c5617", "event": "payments.response", "payment_ref": "pr-000124", "attempt": 1, "status": 200}
+{"ts": 1789323126383, "level": "INFO", "rid": "gw-2c5617", "event": "checkout.done", "order_id": "O-10224"}
+{"ts": 1789323129423, "level": "INFO", "rid": "gw-91ceb5", "event": "checkout.start", "order_id": "O-10225"}
+{"ts": 1789323129432, "level": "INFO", "rid": "gw-91ceb5", "event": "payments.call", "payment_ref": "pr-000125", "attempt": 1}
+{"ts": 1789323129471, "level": "INFO", "rid": "gw-91ceb5", "event": "payments.response", "payment_ref": "pr-000125", "attempt": 1, "status": 200}
+{"ts": 1789323129476, "level": "INFO", "rid": "gw-91ceb5", "event": "checkout.done", "order_id": "O-10225"}
+{"ts": 1789323131461, "level": "INFO", "rid": "gw-3b5140", "event": "order.get", "order_id": "O-10216"}
+{"ts": 1789323132834, "level": "INFO", "rid": "gw-28e28f", "event": "checkout.start", "order_id": "O-10226"}
+{"ts": 1789323132847, "level": "INFO", "rid": "gw-28e28f", "event": "payments.call", "payment_ref": "pr-000126", "attempt": 1}
+{"ts": 1789323132888, "level": "INFO", "rid": "gw-28e28f", "event": "payments.response", "payment_ref": "pr-000126", "attempt": 1, "status": 200}
+{"ts": 1789323132893, "level": "INFO", "rid": "gw-28e28f", "event": "checkout.done", "order_id": "O-10226"}
+{"ts": 1789323134222, "level": "INFO", "rid": "gw-cab075", "event": "checkout.start", "order_id": "O-10227"}
+{"ts": 1789323134237, "level": "INFO", "rid": "gw-cab075", "event": "payments.call", "payment_ref": "pr-000127", "attempt": 1}
+{"ts": 1789323134311, "level": "INFO", "rid": "gw-cab075", "event": "payments.response", "payment_ref": "pr-000127", "attempt": 1, "status": 200}
+{"ts": 1789323134316, "level": "INFO", "rid": "gw-cab075", "event": "checkout.done", "order_id": "O-10227"}
+{"ts": 1789323137045, "level": "INFO", "rid": "gw-04c645", "event": "order.get", "order_id": "O-10213"}
+{"ts": 1789323138350, "level": "INFO", "rid": "gw-12ebcd", "event": "order.get", "order_id": "O-10203"}
+{"ts": 1789323139087, "level": "INFO", "rid": "gw-44ca7f", "event": "order.get", "order_id": "O-10217"}
+{"ts": 1789323142212, "level": "INFO", "rid": "gw-310ab9", "event": "checkout.start", "order_id": "O-10228"}
+{"ts": 1789323142227, "level": "INFO", "rid": "gw-310ab9", "event": "payments.call", "payment_ref": "pr-000128", "attempt": 1}
+{"ts": 1789323142310, "level": "INFO", "rid": "gw-310ab9", "event": "payments.response", "payment_ref": "pr-000128", "attempt": 1, "status": 200}
+{"ts": 1789323142315, "level": "INFO", "rid": "gw-310ab9", "event": "checkout.done", "order_id": "O-10228"}
+{"ts": 1789323143478, "level": "INFO", "rid": "gw-621f9b", "event": "checkout.start", "order_id": "O-10229"}
+{"ts": 1789323143485, "level": "INFO", "rid": "gw-621f9b", "event": "payments.call", "payment_ref": "pr-000129", "attempt": 1}
+{"ts": 1789323143529, "level": "INFO", "rid": "gw-621f9b", "event": "payments.response", "payment_ref": "pr-000129", "attempt": 1, "status": 200}
+{"ts": 1789323143534, "level": "INFO", "rid": "gw-621f9b", "event": "checkout.done", "order_id": "O-10229"}
+{"ts": 1789323144679, "level": "INFO", "rid": "gw-56114f", "event": "checkout.start", "order_id": "O-10230"}
+{"ts": 1789323144691, "level": "INFO", "rid": "gw-56114f", "event": "payments.call", "payment_ref": "pr-000130", "attempt": 1}
+{"ts": 1789323144725, "level": "INFO", "rid": "gw-56114f", "event": "payments.response", "payment_ref": "pr-000130", "attempt": 1, "status": 200}
+{"ts": 1789323144730, "level": "INFO", "rid": "gw-56114f", "event": "checkout.done", "order_id": "O-10230"}
+{"ts": 1789323145973, "level": "INFO", "rid": "gw-90ba2e", "event": "order.get", "order_id": "O-10213"}
+{"ts": 1789323148374, "level": "INFO", "rid": "gw-4a002b", "event": "order.get", "order_id": "O-10217"}
+{"ts": 1789323151429, "level": "INFO", "rid": "gw-effb59", "event": "checkout.start", "order_id": "O-10231"}
+{"ts": 1789323151437, "level": "INFO", "rid": "gw-effb59", "event": "payments.call", "payment_ref": "pr-000131", "attempt": 1}
+{"ts": 1789323151445, "level": "WARN", "rid": "gw-effb59", "event": "payments.response", "payment_ref": "pr-000131", "attempt": 1, "status": 503}
+{"ts": 1789323151446, "level": "INFO", "rid": "gw-effb59", "event": "payments.call", "payment_ref": "pr-000131", "attempt": 2}
+{"ts": 1789323151529, "level": "INFO", "rid": "gw-effb59", "event": "payments.response", "payment_ref": "pr-000131", "attempt": 2, "status": 200}
+{"ts": 1789323151534, "level": "INFO", "rid": "gw-effb59", "event": "checkout.done", "order_id": "O-10231"}
+{"ts": 1789323155392, "level": "INFO", "rid": "gw-0048a5", "event": "order.get", "order_id": "O-10216"}
+{"ts": 1789323159755, "level": "INFO", "rid": "gw-2e1afb", "event": "checkout.start", "order_id": "O-10232"}
+{"ts": 1789323159767, "level": "INFO", "rid": "gw-2e1afb", "event": "payments.call", "payment_ref": "pr-000132", "attempt": 1}
+{"ts": 1789323159820, "level": "INFO", "rid": "gw-2e1afb", "event": "payments.response", "payment_ref": "pr-000132", "attempt": 1, "status": 200}
+{"ts": 1789323159825, "level": "INFO", "rid": "gw-2e1afb", "event": "checkout.done", "order_id": "O-10232"}
+{"ts": 1789323160903, "level": "INFO", "rid": "gw-e19a78", "event": "checkout.start", "order_id": "O-10233"}
+{"ts": 1789323160912, "level": "INFO", "rid": "gw-e19a78", "event": "payments.call", "payment_ref": "pr-000133", "attempt": 1}
+{"ts": 1789323160922, "level": "WARN", "rid": "gw-e19a78", "event": "payments.response", "payment_ref": "pr-000133", "attempt": 1, "status": 503}
+{"ts": 1789323160923, "level": "INFO", "rid": "gw-e19a78", "event": "payments.call", "payment_ref": "pr-000133", "attempt": 2}
+{"ts": 1789323160937, "level": "WARN", "rid": "gw-e19a78", "event": "payments.response", "payment_ref": "pr-000133", "attempt": 2, "status": 503}
+{"ts": 1789323160938, "level": "INFO", "rid": "gw-e19a78", "event": "payments.call", "payment_ref": "pr-000133", "attempt": 3}
+{"ts": 1789323160952, "level": "WARN", "rid": "gw-e19a78", "event": "payments.response", "payment_ref": "pr-000133", "attempt": 3, "status": 503}
+{"ts": 1789323160953, "level": "INFO", "rid": "gw-e19a78", "event": "payments.call", "payment_ref": "pr-000133", "attempt": 4}
+{"ts": 1789323160969, "level": "WARN", "rid": "gw-e19a78", "event": "payments.response", "payment_ref": "pr-000133", "attempt": 4, "status": 503}
+{"ts": 1789323160970, "level": "INFO", "rid": "gw-e19a78", "event": "payments.call", "payment_ref": "pr-000133", "attempt": 5}
+{"ts": 1789323160979, "level": "WARN", "rid": "gw-e19a78", "event": "payments.response", "payment_ref": "pr-000133", "attempt": 5, "status": 503}
+{"ts": 1789323160980, "level": "INFO", "rid": "gw-e19a78", "event": "payments.call", "payment_ref": "pr-000133", "attempt": 6}
+{"ts": 1789323160986, "level": "WARN", "rid": "gw-e19a78", "event": "payments.response", "payment_ref": "pr-000133", "attempt": 6, "status": 503}
+{"ts": 1789323160990, "level": "ERROR", "rid": "gw-e19a78", "event": "checkout.failed", "order_id": "O-10233", "payment_ref": "pr-000133", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323162889, "level": "INFO", "rid": "gw-600f59", "event": "checkout.start", "order_id": "O-10234"}
+{"ts": 1789323162902, "level": "INFO", "rid": "gw-600f59", "event": "payments.call", "payment_ref": "pr-000134", "attempt": 1}
+{"ts": 1789323162909, "level": "WARN", "rid": "gw-600f59", "event": "payments.response", "payment_ref": "pr-000134", "attempt": 1, "status": 503}
+{"ts": 1789323162910, "level": "INFO", "rid": "gw-600f59", "event": "payments.call", "payment_ref": "pr-000134", "attempt": 2}
+{"ts": 1789323162919, "level": "WARN", "rid": "gw-600f59", "event": "payments.response", "payment_ref": "pr-000134", "attempt": 2, "status": 503}
+{"ts": 1789323162920, "level": "INFO", "rid": "gw-600f59", "event": "payments.call", "payment_ref": "pr-000134", "attempt": 3}
+{"ts": 1789323162927, "level": "WARN", "rid": "gw-600f59", "event": "payments.response", "payment_ref": "pr-000134", "attempt": 3, "status": 503}
+{"ts": 1789323162928, "level": "INFO", "rid": "gw-600f59", "event": "payments.call", "payment_ref": "pr-000134", "attempt": 4}
+{"ts": 1789323162938, "level": "WARN", "rid": "gw-600f59", "event": "payments.response", "payment_ref": "pr-000134", "attempt": 4, "status": 503}
+{"ts": 1789323162939, "level": "INFO", "rid": "gw-600f59", "event": "payments.call", "payment_ref": "pr-000134", "attempt": 5}
+{"ts": 1789323162945, "level": "WARN", "rid": "gw-600f59", "event": "payments.response", "payment_ref": "pr-000134", "attempt": 5, "status": 503}
+{"ts": 1789323162946, "level": "INFO", "rid": "gw-600f59", "event": "payments.call", "payment_ref": "pr-000134", "attempt": 6}
+{"ts": 1789323163746, "level": "WARN", "rid": "gw-600f59", "event": "payments.timeout", "payment_ref": "pr-000134", "attempt": 6, "timeout_ms": 800}
+{"ts": 1789323163751, "level": "ERROR", "rid": "gw-600f59", "event": "checkout.failed", "order_id": "O-10234", "payment_ref": "pr-000134", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323165824, "level": "INFO", "rid": "gw-3f456e", "event": "order.get", "order_id": "O-10223"}
+{"ts": 1789323167722, "level": "INFO", "rid": "gw-6f665b", "event": "checkout.start", "order_id": "O-10235"}
+{"ts": 1789323167732, "level": "INFO", "rid": "gw-6f665b", "event": "payments.call", "payment_ref": "pr-000135", "attempt": 1}
+{"ts": 1789323167746, "level": "WARN", "rid": "gw-6f665b", "event": "payments.response", "payment_ref": "pr-000135", "attempt": 1, "status": 503}
+{"ts": 1789323167747, "level": "INFO", "rid": "gw-6f665b", "event": "payments.call", "payment_ref": "pr-000135", "attempt": 2}
+{"ts": 1789323167763, "level": "WARN", "rid": "gw-6f665b", "event": "payments.response", "payment_ref": "pr-000135", "attempt": 2, "status": 503}
+{"ts": 1789323167764, "level": "INFO", "rid": "gw-6f665b", "event": "payments.call", "payment_ref": "pr-000135", "attempt": 3}
+{"ts": 1789323167779, "level": "WARN", "rid": "gw-6f665b", "event": "payments.response", "payment_ref": "pr-000135", "attempt": 3, "status": 503}
+{"ts": 1789323167780, "level": "INFO", "rid": "gw-6f665b", "event": "payments.call", "payment_ref": "pr-000135", "attempt": 4}
+{"ts": 1789323167792, "level": "WARN", "rid": "gw-6f665b", "event": "payments.response", "payment_ref": "pr-000135", "attempt": 4, "status": 503}
+{"ts": 1789323167793, "level": "INFO", "rid": "gw-6f665b", "event": "payments.call", "payment_ref": "pr-000135", "attempt": 5}
+{"ts": 1789323167800, "level": "WARN", "rid": "gw-6f665b", "event": "payments.response", "payment_ref": "pr-000135", "attempt": 5, "status": 503}
+{"ts": 1789323167801, "level": "INFO", "rid": "gw-6f665b", "event": "payments.call", "payment_ref": "pr-000135", "attempt": 6}
+{"ts": 1789323167812, "level": "WARN", "rid": "gw-6f665b", "event": "payments.response", "payment_ref": "pr-000135", "attempt": 6, "status": 503}
+{"ts": 1789323167816, "level": "ERROR", "rid": "gw-6f665b", "event": "checkout.failed", "order_id": "O-10235", "payment_ref": "pr-000135", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323169942, "level": "INFO", "rid": "gw-218e31", "event": "order.get", "order_id": "O-10222"}
+{"ts": 1789323171172, "level": "INFO", "rid": "gw-ebd7f2", "event": "order.get", "order_id": "O-10235"}
+{"ts": 1789323173321, "level": "INFO", "rid": "gw-60684d", "event": "checkout.start", "order_id": "O-10236"}
+{"ts": 1789323173328, "level": "INFO", "rid": "gw-60684d", "event": "payments.call", "payment_ref": "pr-000136", "attempt": 1}
+{"ts": 1789323173340, "level": "WARN", "rid": "gw-60684d", "event": "payments.response", "payment_ref": "pr-000136", "attempt": 1, "status": 503}
+{"ts": 1789323173341, "level": "INFO", "rid": "gw-60684d", "event": "payments.call", "payment_ref": "pr-000136", "attempt": 2}
+{"ts": 1789323173349, "level": "WARN", "rid": "gw-60684d", "event": "payments.response", "payment_ref": "pr-000136", "attempt": 2, "status": 503}
+{"ts": 1789323173350, "level": "INFO", "rid": "gw-60684d", "event": "payments.call", "payment_ref": "pr-000136", "attempt": 3}
+{"ts": 1789323173364, "level": "WARN", "rid": "gw-60684d", "event": "payments.response", "payment_ref": "pr-000136", "attempt": 3, "status": 503}
+{"ts": 1789323173365, "level": "INFO", "rid": "gw-60684d", "event": "payments.call", "payment_ref": "pr-000136", "attempt": 4}
+{"ts": 1789323173374, "level": "WARN", "rid": "gw-60684d", "event": "payments.response", "payment_ref": "pr-000136", "attempt": 4, "status": 503}
+{"ts": 1789323173375, "level": "INFO", "rid": "gw-60684d", "event": "payments.call", "payment_ref": "pr-000136", "attempt": 5}
+{"ts": 1789323173382, "level": "WARN", "rid": "gw-60684d", "event": "payments.response", "payment_ref": "pr-000136", "attempt": 5, "status": 503}
+{"ts": 1789323173383, "level": "INFO", "rid": "gw-60684d", "event": "payments.call", "payment_ref": "pr-000136", "attempt": 6}
+{"ts": 1789323173398, "level": "WARN", "rid": "gw-60684d", "event": "payments.response", "payment_ref": "pr-000136", "attempt": 6, "status": 503}
+{"ts": 1789323173402, "level": "ERROR", "rid": "gw-60684d", "event": "checkout.failed", "order_id": "O-10236", "payment_ref": "pr-000136", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323175317, "level": "INFO", "rid": "gw-07272b", "event": "order.get", "order_id": "O-10200"}
+{"ts": 1789323180641, "level": "INFO", "rid": "gw-ed708f", "event": "checkout.start", "order_id": "O-10237"}
+{"ts": 1789323180653, "level": "INFO", "rid": "gw-ed708f", "event": "payments.call", "payment_ref": "pr-000137", "attempt": 1}
+{"ts": 1789323180667, "level": "WARN", "rid": "gw-ed708f", "event": "payments.response", "payment_ref": "pr-000137", "attempt": 1, "status": 503}
+{"ts": 1789323180668, "level": "INFO", "rid": "gw-ed708f", "event": "payments.call", "payment_ref": "pr-000137", "attempt": 2}
+{"ts": 1789323180677, "level": "WARN", "rid": "gw-ed708f", "event": "payments.response", "payment_ref": "pr-000137", "attempt": 2, "status": 503}
+{"ts": 1789323180678, "level": "INFO", "rid": "gw-ed708f", "event": "payments.call", "payment_ref": "pr-000137", "attempt": 3}
+{"ts": 1789323180690, "level": "WARN", "rid": "gw-ed708f", "event": "payments.response", "payment_ref": "pr-000137", "attempt": 3, "status": 503}
+{"ts": 1789323180691, "level": "INFO", "rid": "gw-ed708f", "event": "payments.call", "payment_ref": "pr-000137", "attempt": 4}
+{"ts": 1789323180702, "level": "WARN", "rid": "gw-ed708f", "event": "payments.response", "payment_ref": "pr-000137", "attempt": 4, "status": 503}
+{"ts": 1789323180703, "level": "INFO", "rid": "gw-ed708f", "event": "payments.call", "payment_ref": "pr-000137", "attempt": 5}
+{"ts": 1789323180714, "level": "WARN", "rid": "gw-ed708f", "event": "payments.response", "payment_ref": "pr-000137", "attempt": 5, "status": 503}
+{"ts": 1789323180715, "level": "INFO", "rid": "gw-ed708f", "event": "payments.call", "payment_ref": "pr-000137", "attempt": 6}
+{"ts": 1789323181515, "level": "WARN", "rid": "gw-ed708f", "event": "payments.timeout", "payment_ref": "pr-000137", "attempt": 6, "timeout_ms": 800}
+{"ts": 1789323181520, "level": "ERROR", "rid": "gw-ed708f", "event": "checkout.failed", "order_id": "O-10237", "payment_ref": "pr-000137", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323183622, "level": "INFO", "rid": "gw-63171e", "event": "checkout.start", "order_id": "O-10238"}
+{"ts": 1789323183634, "level": "INFO", "rid": "gw-63171e", "event": "payments.call", "payment_ref": "pr-000138", "attempt": 1}
+{"ts": 1789323184434, "level": "WARN", "rid": "gw-63171e", "event": "payments.timeout", "payment_ref": "pr-000138", "attempt": 1, "timeout_ms": 800}
+{"ts": 1789323184436, "level": "INFO", "rid": "gw-63171e", "event": "payments.call", "payment_ref": "pr-000138", "attempt": 2}
+{"ts": 1789323184442, "level": "WARN", "rid": "gw-63171e", "event": "payments.response", "payment_ref": "pr-000138", "attempt": 2, "status": 503}
+{"ts": 1789323184443, "level": "INFO", "rid": "gw-63171e", "event": "payments.call", "payment_ref": "pr-000138", "attempt": 3}
+{"ts": 1789323184458, "level": "WARN", "rid": "gw-63171e", "event": "payments.response", "payment_ref": "pr-000138", "attempt": 3, "status": 503}
+{"ts": 1789323184459, "level": "INFO", "rid": "gw-63171e", "event": "payments.call", "payment_ref": "pr-000138", "attempt": 4}
+{"ts": 1789323184466, "level": "WARN", "rid": "gw-63171e", "event": "payments.response", "payment_ref": "pr-000138", "attempt": 4, "status": 503}
+{"ts": 1789323184467, "level": "INFO", "rid": "gw-63171e", "event": "payments.call", "payment_ref": "pr-000138", "attempt": 5}
+{"ts": 1789323184476, "level": "WARN", "rid": "gw-63171e", "event": "payments.response", "payment_ref": "pr-000138", "attempt": 5, "status": 503}
+{"ts": 1789323184477, "level": "INFO", "rid": "gw-63171e", "event": "payments.call", "payment_ref": "pr-000138", "attempt": 6}
+{"ts": 1789323184486, "level": "WARN", "rid": "gw-63171e", "event": "payments.response", "payment_ref": "pr-000138", "attempt": 6, "status": 503}
+{"ts": 1789323184490, "level": "ERROR", "rid": "gw-63171e", "event": "checkout.failed", "order_id": "O-10238", "payment_ref": "pr-000138", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323184944, "level": "INFO", "rid": "gw-36476d", "event": "order.get", "order_id": "O-10220"}
+{"ts": 1789323185888, "level": "INFO", "rid": "gw-e389fd", "event": "order.get", "order_id": "O-10208"}
+{"ts": 1789323188586, "level": "INFO", "rid": "gw-c3dd0a", "event": "checkout.start", "order_id": "O-10239"}
+{"ts": 1789323188596, "level": "INFO", "rid": "gw-c3dd0a", "event": "payments.call", "payment_ref": "pr-000139", "attempt": 1}
+{"ts": 1789323188608, "level": "WARN", "rid": "gw-c3dd0a", "event": "payments.response", "payment_ref": "pr-000139", "attempt": 1, "status": 503}
+{"ts": 1789323188609, "level": "INFO", "rid": "gw-c3dd0a", "event": "payments.call", "payment_ref": "pr-000139", "attempt": 2}
+{"ts": 1789323188617, "level": "WARN", "rid": "gw-c3dd0a", "event": "payments.response", "payment_ref": "pr-000139", "attempt": 2, "status": 503}
+{"ts": 1789323188618, "level": "INFO", "rid": "gw-c3dd0a", "event": "payments.call", "payment_ref": "pr-000139", "attempt": 3}
+{"ts": 1789323188631, "level": "WARN", "rid": "gw-c3dd0a", "event": "payments.response", "payment_ref": "pr-000139", "attempt": 3, "status": 503}
+{"ts": 1789323188632, "level": "INFO", "rid": "gw-c3dd0a", "event": "payments.call", "payment_ref": "pr-000139", "attempt": 4}
+{"ts": 1789323188648, "level": "WARN", "rid": "gw-c3dd0a", "event": "payments.response", "payment_ref": "pr-000139", "attempt": 4, "status": 503}
+{"ts": 1789323188649, "level": "INFO", "rid": "gw-c3dd0a", "event": "payments.call", "payment_ref": "pr-000139", "attempt": 5}
+{"ts": 1789323189449, "level": "WARN", "rid": "gw-c3dd0a", "event": "payments.timeout", "payment_ref": "pr-000139", "attempt": 5, "timeout_ms": 800}
+{"ts": 1789323189451, "level": "INFO", "rid": "gw-c3dd0a", "event": "payments.call", "payment_ref": "pr-000139", "attempt": 6}
+{"ts": 1789323189467, "level": "WARN", "rid": "gw-c3dd0a", "event": "payments.response", "payment_ref": "pr-000139", "attempt": 6, "status": 503}
+{"ts": 1789323189471, "level": "ERROR", "rid": "gw-c3dd0a", "event": "checkout.failed", "order_id": "O-10239", "payment_ref": "pr-000139", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323189900, "level": "INFO", "rid": "gw-e84ac6", "event": "checkout.start", "order_id": "O-10235"}
+{"ts": 1789323189905, "level": "INFO", "rid": "gw-e84ac6", "event": "payments.call", "payment_ref": "pr-000140", "attempt": 1}
+{"ts": 1789323189919, "level": "WARN", "rid": "gw-e84ac6", "event": "payments.response", "payment_ref": "pr-000140", "attempt": 1, "status": 503}
+{"ts": 1789323189920, "level": "INFO", "rid": "gw-e84ac6", "event": "payments.call", "payment_ref": "pr-000140", "attempt": 2}
+{"ts": 1789323189936, "level": "WARN", "rid": "gw-e84ac6", "event": "payments.response", "payment_ref": "pr-000140", "attempt": 2, "status": 503}
+{"ts": 1789323189937, "level": "INFO", "rid": "gw-e84ac6", "event": "payments.call", "payment_ref": "pr-000140", "attempt": 3}
+{"ts": 1789323190355, "level": "INFO", "rid": "gw-453953", "event": "checkout.start", "order_id": "O-10240"}
+{"ts": 1789323190365, "level": "INFO", "rid": "gw-453953", "event": "payments.call", "payment_ref": "pr-000141", "attempt": 1}
+{"ts": 1789323190377, "level": "WARN", "rid": "gw-453953", "event": "payments.response", "payment_ref": "pr-000141", "attempt": 1, "status": 503}
+{"ts": 1789323190378, "level": "INFO", "rid": "gw-453953", "event": "payments.call", "payment_ref": "pr-000141", "attempt": 2}
+{"ts": 1789323190394, "level": "WARN", "rid": "gw-453953", "event": "payments.response", "payment_ref": "pr-000141", "attempt": 2, "status": 503}
+{"ts": 1789323190395, "level": "INFO", "rid": "gw-453953", "event": "payments.call", "payment_ref": "pr-000141", "attempt": 3}
+{"ts": 1789323190426, "level": "INFO", "rid": "gw-453953", "event": "payments.response", "payment_ref": "pr-000141", "attempt": 3, "status": 200}
+{"ts": 1789323190431, "level": "INFO", "rid": "gw-453953", "event": "checkout.done", "order_id": "O-10240"}
+{"ts": 1789323190737, "level": "WARN", "rid": "gw-e84ac6", "event": "payments.timeout", "payment_ref": "pr-000140", "attempt": 3, "timeout_ms": 800}
+{"ts": 1789323190739, "level": "INFO", "rid": "gw-e84ac6", "event": "payments.call", "payment_ref": "pr-000140", "attempt": 4}
+{"ts": 1789323190753, "level": "WARN", "rid": "gw-e84ac6", "event": "payments.response", "payment_ref": "pr-000140", "attempt": 4, "status": 503}
+{"ts": 1789323190754, "level": "INFO", "rid": "gw-e84ac6", "event": "payments.call", "payment_ref": "pr-000140", "attempt": 5}
+{"ts": 1789323190766, "level": "WARN", "rid": "gw-e84ac6", "event": "payments.response", "payment_ref": "pr-000140", "attempt": 5, "status": 503}
+{"ts": 1789323190767, "level": "INFO", "rid": "gw-e84ac6", "event": "payments.call", "payment_ref": "pr-000140", "attempt": 6}
+{"ts": 1789323190777, "level": "WARN", "rid": "gw-e84ac6", "event": "payments.response", "payment_ref": "pr-000140", "attempt": 6, "status": 503}
+{"ts": 1789323190781, "level": "ERROR", "rid": "gw-e84ac6", "event": "checkout.failed", "order_id": "O-10235", "payment_ref": "pr-000140", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323192184, "level": "INFO", "rid": "gw-5f8e73", "event": "order.get", "order_id": "O-10207"}
+{"ts": 1789323193588, "level": "INFO", "rid": "gw-a49150", "event": "checkout.start", "order_id": "O-10241"}
+{"ts": 1789323193603, "level": "INFO", "rid": "gw-a49150", "event": "payments.call", "payment_ref": "pr-000142", "attempt": 1}
+{"ts": 1789323193611, "level": "WARN", "rid": "gw-a49150", "event": "payments.response", "payment_ref": "pr-000142", "attempt": 1, "status": 503}
+{"ts": 1789323193612, "level": "INFO", "rid": "gw-a49150", "event": "payments.call", "payment_ref": "pr-000142", "attempt": 2}
+{"ts": 1789323193618, "level": "WARN", "rid": "gw-a49150", "event": "payments.response", "payment_ref": "pr-000142", "attempt": 2, "status": 503}
+{"ts": 1789323193619, "level": "INFO", "rid": "gw-a49150", "event": "payments.call", "payment_ref": "pr-000142", "attempt": 3}
+{"ts": 1789323193627, "level": "WARN", "rid": "gw-a49150", "event": "payments.response", "payment_ref": "pr-000142", "attempt": 3, "status": 503}
+{"ts": 1789323193628, "level": "INFO", "rid": "gw-a49150", "event": "payments.call", "payment_ref": "pr-000142", "attempt": 4}
+{"ts": 1789323193642, "level": "WARN", "rid": "gw-a49150", "event": "payments.response", "payment_ref": "pr-000142", "attempt": 4, "status": 503}
+{"ts": 1789323193643, "level": "INFO", "rid": "gw-a49150", "event": "payments.call", "payment_ref": "pr-000142", "attempt": 5}
+{"ts": 1789323193650, "level": "WARN", "rid": "gw-a49150", "event": "payments.response", "payment_ref": "pr-000142", "attempt": 5, "status": 503}
+{"ts": 1789323193651, "level": "INFO", "rid": "gw-a49150", "event": "payments.call", "payment_ref": "pr-000142", "attempt": 6}
+{"ts": 1789323193657, "level": "WARN", "rid": "gw-a49150", "event": "payments.response", "payment_ref": "pr-000142", "attempt": 6, "status": 503}
+{"ts": 1789323193661, "level": "ERROR", "rid": "gw-a49150", "event": "checkout.failed", "order_id": "O-10241", "payment_ref": "pr-000142", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323194480, "level": "INFO", "rid": "gw-cecd79", "event": "checkout.start", "order_id": "O-10242"}
+{"ts": 1789323194493, "level": "INFO", "rid": "gw-cecd79", "event": "payments.call", "payment_ref": "pr-000143", "attempt": 1}
+{"ts": 1789323194504, "level": "WARN", "rid": "gw-cecd79", "event": "payments.response", "payment_ref": "pr-000143", "attempt": 1, "status": 503}
+{"ts": 1789323194505, "level": "INFO", "rid": "gw-cecd79", "event": "payments.call", "payment_ref": "pr-000143", "attempt": 2}
+{"ts": 1789323194520, "level": "WARN", "rid": "gw-cecd79", "event": "payments.response", "payment_ref": "pr-000143", "attempt": 2, "status": 503}
+{"ts": 1789323194521, "level": "INFO", "rid": "gw-cecd79", "event": "payments.call", "payment_ref": "pr-000143", "attempt": 3}
+{"ts": 1789323194536, "level": "WARN", "rid": "gw-cecd79", "event": "payments.response", "payment_ref": "pr-000143", "attempt": 3, "status": 503}
+{"ts": 1789323194537, "level": "INFO", "rid": "gw-cecd79", "event": "payments.call", "payment_ref": "pr-000143", "attempt": 4}
+{"ts": 1789323194598, "level": "INFO", "rid": "gw-cecd79", "event": "payments.response", "payment_ref": "pr-000143", "attempt": 4, "status": 200}
+{"ts": 1789323194603, "level": "INFO", "rid": "gw-cecd79", "event": "checkout.done", "order_id": "O-10242"}
+{"ts": 1789323197478, "level": "INFO", "rid": "gw-7a61f5", "event": "checkout.start", "order_id": "O-10243"}
+{"ts": 1789323197483, "level": "INFO", "rid": "gw-7a61f5", "event": "payments.call", "payment_ref": "pr-000144", "attempt": 1}
+{"ts": 1789323197489, "level": "WARN", "rid": "gw-7a61f5", "event": "payments.response", "payment_ref": "pr-000144", "attempt": 1, "status": 503}
+{"ts": 1789323197490, "level": "INFO", "rid": "gw-7a61f5", "event": "payments.call", "payment_ref": "pr-000144", "attempt": 2}
+{"ts": 1789323197497, "level": "WARN", "rid": "gw-7a61f5", "event": "payments.response", "payment_ref": "pr-000144", "attempt": 2, "status": 503}
+{"ts": 1789323197498, "level": "INFO", "rid": "gw-7a61f5", "event": "payments.call", "payment_ref": "pr-000144", "attempt": 3}
+{"ts": 1789323197507, "level": "WARN", "rid": "gw-7a61f5", "event": "payments.response", "payment_ref": "pr-000144", "attempt": 3, "status": 503}
+{"ts": 1789323197508, "level": "INFO", "rid": "gw-7a61f5", "event": "payments.call", "payment_ref": "pr-000144", "attempt": 4}
+{"ts": 1789323197521, "level": "WARN", "rid": "gw-7a61f5", "event": "payments.response", "payment_ref": "pr-000144", "attempt": 4, "status": 503}
+{"ts": 1789323197522, "level": "INFO", "rid": "gw-7a61f5", "event": "payments.call", "payment_ref": "pr-000144", "attempt": 5}
+{"ts": 1789323198322, "level": "WARN", "rid": "gw-7a61f5", "event": "payments.timeout", "payment_ref": "pr-000144", "attempt": 5, "timeout_ms": 800}
+{"ts": 1789323198324, "level": "INFO", "rid": "gw-7a61f5", "event": "payments.call", "payment_ref": "pr-000144", "attempt": 6}
+{"ts": 1789323198337, "level": "WARN", "rid": "gw-7a61f5", "event": "payments.response", "payment_ref": "pr-000144", "attempt": 6, "status": 503}
+{"ts": 1789323198341, "level": "ERROR", "rid": "gw-7a61f5", "event": "checkout.failed", "order_id": "O-10243", "payment_ref": "pr-000144", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323200487, "level": "INFO", "rid": "gw-fafc1e", "event": "checkout.start", "order_id": "O-10244"}
+{"ts": 1789323200497, "level": "INFO", "rid": "gw-fafc1e", "event": "payments.call", "payment_ref": "pr-000145", "attempt": 1}
+{"ts": 1789323200508, "level": "WARN", "rid": "gw-fafc1e", "event": "payments.response", "payment_ref": "pr-000145", "attempt": 1, "status": 503}
+{"ts": 1789323200509, "level": "INFO", "rid": "gw-fafc1e", "event": "payments.call", "payment_ref": "pr-000145", "attempt": 2}
+{"ts": 1789323200576, "level": "INFO", "rid": "gw-fafc1e", "event": "payments.response", "payment_ref": "pr-000145", "attempt": 2, "status": 200}
+{"ts": 1789323200581, "level": "INFO", "rid": "gw-fafc1e", "event": "checkout.done", "order_id": "O-10244"}
+{"ts": 1789323201405, "level": "INFO", "rid": "gw-b1b464", "event": "checkout.start", "order_id": "O-10245"}
+{"ts": 1789323201419, "level": "INFO", "rid": "gw-b1b464", "event": "payments.call", "payment_ref": "pr-000146", "attempt": 1}
+{"ts": 1789323201435, "level": "WARN", "rid": "gw-b1b464", "event": "payments.response", "payment_ref": "pr-000146", "attempt": 1, "status": 503}
+{"ts": 1789323201436, "level": "INFO", "rid": "gw-b1b464", "event": "payments.call", "payment_ref": "pr-000146", "attempt": 2}
+{"ts": 1789323201451, "level": "WARN", "rid": "gw-b1b464", "event": "payments.response", "payment_ref": "pr-000146", "attempt": 2, "status": 503}
+{"ts": 1789323201452, "level": "INFO", "rid": "gw-b1b464", "event": "payments.call", "payment_ref": "pr-000146", "attempt": 3}
+{"ts": 1789323201463, "level": "WARN", "rid": "gw-b1b464", "event": "payments.response", "payment_ref": "pr-000146", "attempt": 3, "status": 503}
+{"ts": 1789323201464, "level": "INFO", "rid": "gw-b1b464", "event": "payments.call", "payment_ref": "pr-000146", "attempt": 4}
+{"ts": 1789323201480, "level": "WARN", "rid": "gw-b1b464", "event": "payments.response", "payment_ref": "pr-000146", "attempt": 4, "status": 503}
+{"ts": 1789323201481, "level": "INFO", "rid": "gw-b1b464", "event": "payments.call", "payment_ref": "pr-000146", "attempt": 5}
+{"ts": 1789323201497, "level": "WARN", "rid": "gw-b1b464", "event": "payments.response", "payment_ref": "pr-000146", "attempt": 5, "status": 503}
+{"ts": 1789323201498, "level": "INFO", "rid": "gw-b1b464", "event": "payments.call", "payment_ref": "pr-000146", "attempt": 6}
+{"ts": 1789323201505, "level": "WARN", "rid": "gw-b1b464", "event": "payments.response", "payment_ref": "pr-000146", "attempt": 6, "status": 503}
+{"ts": 1789323201509, "level": "ERROR", "rid": "gw-b1b464", "event": "checkout.failed", "order_id": "O-10245", "payment_ref": "pr-000146", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323204284, "level": "INFO", "rid": "gw-dc9d04", "event": "checkout.start", "order_id": "O-10246"}
+{"ts": 1789323204295, "level": "INFO", "rid": "gw-dc9d04", "event": "payments.call", "payment_ref": "pr-000147", "attempt": 1}
+{"ts": 1789323204306, "level": "WARN", "rid": "gw-dc9d04", "event": "payments.response", "payment_ref": "pr-000147", "attempt": 1, "status": 503}
+{"ts": 1789323204307, "level": "INFO", "rid": "gw-dc9d04", "event": "payments.call", "payment_ref": "pr-000147", "attempt": 2}
+{"ts": 1789323204321, "level": "WARN", "rid": "gw-dc9d04", "event": "payments.response", "payment_ref": "pr-000147", "attempt": 2, "status": 503}
+{"ts": 1789323204322, "level": "INFO", "rid": "gw-dc9d04", "event": "payments.call", "payment_ref": "pr-000147", "attempt": 3}
+{"ts": 1789323204336, "level": "WARN", "rid": "gw-dc9d04", "event": "payments.response", "payment_ref": "pr-000147", "attempt": 3, "status": 503}
+{"ts": 1789323204337, "level": "INFO", "rid": "gw-dc9d04", "event": "payments.call", "payment_ref": "pr-000147", "attempt": 4}
+{"ts": 1789323204343, "level": "WARN", "rid": "gw-dc9d04", "event": "payments.response", "payment_ref": "pr-000147", "attempt": 4, "status": 503}
+{"ts": 1789323204344, "level": "INFO", "rid": "gw-dc9d04", "event": "payments.call", "payment_ref": "pr-000147", "attempt": 5}
+{"ts": 1789323204354, "level": "WARN", "rid": "gw-dc9d04", "event": "payments.response", "payment_ref": "pr-000147", "attempt": 5, "status": 503}
+{"ts": 1789323204355, "level": "INFO", "rid": "gw-dc9d04", "event": "payments.call", "payment_ref": "pr-000147", "attempt": 6}
+{"ts": 1789323204367, "level": "WARN", "rid": "gw-dc9d04", "event": "payments.response", "payment_ref": "pr-000147", "attempt": 6, "status": 503}
+{"ts": 1789323204371, "level": "ERROR", "rid": "gw-dc9d04", "event": "checkout.failed", "order_id": "O-10246", "payment_ref": "pr-000147", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323205912, "level": "INFO", "rid": "gw-18651c", "event": "checkout.start", "order_id": "O-10247"}
+{"ts": 1789323205927, "level": "INFO", "rid": "gw-18651c", "event": "payments.call", "payment_ref": "pr-000148", "attempt": 1}
+{"ts": 1789323205933, "level": "WARN", "rid": "gw-18651c", "event": "payments.response", "payment_ref": "pr-000148", "attempt": 1, "status": 503}
+{"ts": 1789323205934, "level": "INFO", "rid": "gw-18651c", "event": "payments.call", "payment_ref": "pr-000148", "attempt": 2}
+{"ts": 1789323205943, "level": "WARN", "rid": "gw-18651c", "event": "payments.response", "payment_ref": "pr-000148", "attempt": 2, "status": 503}
+{"ts": 1789323205944, "level": "INFO", "rid": "gw-18651c", "event": "payments.call", "payment_ref": "pr-000148", "attempt": 3}
+{"ts": 1789323205953, "level": "WARN", "rid": "gw-18651c", "event": "payments.response", "payment_ref": "pr-000148", "attempt": 3, "status": 503}
+{"ts": 1789323205954, "level": "INFO", "rid": "gw-18651c", "event": "payments.call", "payment_ref": "pr-000148", "attempt": 4}
+{"ts": 1789323206754, "level": "WARN", "rid": "gw-18651c", "event": "payments.timeout", "payment_ref": "pr-000148", "attempt": 4, "timeout_ms": 800}
+{"ts": 1789323206756, "level": "INFO", "rid": "gw-18651c", "event": "payments.call", "payment_ref": "pr-000148", "attempt": 5}
+{"ts": 1789323207138, "level": "INFO", "rid": "gw-68c224", "event": "checkout.start", "order_id": "O-10248"}
+{"ts": 1789323207143, "level": "INFO", "rid": "gw-68c224", "event": "payments.call", "payment_ref": "pr-000149", "attempt": 1}
+{"ts": 1789323207159, "level": "WARN", "rid": "gw-68c224", "event": "payments.response", "payment_ref": "pr-000149", "attempt": 1, "status": 503}
+{"ts": 1789323207160, "level": "INFO", "rid": "gw-68c224", "event": "payments.call", "payment_ref": "pr-000149", "attempt": 2}
+{"ts": 1789323207170, "level": "WARN", "rid": "gw-68c224", "event": "payments.response", "payment_ref": "pr-000149", "attempt": 2, "status": 503}
+{"ts": 1789323207171, "level": "INFO", "rid": "gw-68c224", "event": "payments.call", "payment_ref": "pr-000149", "attempt": 3}
+{"ts": 1789323207186, "level": "WARN", "rid": "gw-68c224", "event": "payments.response", "payment_ref": "pr-000149", "attempt": 3, "status": 503}
+{"ts": 1789323207187, "level": "INFO", "rid": "gw-68c224", "event": "payments.call", "payment_ref": "pr-000149", "attempt": 4}
+{"ts": 1789323207195, "level": "WARN", "rid": "gw-68c224", "event": "payments.response", "payment_ref": "pr-000149", "attempt": 4, "status": 503}
+{"ts": 1789323207196, "level": "INFO", "rid": "gw-68c224", "event": "payments.call", "payment_ref": "pr-000149", "attempt": 5}
+{"ts": 1789323207202, "level": "WARN", "rid": "gw-68c224", "event": "payments.response", "payment_ref": "pr-000149", "attempt": 5, "status": 503}
+{"ts": 1789323207203, "level": "INFO", "rid": "gw-68c224", "event": "payments.call", "payment_ref": "pr-000149", "attempt": 6}
+{"ts": 1789323207556, "level": "WARN", "rid": "gw-18651c", "event": "payments.timeout", "payment_ref": "pr-000148", "attempt": 5, "timeout_ms": 800}
+{"ts": 1789323207558, "level": "INFO", "rid": "gw-18651c", "event": "payments.call", "payment_ref": "pr-000148", "attempt": 6}
+{"ts": 1789323207571, "level": "WARN", "rid": "gw-18651c", "event": "payments.response", "payment_ref": "pr-000148", "attempt": 6, "status": 503}
+{"ts": 1789323207575, "level": "ERROR", "rid": "gw-18651c", "event": "checkout.failed", "order_id": "O-10247", "payment_ref": "pr-000148", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323208003, "level": "WARN", "rid": "gw-68c224", "event": "payments.timeout", "payment_ref": "pr-000149", "attempt": 6, "timeout_ms": 800}
+{"ts": 1789323208008, "level": "ERROR", "rid": "gw-68c224", "event": "checkout.failed", "order_id": "O-10248", "payment_ref": "pr-000149", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323210750, "level": "INFO", "rid": "gw-c65dd0", "event": "checkout.start", "order_id": "O-10236"}
+{"ts": 1789323210765, "level": "INFO", "rid": "gw-c65dd0", "event": "payments.call", "payment_ref": "pr-000150", "attempt": 1}
+{"ts": 1789323210775, "level": "WARN", "rid": "gw-c65dd0", "event": "payments.response", "payment_ref": "pr-000150", "attempt": 1, "status": 503}
+{"ts": 1789323210776, "level": "INFO", "rid": "gw-c65dd0", "event": "payments.call", "payment_ref": "pr-000150", "attempt": 2}
+{"ts": 1789323210809, "level": "INFO", "rid": "gw-c65dd0", "event": "payments.response", "payment_ref": "pr-000150", "attempt": 2, "status": 200}
+{"ts": 1789323210814, "level": "INFO", "rid": "gw-c65dd0", "event": "checkout.done", "order_id": "O-10236"}
+{"ts": 1789323211448, "level": "INFO", "rid": "gw-697a96", "event": "checkout.start", "order_id": "O-10241"}
+{"ts": 1789323211456, "level": "INFO", "rid": "gw-697a96", "event": "payments.call", "payment_ref": "pr-000151", "attempt": 1}
+{"ts": 1789323211467, "level": "WARN", "rid": "gw-697a96", "event": "payments.response", "payment_ref": "pr-000151", "attempt": 1, "status": 503}
+{"ts": 1789323211468, "level": "INFO", "rid": "gw-697a96", "event": "payments.call", "payment_ref": "pr-000151", "attempt": 2}
+{"ts": 1789323211475, "level": "WARN", "rid": "gw-697a96", "event": "payments.response", "payment_ref": "pr-000151", "attempt": 2, "status": 503}
+{"ts": 1789323211476, "level": "INFO", "rid": "gw-697a96", "event": "payments.call", "payment_ref": "pr-000151", "attempt": 3}
+{"ts": 1789323212035, "level": "INFO", "rid": "gw-5bd6b5", "event": "order.get", "order_id": "O-10200"}
+{"ts": 1789323212276, "level": "WARN", "rid": "gw-697a96", "event": "payments.timeout", "payment_ref": "pr-000151", "attempt": 3, "timeout_ms": 800}
+{"ts": 1789323212278, "level": "INFO", "rid": "gw-697a96", "event": "payments.call", "payment_ref": "pr-000151", "attempt": 4}
+{"ts": 1789323212292, "level": "WARN", "rid": "gw-697a96", "event": "payments.response", "payment_ref": "pr-000151", "attempt": 4, "status": 503}
+{"ts": 1789323212293, "level": "INFO", "rid": "gw-697a96", "event": "payments.call", "payment_ref": "pr-000151", "attempt": 5}
+{"ts": 1789323213093, "level": "WARN", "rid": "gw-697a96", "event": "payments.timeout", "payment_ref": "pr-000151", "attempt": 5, "timeout_ms": 800}
+{"ts": 1789323213095, "level": "INFO", "rid": "gw-697a96", "event": "payments.call", "payment_ref": "pr-000151", "attempt": 6}
+{"ts": 1789323213108, "level": "WARN", "rid": "gw-697a96", "event": "payments.response", "payment_ref": "pr-000151", "attempt": 6, "status": 503}
+{"ts": 1789323213112, "level": "ERROR", "rid": "gw-697a96", "event": "checkout.failed", "order_id": "O-10241", "payment_ref": "pr-000151", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323214763, "level": "INFO", "rid": "gw-c124fa", "event": "checkout.start", "order_id": "O-10249"}
+{"ts": 1789323214774, "level": "INFO", "rid": "gw-c124fa", "event": "payments.call", "payment_ref": "pr-000152", "attempt": 1}
+{"ts": 1789323214826, "level": "INFO", "rid": "gw-c124fa", "event": "payments.response", "payment_ref": "pr-000152", "attempt": 1, "status": 200}
+{"ts": 1789323214831, "level": "INFO", "rid": "gw-c124fa", "event": "checkout.done", "order_id": "O-10249"}
+{"ts": 1789323217232, "level": "INFO", "rid": "gw-288332", "event": "checkout.start", "order_id": "O-10250"}
+{"ts": 1789323217246, "level": "INFO", "rid": "gw-288332", "event": "payments.call", "payment_ref": "pr-000153", "attempt": 1}
+{"ts": 1789323217255, "level": "WARN", "rid": "gw-288332", "event": "payments.response", "payment_ref": "pr-000153", "attempt": 1, "status": 503}
+{"ts": 1789323217256, "level": "INFO", "rid": "gw-288332", "event": "payments.call", "payment_ref": "pr-000153", "attempt": 2}
+{"ts": 1789323217263, "level": "WARN", "rid": "gw-288332", "event": "payments.response", "payment_ref": "pr-000153", "attempt": 2, "status": 503}
+{"ts": 1789323217264, "level": "INFO", "rid": "gw-288332", "event": "payments.call", "payment_ref": "pr-000153", "attempt": 3}
+{"ts": 1789323217275, "level": "WARN", "rid": "gw-288332", "event": "payments.response", "payment_ref": "pr-000153", "attempt": 3, "status": 503}
+{"ts": 1789323217276, "level": "INFO", "rid": "gw-288332", "event": "payments.call", "payment_ref": "pr-000153", "attempt": 4}
+{"ts": 1789323217282, "level": "WARN", "rid": "gw-288332", "event": "payments.response", "payment_ref": "pr-000153", "attempt": 4, "status": 503}
+{"ts": 1789323217283, "level": "INFO", "rid": "gw-288332", "event": "payments.call", "payment_ref": "pr-000153", "attempt": 5}
+{"ts": 1789323217296, "level": "WARN", "rid": "gw-288332", "event": "payments.response", "payment_ref": "pr-000153", "attempt": 5, "status": 503}
+{"ts": 1789323217297, "level": "INFO", "rid": "gw-288332", "event": "payments.call", "payment_ref": "pr-000153", "attempt": 6}
+{"ts": 1789323217303, "level": "WARN", "rid": "gw-288332", "event": "payments.response", "payment_ref": "pr-000153", "attempt": 6, "status": 503}
+{"ts": 1789323217307, "level": "ERROR", "rid": "gw-288332", "event": "checkout.failed", "order_id": "O-10250", "payment_ref": "pr-000153", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323220015, "level": "INFO", "rid": "gw-2d6339", "event": "checkout.start", "order_id": "O-10251"}
+{"ts": 1789323220024, "level": "INFO", "rid": "gw-2d6339", "event": "payments.call", "payment_ref": "pr-000154", "attempt": 1}
+{"ts": 1789323220036, "level": "WARN", "rid": "gw-2d6339", "event": "payments.response", "payment_ref": "pr-000154", "attempt": 1, "status": 503}
+{"ts": 1789323220037, "level": "INFO", "rid": "gw-2d6339", "event": "payments.call", "payment_ref": "pr-000154", "attempt": 2}
+{"ts": 1789323220052, "level": "WARN", "rid": "gw-2d6339", "event": "payments.response", "payment_ref": "pr-000154", "attempt": 2, "status": 503}
+{"ts": 1789323220053, "level": "INFO", "rid": "gw-2d6339", "event": "payments.call", "payment_ref": "pr-000154", "attempt": 3}
+{"ts": 1789323220065, "level": "WARN", "rid": "gw-2d6339", "event": "payments.response", "payment_ref": "pr-000154", "attempt": 3, "status": 503}
+{"ts": 1789323220066, "level": "INFO", "rid": "gw-2d6339", "event": "payments.call", "payment_ref": "pr-000154", "attempt": 4}
+{"ts": 1789323220079, "level": "WARN", "rid": "gw-2d6339", "event": "payments.response", "payment_ref": "pr-000154", "attempt": 4, "status": 503}
+{"ts": 1789323220080, "level": "INFO", "rid": "gw-2d6339", "event": "payments.call", "payment_ref": "pr-000154", "attempt": 5}
+{"ts": 1789323220092, "level": "WARN", "rid": "gw-2d6339", "event": "payments.response", "payment_ref": "pr-000154", "attempt": 5, "status": 503}
+{"ts": 1789323220093, "level": "INFO", "rid": "gw-2d6339", "event": "payments.call", "payment_ref": "pr-000154", "attempt": 6}
+{"ts": 1789323220109, "level": "WARN", "rid": "gw-2d6339", "event": "payments.response", "payment_ref": "pr-000154", "attempt": 6, "status": 503}
+{"ts": 1789323220113, "level": "ERROR", "rid": "gw-2d6339", "event": "checkout.failed", "order_id": "O-10251", "payment_ref": "pr-000154", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323221989, "level": "INFO", "rid": "gw-6d644e", "event": "order.get", "order_id": "O-10204"}
+{"ts": 1789323225195, "level": "INFO", "rid": "gw-9bbfe6", "event": "checkout.start", "order_id": "O-10252"}
+{"ts": 1789323225205, "level": "INFO", "rid": "gw-9bbfe6", "event": "payments.call", "payment_ref": "pr-000155", "attempt": 1}
+{"ts": 1789323225214, "level": "WARN", "rid": "gw-9bbfe6", "event": "payments.response", "payment_ref": "pr-000155", "attempt": 1, "status": 503}
+{"ts": 1789323225215, "level": "INFO", "rid": "gw-9bbfe6", "event": "payments.call", "payment_ref": "pr-000155", "attempt": 2}
+{"ts": 1789323225231, "level": "WARN", "rid": "gw-9bbfe6", "event": "payments.response", "payment_ref": "pr-000155", "attempt": 2, "status": 503}
+{"ts": 1789323225232, "level": "INFO", "rid": "gw-9bbfe6", "event": "payments.call", "payment_ref": "pr-000155", "attempt": 3}
+{"ts": 1789323226032, "level": "WARN", "rid": "gw-9bbfe6", "event": "payments.timeout", "payment_ref": "pr-000155", "attempt": 3, "timeout_ms": 800}
+{"ts": 1789323226034, "level": "INFO", "rid": "gw-9bbfe6", "event": "payments.call", "payment_ref": "pr-000155", "attempt": 4}
+{"ts": 1789323226042, "level": "WARN", "rid": "gw-9bbfe6", "event": "payments.response", "payment_ref": "pr-000155", "attempt": 4, "status": 503}
+{"ts": 1789323226043, "level": "INFO", "rid": "gw-9bbfe6", "event": "payments.call", "payment_ref": "pr-000155", "attempt": 5}
+{"ts": 1789323226057, "level": "WARN", "rid": "gw-9bbfe6", "event": "payments.response", "payment_ref": "pr-000155", "attempt": 5, "status": 503}
+{"ts": 1789323226058, "level": "INFO", "rid": "gw-9bbfe6", "event": "payments.call", "payment_ref": "pr-000155", "attempt": 6}
+{"ts": 1789323226071, "level": "WARN", "rid": "gw-9bbfe6", "event": "payments.response", "payment_ref": "pr-000155", "attempt": 6, "status": 503}
+{"ts": 1789323226075, "level": "ERROR", "rid": "gw-9bbfe6", "event": "checkout.failed", "order_id": "O-10252", "payment_ref": "pr-000155", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323228580, "level": "INFO", "rid": "gw-76be5e", "event": "order.get", "order_id": "O-10249"}
+{"ts": 1789323231194, "level": "INFO", "rid": "gw-57cd6b", "event": "checkout.start", "order_id": "O-10253"}
+{"ts": 1789323231205, "level": "INFO", "rid": "gw-57cd6b", "event": "payments.call", "payment_ref": "pr-000156", "attempt": 1}
+{"ts": 1789323231215, "level": "WARN", "rid": "gw-57cd6b", "event": "payments.response", "payment_ref": "pr-000156", "attempt": 1, "status": 503}
+{"ts": 1789323231216, "level": "INFO", "rid": "gw-57cd6b", "event": "payments.call", "payment_ref": "pr-000156", "attempt": 2}
+{"ts": 1789323231230, "level": "WARN", "rid": "gw-57cd6b", "event": "payments.response", "payment_ref": "pr-000156", "attempt": 2, "status": 503}
+{"ts": 1789323231231, "level": "INFO", "rid": "gw-57cd6b", "event": "payments.call", "payment_ref": "pr-000156", "attempt": 3}
+{"ts": 1789323231241, "level": "WARN", "rid": "gw-57cd6b", "event": "payments.response", "payment_ref": "pr-000156", "attempt": 3, "status": 503}
+{"ts": 1789323231242, "level": "INFO", "rid": "gw-57cd6b", "event": "payments.call", "payment_ref": "pr-000156", "attempt": 4}
+{"ts": 1789323231257, "level": "WARN", "rid": "gw-57cd6b", "event": "payments.response", "payment_ref": "pr-000156", "attempt": 4, "status": 503}
+{"ts": 1789323231258, "level": "INFO", "rid": "gw-57cd6b", "event": "payments.call", "payment_ref": "pr-000156", "attempt": 5}
+{"ts": 1789323231265, "level": "WARN", "rid": "gw-57cd6b", "event": "payments.response", "payment_ref": "pr-000156", "attempt": 5, "status": 503}
+{"ts": 1789323231266, "level": "INFO", "rid": "gw-57cd6b", "event": "payments.call", "payment_ref": "pr-000156", "attempt": 6}
+{"ts": 1789323231356, "level": "INFO", "rid": "gw-57cd6b", "event": "payments.response", "payment_ref": "pr-000156", "attempt": 6, "status": 200}
+{"ts": 1789323231361, "level": "INFO", "rid": "gw-57cd6b", "event": "checkout.done", "order_id": "O-10253"}
+{"ts": 1789323232065, "level": "INFO", "rid": "gw-5af986", "event": "checkout.start", "order_id": "O-10254"}
+{"ts": 1789323232070, "level": "INFO", "rid": "gw-5af986", "event": "payments.call", "payment_ref": "pr-000157", "attempt": 1}
+{"ts": 1789323232083, "level": "WARN", "rid": "gw-5af986", "event": "payments.response", "payment_ref": "pr-000157", "attempt": 1, "status": 503}
+{"ts": 1789323232084, "level": "INFO", "rid": "gw-5af986", "event": "payments.call", "payment_ref": "pr-000157", "attempt": 2}
+{"ts": 1789323232094, "level": "WARN", "rid": "gw-5af986", "event": "payments.response", "payment_ref": "pr-000157", "attempt": 2, "status": 503}
+{"ts": 1789323232095, "level": "INFO", "rid": "gw-5af986", "event": "payments.call", "payment_ref": "pr-000157", "attempt": 3}
+{"ts": 1789323232111, "level": "WARN", "rid": "gw-5af986", "event": "payments.response", "payment_ref": "pr-000157", "attempt": 3, "status": 503}
+{"ts": 1789323232112, "level": "INFO", "rid": "gw-5af986", "event": "payments.call", "payment_ref": "pr-000157", "attempt": 4}
+{"ts": 1789323232195, "level": "INFO", "rid": "gw-5af986", "event": "payments.response", "payment_ref": "pr-000157", "attempt": 4, "status": 200}
+{"ts": 1789323232200, "level": "INFO", "rid": "gw-5af986", "event": "checkout.done", "order_id": "O-10254"}
+{"ts": 1789323234407, "level": "INFO", "rid": "gw-476850", "event": "order.get", "order_id": "O-10230"}
+{"ts": 1789323241465, "level": "INFO", "rid": "gw-7d90b2", "event": "checkout.start", "order_id": "O-10255"}
+{"ts": 1789323241471, "level": "INFO", "rid": "gw-7d90b2", "event": "payments.call", "payment_ref": "pr-000158", "attempt": 1}
+{"ts": 1789323241478, "level": "WARN", "rid": "gw-7d90b2", "event": "payments.response", "payment_ref": "pr-000158", "attempt": 1, "status": 503}
+{"ts": 1789323241479, "level": "INFO", "rid": "gw-7d90b2", "event": "payments.call", "payment_ref": "pr-000158", "attempt": 2}
+{"ts": 1789323241492, "level": "WARN", "rid": "gw-7d90b2", "event": "payments.response", "payment_ref": "pr-000158", "attempt": 2, "status": 503}
+{"ts": 1789323241493, "level": "INFO", "rid": "gw-7d90b2", "event": "payments.call", "payment_ref": "pr-000158", "attempt": 3}
+{"ts": 1789323241501, "level": "WARN", "rid": "gw-7d90b2", "event": "payments.response", "payment_ref": "pr-000158", "attempt": 3, "status": 503}
+{"ts": 1789323241502, "level": "INFO", "rid": "gw-7d90b2", "event": "payments.call", "payment_ref": "pr-000158", "attempt": 4}
+{"ts": 1789323241510, "level": "WARN", "rid": "gw-7d90b2", "event": "payments.response", "payment_ref": "pr-000158", "attempt": 4, "status": 503}
+{"ts": 1789323241511, "level": "INFO", "rid": "gw-7d90b2", "event": "payments.call", "payment_ref": "pr-000158", "attempt": 5}
+{"ts": 1789323241527, "level": "WARN", "rid": "gw-7d90b2", "event": "payments.response", "payment_ref": "pr-000158", "attempt": 5, "status": 503}
+{"ts": 1789323241528, "level": "INFO", "rid": "gw-7d90b2", "event": "payments.call", "payment_ref": "pr-000158", "attempt": 6}
+{"ts": 1789323241534, "level": "WARN", "rid": "gw-7d90b2", "event": "payments.response", "payment_ref": "pr-000158", "attempt": 6, "status": 503}
+{"ts": 1789323241538, "level": "ERROR", "rid": "gw-7d90b2", "event": "checkout.failed", "order_id": "O-10255", "payment_ref": "pr-000158", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323244511, "level": "INFO", "rid": "gw-7f4539", "event": "checkout.start", "order_id": "O-10245"}
+{"ts": 1789323244518, "level": "INFO", "rid": "gw-7f4539", "event": "payments.call", "payment_ref": "pr-000159", "attempt": 1}
+{"ts": 1789323244554, "level": "INFO", "rid": "gw-7f4539", "event": "payments.response", "payment_ref": "pr-000159", "attempt": 1, "status": 200}
+{"ts": 1789323244559, "level": "INFO", "rid": "gw-7f4539", "event": "checkout.done", "order_id": "O-10245"}
+{"ts": 1789323244822, "level": "INFO", "rid": "gw-bf7898", "event": "order.get", "order_id": "O-10218"}
+{"ts": 1789323246507, "level": "INFO", "rid": "gw-9de140", "event": "order.get", "order_id": "O-10202"}
+{"ts": 1789323248373, "level": "INFO", "rid": "gw-8a2bd7", "event": "order.get", "order_id": "O-10245"}
+{"ts": 1789323249441, "level": "INFO", "rid": "gw-b95e18", "event": "order.get", "order_id": "O-10206"}
+{"ts": 1789323252558, "level": "INFO", "rid": "gw-8ba16c", "event": "checkout.start", "order_id": "O-10256"}
+{"ts": 1789323252570, "level": "INFO", "rid": "gw-8ba16c", "event": "payments.call", "payment_ref": "pr-000160", "attempt": 1}
+{"ts": 1789323252583, "level": "WARN", "rid": "gw-8ba16c", "event": "payments.response", "payment_ref": "pr-000160", "attempt": 1, "status": 503}
+{"ts": 1789323252584, "level": "INFO", "rid": "gw-8ba16c", "event": "payments.call", "payment_ref": "pr-000160", "attempt": 2}
+{"ts": 1789323252597, "level": "WARN", "rid": "gw-8ba16c", "event": "payments.response", "payment_ref": "pr-000160", "attempt": 2, "status": 503}
+{"ts": 1789323252598, "level": "INFO", "rid": "gw-8ba16c", "event": "payments.call", "payment_ref": "pr-000160", "attempt": 3}
+{"ts": 1789323252609, "level": "WARN", "rid": "gw-8ba16c", "event": "payments.response", "payment_ref": "pr-000160", "attempt": 3, "status": 503}
+{"ts": 1789323252610, "level": "INFO", "rid": "gw-8ba16c", "event": "payments.call", "payment_ref": "pr-000160", "attempt": 4}
+{"ts": 1789323252617, "level": "WARN", "rid": "gw-8ba16c", "event": "payments.response", "payment_ref": "pr-000160", "attempt": 4, "status": 503}
+{"ts": 1789323252618, "level": "INFO", "rid": "gw-8ba16c", "event": "payments.call", "payment_ref": "pr-000160", "attempt": 5}
+{"ts": 1789323252634, "level": "WARN", "rid": "gw-8ba16c", "event": "payments.response", "payment_ref": "pr-000160", "attempt": 5, "status": 503}
+{"ts": 1789323252635, "level": "INFO", "rid": "gw-8ba16c", "event": "payments.call", "payment_ref": "pr-000160", "attempt": 6}
+{"ts": 1789323252645, "level": "WARN", "rid": "gw-8ba16c", "event": "payments.response", "payment_ref": "pr-000160", "attempt": 6, "status": 503}
+{"ts": 1789323252649, "level": "ERROR", "rid": "gw-8ba16c", "event": "checkout.failed", "order_id": "O-10256", "payment_ref": "pr-000160", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323254405, "level": "INFO", "rid": "gw-c28109", "event": "checkout.start", "order_id": "O-10257"}
+{"ts": 1789323254417, "level": "INFO", "rid": "gw-c28109", "event": "payments.call", "payment_ref": "pr-000161", "attempt": 1}
+{"ts": 1789323254478, "level": "INFO", "rid": "gw-c28109", "event": "payments.response", "payment_ref": "pr-000161", "attempt": 1, "status": 200}
+{"ts": 1789323254483, "level": "INFO", "rid": "gw-c28109", "event": "checkout.done", "order_id": "O-10257"}
+{"ts": 1789323257009, "level": "INFO", "rid": "gw-ba246a", "event": "checkout.start", "order_id": "O-10258"}
+{"ts": 1789323257023, "level": "INFO", "rid": "gw-ba246a", "event": "payments.call", "payment_ref": "pr-000162", "attempt": 1}
+{"ts": 1789323257036, "level": "WARN", "rid": "gw-ba246a", "event": "payments.response", "payment_ref": "pr-000162", "attempt": 1, "status": 503}
+{"ts": 1789323257037, "level": "INFO", "rid": "gw-ba246a", "event": "payments.call", "payment_ref": "pr-000162", "attempt": 2}
+{"ts": 1789323257837, "level": "WARN", "rid": "gw-ba246a", "event": "payments.timeout", "payment_ref": "pr-000162", "attempt": 2, "timeout_ms": 800}
+{"ts": 1789323257839, "level": "INFO", "rid": "gw-ba246a", "event": "payments.call", "payment_ref": "pr-000162", "attempt": 3}
+{"ts": 1789323257852, "level": "WARN", "rid": "gw-ba246a", "event": "payments.response", "payment_ref": "pr-000162", "attempt": 3, "status": 503}
+{"ts": 1789323257853, "level": "INFO", "rid": "gw-ba246a", "event": "payments.call", "payment_ref": "pr-000162", "attempt": 4}
+{"ts": 1789323257867, "level": "WARN", "rid": "gw-ba246a", "event": "payments.response", "payment_ref": "pr-000162", "attempt": 4, "status": 503}
+{"ts": 1789323257868, "level": "INFO", "rid": "gw-ba246a", "event": "payments.call", "payment_ref": "pr-000162", "attempt": 5}
+{"ts": 1789323257880, "level": "WARN", "rid": "gw-ba246a", "event": "payments.response", "payment_ref": "pr-000162", "attempt": 5, "status": 503}
+{"ts": 1789323257881, "level": "INFO", "rid": "gw-ba246a", "event": "payments.call", "payment_ref": "pr-000162", "attempt": 6}
+{"ts": 1789323257897, "level": "WARN", "rid": "gw-ba246a", "event": "payments.response", "payment_ref": "pr-000162", "attempt": 6, "status": 503}
+{"ts": 1789323257901, "level": "ERROR", "rid": "gw-ba246a", "event": "checkout.failed", "order_id": "O-10258", "payment_ref": "pr-000162", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323258685, "level": "INFO", "rid": "gw-f89bb4", "event": "checkout.start", "order_id": "O-10259"}
+{"ts": 1789323258694, "level": "INFO", "rid": "gw-f89bb4", "event": "payments.call", "payment_ref": "pr-000163", "attempt": 1}
+{"ts": 1789323258704, "level": "WARN", "rid": "gw-f89bb4", "event": "payments.response", "payment_ref": "pr-000163", "attempt": 1, "status": 503}
+{"ts": 1789323258705, "level": "INFO", "rid": "gw-f89bb4", "event": "payments.call", "payment_ref": "pr-000163", "attempt": 2}
+{"ts": 1789323258712, "level": "WARN", "rid": "gw-f89bb4", "event": "payments.response", "payment_ref": "pr-000163", "attempt": 2, "status": 503}
+{"ts": 1789323258713, "level": "INFO", "rid": "gw-f89bb4", "event": "payments.call", "payment_ref": "pr-000163", "attempt": 3}
+{"ts": 1789323258725, "level": "WARN", "rid": "gw-f89bb4", "event": "payments.response", "payment_ref": "pr-000163", "attempt": 3, "status": 503}
+{"ts": 1789323258726, "level": "INFO", "rid": "gw-f89bb4", "event": "payments.call", "payment_ref": "pr-000163", "attempt": 4}
+{"ts": 1789323258734, "level": "WARN", "rid": "gw-f89bb4", "event": "payments.response", "payment_ref": "pr-000163", "attempt": 4, "status": 503}
+{"ts": 1789323258735, "level": "INFO", "rid": "gw-f89bb4", "event": "payments.call", "payment_ref": "pr-000163", "attempt": 5}
+{"ts": 1789323258748, "level": "WARN", "rid": "gw-f89bb4", "event": "payments.response", "payment_ref": "pr-000163", "attempt": 5, "status": 503}
+{"ts": 1789323258749, "level": "INFO", "rid": "gw-f89bb4", "event": "payments.call", "payment_ref": "pr-000163", "attempt": 6}
+{"ts": 1789323258763, "level": "WARN", "rid": "gw-f89bb4", "event": "payments.response", "payment_ref": "pr-000163", "attempt": 6, "status": 503}
+{"ts": 1789323258767, "level": "ERROR", "rid": "gw-f89bb4", "event": "checkout.failed", "order_id": "O-10259", "payment_ref": "pr-000163", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323259445, "level": "INFO", "rid": "gw-44ca11", "event": "checkout.start", "order_id": "O-10260"}
+{"ts": 1789323259459, "level": "INFO", "rid": "gw-44ca11", "event": "payments.call", "payment_ref": "pr-000164", "attempt": 1}
+{"ts": 1789323259517, "level": "INFO", "rid": "gw-44ca11", "event": "payments.response", "payment_ref": "pr-000164", "attempt": 1, "status": 200}
+{"ts": 1789323259522, "level": "INFO", "rid": "gw-44ca11", "event": "checkout.done", "order_id": "O-10260"}
+{"ts": 1789323261526, "level": "INFO", "rid": "gw-1ec195", "event": "checkout.start", "order_id": "O-10261"}
+{"ts": 1789323261531, "level": "INFO", "rid": "gw-1ec195", "event": "payments.call", "payment_ref": "pr-000165", "attempt": 1}
+{"ts": 1789323261542, "level": "WARN", "rid": "gw-1ec195", "event": "payments.response", "payment_ref": "pr-000165", "attempt": 1, "status": 503}
+{"ts": 1789323261543, "level": "INFO", "rid": "gw-1ec195", "event": "payments.call", "payment_ref": "pr-000165", "attempt": 2}
+{"ts": 1789323261550, "level": "WARN", "rid": "gw-1ec195", "event": "payments.response", "payment_ref": "pr-000165", "attempt": 2, "status": 503}
+{"ts": 1789323261551, "level": "INFO", "rid": "gw-1ec195", "event": "payments.call", "payment_ref": "pr-000165", "attempt": 3}
+{"ts": 1789323261562, "level": "WARN", "rid": "gw-1ec195", "event": "payments.response", "payment_ref": "pr-000165", "attempt": 3, "status": 503}
+{"ts": 1789323261563, "level": "INFO", "rid": "gw-1ec195", "event": "payments.call", "payment_ref": "pr-000165", "attempt": 4}
+{"ts": 1789323262363, "level": "WARN", "rid": "gw-1ec195", "event": "payments.timeout", "payment_ref": "pr-000165", "attempt": 4, "timeout_ms": 800}
+{"ts": 1789323262365, "level": "INFO", "rid": "gw-1ec195", "event": "payments.call", "payment_ref": "pr-000165", "attempt": 5}
+{"ts": 1789323262378, "level": "WARN", "rid": "gw-1ec195", "event": "payments.response", "payment_ref": "pr-000165", "attempt": 5, "status": 503}
+{"ts": 1789323262379, "level": "INFO", "rid": "gw-1ec195", "event": "payments.call", "payment_ref": "pr-000165", "attempt": 6}
+{"ts": 1789323262391, "level": "WARN", "rid": "gw-1ec195", "event": "payments.response", "payment_ref": "pr-000165", "attempt": 6, "status": 503}
+{"ts": 1789323262395, "level": "ERROR", "rid": "gw-1ec195", "event": "checkout.failed", "order_id": "O-10261", "payment_ref": "pr-000165", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323262546, "level": "INFO", "rid": "gw-a48f64", "event": "checkout.start", "order_id": "O-10262"}
+{"ts": 1789323262553, "level": "INFO", "rid": "gw-a48f64", "event": "payments.call", "payment_ref": "pr-000166", "attempt": 1}
+{"ts": 1789323262560, "level": "WARN", "rid": "gw-a48f64", "event": "payments.response", "payment_ref": "pr-000166", "attempt": 1, "status": 503}
+{"ts": 1789323262561, "level": "INFO", "rid": "gw-a48f64", "event": "payments.call", "payment_ref": "pr-000166", "attempt": 2}
+{"ts": 1789323262572, "level": "WARN", "rid": "gw-a48f64", "event": "payments.response", "payment_ref": "pr-000166", "attempt": 2, "status": 503}
+{"ts": 1789323262573, "level": "INFO", "rid": "gw-a48f64", "event": "payments.call", "payment_ref": "pr-000166", "attempt": 3}
+{"ts": 1789323262582, "level": "WARN", "rid": "gw-a48f64", "event": "payments.response", "payment_ref": "pr-000166", "attempt": 3, "status": 503}
+{"ts": 1789323262583, "level": "INFO", "rid": "gw-a48f64", "event": "payments.call", "payment_ref": "pr-000166", "attempt": 4}
+{"ts": 1789323262593, "level": "WARN", "rid": "gw-a48f64", "event": "payments.response", "payment_ref": "pr-000166", "attempt": 4, "status": 503}
+{"ts": 1789323262594, "level": "INFO", "rid": "gw-a48f64", "event": "payments.call", "payment_ref": "pr-000166", "attempt": 5}
+{"ts": 1789323262603, "level": "WARN", "rid": "gw-a48f64", "event": "payments.response", "payment_ref": "pr-000166", "attempt": 5, "status": 503}
+{"ts": 1789323262604, "level": "INFO", "rid": "gw-a48f64", "event": "payments.call", "payment_ref": "pr-000166", "attempt": 6}
+{"ts": 1789323262674, "level": "INFO", "rid": "gw-a48f64", "event": "payments.response", "payment_ref": "pr-000166", "attempt": 6, "status": 200}
+{"ts": 1789323262679, "level": "INFO", "rid": "gw-a48f64", "event": "checkout.done", "order_id": "O-10262"}
+{"ts": 1789323265269, "level": "INFO", "rid": "gw-8c8502", "event": "checkout.start", "order_id": "O-10248"}
+{"ts": 1789323265278, "level": "INFO", "rid": "gw-8c8502", "event": "payments.call", "payment_ref": "pr-000167", "attempt": 1}
+{"ts": 1789323265288, "level": "WARN", "rid": "gw-8c8502", "event": "payments.response", "payment_ref": "pr-000167", "attempt": 1, "status": 503}
+{"ts": 1789323265289, "level": "INFO", "rid": "gw-8c8502", "event": "payments.call", "payment_ref": "pr-000167", "attempt": 2}
+{"ts": 1789323265303, "level": "WARN", "rid": "gw-8c8502", "event": "payments.response", "payment_ref": "pr-000167", "attempt": 2, "status": 503}
+{"ts": 1789323265304, "level": "INFO", "rid": "gw-8c8502", "event": "payments.call", "payment_ref": "pr-000167", "attempt": 3}
+{"ts": 1789323265320, "level": "WARN", "rid": "gw-8c8502", "event": "payments.response", "payment_ref": "pr-000167", "attempt": 3, "status": 503}
+{"ts": 1789323265321, "level": "INFO", "rid": "gw-8c8502", "event": "payments.call", "payment_ref": "pr-000167", "attempt": 4}
+{"ts": 1789323265331, "level": "WARN", "rid": "gw-8c8502", "event": "payments.response", "payment_ref": "pr-000167", "attempt": 4, "status": 503}
+{"ts": 1789323265332, "level": "INFO", "rid": "gw-8c8502", "event": "payments.call", "payment_ref": "pr-000167", "attempt": 5}
+{"ts": 1789323265338, "level": "WARN", "rid": "gw-8c8502", "event": "payments.response", "payment_ref": "pr-000167", "attempt": 5, "status": 503}
+{"ts": 1789323265339, "level": "INFO", "rid": "gw-8c8502", "event": "payments.call", "payment_ref": "pr-000167", "attempt": 6}
+{"ts": 1789323265349, "level": "WARN", "rid": "gw-8c8502", "event": "payments.response", "payment_ref": "pr-000167", "attempt": 6, "status": 503}
+{"ts": 1789323265353, "level": "ERROR", "rid": "gw-8c8502", "event": "checkout.failed", "order_id": "O-10248", "payment_ref": "pr-000167", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323265971, "level": "INFO", "rid": "gw-1942f2", "event": "checkout.start", "order_id": "O-10251"}
+{"ts": 1789323265986, "level": "INFO", "rid": "gw-1942f2", "event": "payments.call", "payment_ref": "pr-000168", "attempt": 1}
+{"ts": 1789323265995, "level": "WARN", "rid": "gw-1942f2", "event": "payments.response", "payment_ref": "pr-000168", "attempt": 1, "status": 503}
+{"ts": 1789323265996, "level": "INFO", "rid": "gw-1942f2", "event": "payments.call", "payment_ref": "pr-000168", "attempt": 2}
+{"ts": 1789323266002, "level": "WARN", "rid": "gw-1942f2", "event": "payments.response", "payment_ref": "pr-000168", "attempt": 2, "status": 503}
+{"ts": 1789323266003, "level": "INFO", "rid": "gw-1942f2", "event": "payments.call", "payment_ref": "pr-000168", "attempt": 3}
+{"ts": 1789323266018, "level": "WARN", "rid": "gw-1942f2", "event": "payments.response", "payment_ref": "pr-000168", "attempt": 3, "status": 503}
+{"ts": 1789323266019, "level": "INFO", "rid": "gw-1942f2", "event": "payments.call", "payment_ref": "pr-000168", "attempt": 4}
+{"ts": 1789323266032, "level": "WARN", "rid": "gw-1942f2", "event": "payments.response", "payment_ref": "pr-000168", "attempt": 4, "status": 503}
+{"ts": 1789323266033, "level": "INFO", "rid": "gw-1942f2", "event": "payments.call", "payment_ref": "pr-000168", "attempt": 5}
+{"ts": 1789323266804, "level": "INFO", "rid": "gw-940243", "event": "checkout.start", "order_id": "O-10263"}
+{"ts": 1789323266816, "level": "INFO", "rid": "gw-940243", "event": "payments.call", "payment_ref": "pr-000169", "attempt": 1}
+{"ts": 1789323266824, "level": "WARN", "rid": "gw-940243", "event": "payments.response", "payment_ref": "pr-000169", "attempt": 1, "status": 503}
+{"ts": 1789323266825, "level": "INFO", "rid": "gw-940243", "event": "payments.call", "payment_ref": "pr-000169", "attempt": 2}
+{"ts": 1789323266833, "level": "WARN", "rid": "gw-1942f2", "event": "payments.timeout", "payment_ref": "pr-000168", "attempt": 5, "timeout_ms": 800}
+{"ts": 1789323266835, "level": "INFO", "rid": "gw-1942f2", "event": "payments.call", "payment_ref": "pr-000168", "attempt": 6}
+{"ts": 1789323266840, "level": "WARN", "rid": "gw-940243", "event": "payments.response", "payment_ref": "pr-000169", "attempt": 2, "status": 503}
+{"ts": 1789323266841, "level": "INFO", "rid": "gw-940243", "event": "payments.call", "payment_ref": "pr-000169", "attempt": 3}
+{"ts": 1789323266844, "level": "WARN", "rid": "gw-1942f2", "event": "payments.response", "payment_ref": "pr-000168", "attempt": 6, "status": 503}
+{"ts": 1789323266848, "level": "ERROR", "rid": "gw-1942f2", "event": "checkout.failed", "order_id": "O-10251", "payment_ref": "pr-000168", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323266856, "level": "WARN", "rid": "gw-940243", "event": "payments.response", "payment_ref": "pr-000169", "attempt": 3, "status": 503}
+{"ts": 1789323266857, "level": "INFO", "rid": "gw-940243", "event": "payments.call", "payment_ref": "pr-000169", "attempt": 4}
+{"ts": 1789323266868, "level": "WARN", "rid": "gw-940243", "event": "payments.response", "payment_ref": "pr-000169", "attempt": 4, "status": 503}
+{"ts": 1789323266869, "level": "INFO", "rid": "gw-940243", "event": "payments.call", "payment_ref": "pr-000169", "attempt": 5}
+{"ts": 1789323266879, "level": "WARN", "rid": "gw-940243", "event": "payments.response", "payment_ref": "pr-000169", "attempt": 5, "status": 503}
+{"ts": 1789323266880, "level": "INFO", "rid": "gw-940243", "event": "payments.call", "payment_ref": "pr-000169", "attempt": 6}
+{"ts": 1789323266892, "level": "WARN", "rid": "gw-940243", "event": "payments.response", "payment_ref": "pr-000169", "attempt": 6, "status": 503}
+{"ts": 1789323266896, "level": "ERROR", "rid": "gw-940243", "event": "checkout.failed", "order_id": "O-10263", "payment_ref": "pr-000169", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323271768, "level": "INFO", "rid": "gw-92da79", "event": "checkout.start", "order_id": "O-10264"}
+{"ts": 1789323271780, "level": "INFO", "rid": "gw-92da79", "event": "payments.call", "payment_ref": "pr-000170", "attempt": 1}
+{"ts": 1789323271792, "level": "WARN", "rid": "gw-92da79", "event": "payments.response", "payment_ref": "pr-000170", "attempt": 1, "status": 503}
+{"ts": 1789323271793, "level": "INFO", "rid": "gw-92da79", "event": "payments.call", "payment_ref": "pr-000170", "attempt": 2}
+{"ts": 1789323271803, "level": "WARN", "rid": "gw-92da79", "event": "payments.response", "payment_ref": "pr-000170", "attempt": 2, "status": 503}
+{"ts": 1789323271804, "level": "INFO", "rid": "gw-92da79", "event": "payments.call", "payment_ref": "pr-000170", "attempt": 3}
+{"ts": 1789323271814, "level": "WARN", "rid": "gw-92da79", "event": "payments.response", "payment_ref": "pr-000170", "attempt": 3, "status": 503}
+{"ts": 1789323271815, "level": "INFO", "rid": "gw-92da79", "event": "payments.call", "payment_ref": "pr-000170", "attempt": 4}
+{"ts": 1789323271829, "level": "WARN", "rid": "gw-92da79", "event": "payments.response", "payment_ref": "pr-000170", "attempt": 4, "status": 503}
+{"ts": 1789323271830, "level": "INFO", "rid": "gw-92da79", "event": "payments.call", "payment_ref": "pr-000170", "attempt": 5}
+{"ts": 1789323271846, "level": "WARN", "rid": "gw-92da79", "event": "payments.response", "payment_ref": "pr-000170", "attempt": 5, "status": 503}
+{"ts": 1789323271847, "level": "INFO", "rid": "gw-92da79", "event": "payments.call", "payment_ref": "pr-000170", "attempt": 6}
+{"ts": 1789323271863, "level": "WARN", "rid": "gw-92da79", "event": "payments.response", "payment_ref": "pr-000170", "attempt": 6, "status": 503}
+{"ts": 1789323271867, "level": "ERROR", "rid": "gw-92da79", "event": "checkout.failed", "order_id": "O-10264", "payment_ref": "pr-000170", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323272621, "level": "INFO", "rid": "gw-2aa68f", "event": "checkout.start", "order_id": "O-10265"}
+{"ts": 1789323272636, "level": "INFO", "rid": "gw-2aa68f", "event": "payments.call", "payment_ref": "pr-000171", "attempt": 1}
+{"ts": 1789323272647, "level": "WARN", "rid": "gw-2aa68f", "event": "payments.response", "payment_ref": "pr-000171", "attempt": 1, "status": 503}
+{"ts": 1789323272648, "level": "INFO", "rid": "gw-2aa68f", "event": "payments.call", "payment_ref": "pr-000171", "attempt": 2}
+{"ts": 1789323272661, "level": "WARN", "rid": "gw-2aa68f", "event": "payments.response", "payment_ref": "pr-000171", "attempt": 2, "status": 503}
+{"ts": 1789323272662, "level": "INFO", "rid": "gw-2aa68f", "event": "payments.call", "payment_ref": "pr-000171", "attempt": 3}
+{"ts": 1789323272676, "level": "WARN", "rid": "gw-2aa68f", "event": "payments.response", "payment_ref": "pr-000171", "attempt": 3, "status": 503}
+{"ts": 1789323272677, "level": "INFO", "rid": "gw-2aa68f", "event": "payments.call", "payment_ref": "pr-000171", "attempt": 4}
+{"ts": 1789323272685, "level": "WARN", "rid": "gw-2aa68f", "event": "payments.response", "payment_ref": "pr-000171", "attempt": 4, "status": 503}
+{"ts": 1789323272686, "level": "INFO", "rid": "gw-2aa68f", "event": "payments.call", "payment_ref": "pr-000171", "attempt": 5}
+{"ts": 1789323272700, "level": "WARN", "rid": "gw-2aa68f", "event": "payments.response", "payment_ref": "pr-000171", "attempt": 5, "status": 503}
+{"ts": 1789323272701, "level": "INFO", "rid": "gw-2aa68f", "event": "payments.call", "payment_ref": "pr-000171", "attempt": 6}
+{"ts": 1789323272708, "level": "WARN", "rid": "gw-2aa68f", "event": "payments.response", "payment_ref": "pr-000171", "attempt": 6, "status": 503}
+{"ts": 1789323272712, "level": "ERROR", "rid": "gw-2aa68f", "event": "checkout.failed", "order_id": "O-10265", "payment_ref": "pr-000171", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323275414, "level": "INFO", "rid": "gw-3c1ad4", "event": "order.get", "order_id": "O-10213"}
+{"ts": 1789323278046, "level": "INFO", "rid": "gw-078f77", "event": "order.get", "order_id": "O-10212"}
+{"ts": 1789323280065, "level": "INFO", "rid": "gw-d20bba", "event": "checkout.start", "order_id": "O-10266"}
+{"ts": 1789323280073, "level": "INFO", "rid": "gw-d20bba", "event": "payments.call", "payment_ref": "pr-000172", "attempt": 1}
+{"ts": 1789323280082, "level": "WARN", "rid": "gw-d20bba", "event": "payments.response", "payment_ref": "pr-000172", "attempt": 1, "status": 503}
+{"ts": 1789323280083, "level": "INFO", "rid": "gw-d20bba", "event": "payments.call", "payment_ref": "pr-000172", "attempt": 2}
+{"ts": 1789323280090, "level": "WARN", "rid": "gw-d20bba", "event": "payments.response", "payment_ref": "pr-000172", "attempt": 2, "status": 503}
+{"ts": 1789323280091, "level": "INFO", "rid": "gw-d20bba", "event": "payments.call", "payment_ref": "pr-000172", "attempt": 3}
+{"ts": 1789323280167, "level": "INFO", "rid": "gw-d20bba", "event": "payments.response", "payment_ref": "pr-000172", "attempt": 3, "status": 200}
+{"ts": 1789323280172, "level": "INFO", "rid": "gw-d20bba", "event": "checkout.done", "order_id": "O-10266"}
+{"ts": 1789323282591, "level": "INFO", "rid": "gw-d4310d", "event": "checkout.start", "order_id": "O-10267"}
+{"ts": 1789323282604, "level": "INFO", "rid": "gw-d4310d", "event": "payments.call", "payment_ref": "pr-000173", "attempt": 1}
+{"ts": 1789323282610, "level": "WARN", "rid": "gw-d4310d", "event": "payments.response", "payment_ref": "pr-000173", "attempt": 1, "status": 503}
+{"ts": 1789323282611, "level": "INFO", "rid": "gw-d4310d", "event": "payments.call", "payment_ref": "pr-000173", "attempt": 2}
+{"ts": 1789323282626, "level": "WARN", "rid": "gw-d4310d", "event": "payments.response", "payment_ref": "pr-000173", "attempt": 2, "status": 503}
+{"ts": 1789323282627, "level": "INFO", "rid": "gw-d4310d", "event": "payments.call", "payment_ref": "pr-000173", "attempt": 3}
+{"ts": 1789323282635, "level": "WARN", "rid": "gw-d4310d", "event": "payments.response", "payment_ref": "pr-000173", "attempt": 3, "status": 503}
+{"ts": 1789323282636, "level": "INFO", "rid": "gw-d4310d", "event": "payments.call", "payment_ref": "pr-000173", "attempt": 4}
+{"ts": 1789323282650, "level": "WARN", "rid": "gw-d4310d", "event": "payments.response", "payment_ref": "pr-000173", "attempt": 4, "status": 503}
+{"ts": 1789323282651, "level": "INFO", "rid": "gw-d4310d", "event": "payments.call", "payment_ref": "pr-000173", "attempt": 5}
+{"ts": 1789323282657, "level": "WARN", "rid": "gw-d4310d", "event": "payments.response", "payment_ref": "pr-000173", "attempt": 5, "status": 503}
+{"ts": 1789323282658, "level": "INFO", "rid": "gw-d4310d", "event": "payments.call", "payment_ref": "pr-000173", "attempt": 6}
+{"ts": 1789323282674, "level": "WARN", "rid": "gw-d4310d", "event": "payments.response", "payment_ref": "pr-000173", "attempt": 6, "status": 503}
+{"ts": 1789323282678, "level": "ERROR", "rid": "gw-d4310d", "event": "checkout.failed", "order_id": "O-10267", "payment_ref": "pr-000173", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323283706, "level": "INFO", "rid": "gw-948e4f", "event": "checkout.start", "order_id": "O-10268"}
+{"ts": 1789323283717, "level": "INFO", "rid": "gw-948e4f", "event": "payments.call", "payment_ref": "pr-000174", "attempt": 1}
+{"ts": 1789323283725, "level": "WARN", "rid": "gw-948e4f", "event": "payments.response", "payment_ref": "pr-000174", "attempt": 1, "status": 503}
+{"ts": 1789323283726, "level": "INFO", "rid": "gw-948e4f", "event": "payments.call", "payment_ref": "pr-000174", "attempt": 2}
+{"ts": 1789323283736, "level": "WARN", "rid": "gw-948e4f", "event": "payments.response", "payment_ref": "pr-000174", "attempt": 2, "status": 503}
+{"ts": 1789323283737, "level": "INFO", "rid": "gw-948e4f", "event": "payments.call", "payment_ref": "pr-000174", "attempt": 3}
+{"ts": 1789323283752, "level": "WARN", "rid": "gw-948e4f", "event": "payments.response", "payment_ref": "pr-000174", "attempt": 3, "status": 503}
+{"ts": 1789323283753, "level": "INFO", "rid": "gw-948e4f", "event": "payments.call", "payment_ref": "pr-000174", "attempt": 4}
+{"ts": 1789323283841, "level": "INFO", "rid": "gw-948e4f", "event": "payments.response", "payment_ref": "pr-000174", "attempt": 4, "status": 200}
+{"ts": 1789323283846, "level": "INFO", "rid": "gw-948e4f", "event": "checkout.done", "order_id": "O-10268"}
+{"ts": 1789323286756, "level": "INFO", "rid": "gw-47736c", "event": "checkout.start", "order_id": "O-10269"}
+{"ts": 1789323286769, "level": "INFO", "rid": "gw-47736c", "event": "payments.call", "payment_ref": "pr-000175", "attempt": 1}
+{"ts": 1789323286776, "level": "WARN", "rid": "gw-47736c", "event": "payments.response", "payment_ref": "pr-000175", "attempt": 1, "status": 503}
+{"ts": 1789323286777, "level": "INFO", "rid": "gw-47736c", "event": "payments.call", "payment_ref": "pr-000175", "attempt": 2}
+{"ts": 1789323286784, "level": "WARN", "rid": "gw-47736c", "event": "payments.response", "payment_ref": "pr-000175", "attempt": 2, "status": 503}
+{"ts": 1789323286785, "level": "INFO", "rid": "gw-47736c", "event": "payments.call", "payment_ref": "pr-000175", "attempt": 3}
+{"ts": 1789323286796, "level": "WARN", "rid": "gw-47736c", "event": "payments.response", "payment_ref": "pr-000175", "attempt": 3, "status": 503}
+{"ts": 1789323286797, "level": "INFO", "rid": "gw-47736c", "event": "payments.call", "payment_ref": "pr-000175", "attempt": 4}
+{"ts": 1789323286810, "level": "WARN", "rid": "gw-47736c", "event": "payments.response", "payment_ref": "pr-000175", "attempt": 4, "status": 503}
+{"ts": 1789323286811, "level": "INFO", "rid": "gw-47736c", "event": "payments.call", "payment_ref": "pr-000175", "attempt": 5}
+{"ts": 1789323286820, "level": "WARN", "rid": "gw-47736c", "event": "payments.response", "payment_ref": "pr-000175", "attempt": 5, "status": 503}
+{"ts": 1789323286821, "level": "INFO", "rid": "gw-47736c", "event": "payments.call", "payment_ref": "pr-000175", "attempt": 6}
+{"ts": 1789323286830, "level": "WARN", "rid": "gw-47736c", "event": "payments.response", "payment_ref": "pr-000175", "attempt": 6, "status": 503}
+{"ts": 1789323286834, "level": "ERROR", "rid": "gw-47736c", "event": "checkout.failed", "order_id": "O-10269", "payment_ref": "pr-000175", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323287936, "level": "INFO", "rid": "gw-ed4530", "event": "order.get", "order_id": "O-10269"}
+{"ts": 1789323290661, "level": "INFO", "rid": "gw-2935da", "event": "checkout.start", "order_id": "O-10263"}
+{"ts": 1789323290669, "level": "INFO", "rid": "gw-2935da", "event": "payments.call", "payment_ref": "pr-000176", "attempt": 1}
+{"ts": 1789323290680, "level": "WARN", "rid": "gw-2935da", "event": "payments.response", "payment_ref": "pr-000176", "attempt": 1, "status": 503}
+{"ts": 1789323290681, "level": "INFO", "rid": "gw-2935da", "event": "payments.call", "payment_ref": "pr-000176", "attempt": 2}
+{"ts": 1789323290693, "level": "WARN", "rid": "gw-2935da", "event": "payments.response", "payment_ref": "pr-000176", "attempt": 2, "status": 503}
+{"ts": 1789323290694, "level": "INFO", "rid": "gw-2935da", "event": "payments.call", "payment_ref": "pr-000176", "attempt": 3}
+{"ts": 1789323290709, "level": "WARN", "rid": "gw-2935da", "event": "payments.response", "payment_ref": "pr-000176", "attempt": 3, "status": 503}
+{"ts": 1789323290710, "level": "INFO", "rid": "gw-2935da", "event": "payments.call", "payment_ref": "pr-000176", "attempt": 4}
+{"ts": 1789323290725, "level": "WARN", "rid": "gw-2935da", "event": "payments.response", "payment_ref": "pr-000176", "attempt": 4, "status": 503}
+{"ts": 1789323290726, "level": "INFO", "rid": "gw-2935da", "event": "payments.call", "payment_ref": "pr-000176", "attempt": 5}
+{"ts": 1789323290735, "level": "WARN", "rid": "gw-2935da", "event": "payments.response", "payment_ref": "pr-000176", "attempt": 5, "status": 503}
+{"ts": 1789323290736, "level": "INFO", "rid": "gw-2935da", "event": "payments.call", "payment_ref": "pr-000176", "attempt": 6}
+{"ts": 1789323290746, "level": "WARN", "rid": "gw-2935da", "event": "payments.response", "payment_ref": "pr-000176", "attempt": 6, "status": 503}
+{"ts": 1789323290750, "level": "ERROR", "rid": "gw-2935da", "event": "checkout.failed", "order_id": "O-10263", "payment_ref": "pr-000176", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323294806, "level": "INFO", "rid": "gw-3b23c8", "event": "order.get", "order_id": "O-10206"}
+{"ts": 1789323297584, "level": "INFO", "rid": "gw-5bb5b7", "event": "checkout.start", "order_id": "O-10270"}
+{"ts": 1789323297591, "level": "INFO", "rid": "gw-5bb5b7", "event": "payments.call", "payment_ref": "pr-000177", "attempt": 1}
+{"ts": 1789323297598, "level": "WARN", "rid": "gw-5bb5b7", "event": "payments.response", "payment_ref": "pr-000177", "attempt": 1, "status": 503}
+{"ts": 1789323297599, "level": "INFO", "rid": "gw-5bb5b7", "event": "payments.call", "payment_ref": "pr-000177", "attempt": 2}
+{"ts": 1789323297613, "level": "WARN", "rid": "gw-5bb5b7", "event": "payments.response", "payment_ref": "pr-000177", "attempt": 2, "status": 503}
+{"ts": 1789323297614, "level": "INFO", "rid": "gw-5bb5b7", "event": "payments.call", "payment_ref": "pr-000177", "attempt": 3}
+{"ts": 1789323297621, "level": "WARN", "rid": "gw-5bb5b7", "event": "payments.response", "payment_ref": "pr-000177", "attempt": 3, "status": 503}
+{"ts": 1789323297622, "level": "INFO", "rid": "gw-5bb5b7", "event": "payments.call", "payment_ref": "pr-000177", "attempt": 4}
+{"ts": 1789323297629, "level": "WARN", "rid": "gw-5bb5b7", "event": "payments.response", "payment_ref": "pr-000177", "attempt": 4, "status": 503}
+{"ts": 1789323297630, "level": "INFO", "rid": "gw-5bb5b7", "event": "payments.call", "payment_ref": "pr-000177", "attempt": 5}
+{"ts": 1789323297639, "level": "WARN", "rid": "gw-5bb5b7", "event": "payments.response", "payment_ref": "pr-000177", "attempt": 5, "status": 503}
+{"ts": 1789323297640, "level": "INFO", "rid": "gw-5bb5b7", "event": "payments.call", "payment_ref": "pr-000177", "attempt": 6}
+{"ts": 1789323297652, "level": "WARN", "rid": "gw-5bb5b7", "event": "payments.response", "payment_ref": "pr-000177", "attempt": 6, "status": 503}
+{"ts": 1789323297656, "level": "ERROR", "rid": "gw-5bb5b7", "event": "checkout.failed", "order_id": "O-10270", "payment_ref": "pr-000177", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323300469, "level": "INFO", "rid": "gw-c5ac4c", "event": "checkout.start", "order_id": "O-10271"}
+{"ts": 1789323300477, "level": "INFO", "rid": "gw-c5ac4c", "event": "payments.call", "payment_ref": "pr-000178", "attempt": 1}
+{"ts": 1789323300493, "level": "WARN", "rid": "gw-c5ac4c", "event": "payments.response", "payment_ref": "pr-000178", "attempt": 1, "status": 503}
+{"ts": 1789323300494, "level": "INFO", "rid": "gw-c5ac4c", "event": "payments.call", "payment_ref": "pr-000178", "attempt": 2}
+{"ts": 1789323300506, "level": "WARN", "rid": "gw-c5ac4c", "event": "payments.response", "payment_ref": "pr-000178", "attempt": 2, "status": 503}
+{"ts": 1789323300507, "level": "INFO", "rid": "gw-c5ac4c", "event": "payments.call", "payment_ref": "pr-000178", "attempt": 3}
+{"ts": 1789323300522, "level": "WARN", "rid": "gw-c5ac4c", "event": "payments.response", "payment_ref": "pr-000178", "attempt": 3, "status": 503}
+{"ts": 1789323300523, "level": "INFO", "rid": "gw-c5ac4c", "event": "payments.call", "payment_ref": "pr-000178", "attempt": 4}
+{"ts": 1789323300535, "level": "WARN", "rid": "gw-c5ac4c", "event": "payments.response", "payment_ref": "pr-000178", "attempt": 4, "status": 503}
+{"ts": 1789323300536, "level": "INFO", "rid": "gw-c5ac4c", "event": "payments.call", "payment_ref": "pr-000178", "attempt": 5}
+{"ts": 1789323300550, "level": "WARN", "rid": "gw-c5ac4c", "event": "payments.response", "payment_ref": "pr-000178", "attempt": 5, "status": 503}
+{"ts": 1789323300551, "level": "INFO", "rid": "gw-c5ac4c", "event": "payments.call", "payment_ref": "pr-000178", "attempt": 6}
+{"ts": 1789323300560, "level": "WARN", "rid": "gw-c5ac4c", "event": "payments.response", "payment_ref": "pr-000178", "attempt": 6, "status": 503}
+{"ts": 1789323300564, "level": "ERROR", "rid": "gw-c5ac4c", "event": "checkout.failed", "order_id": "O-10271", "payment_ref": "pr-000178", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323301767, "level": "INFO", "rid": "gw-a81eb6", "event": "order.get", "order_id": "O-10244"}
+{"ts": 1789323305815, "level": "INFO", "rid": "gw-fba44c", "event": "order.get", "order_id": "O-10259"}
+{"ts": 1789323306710, "level": "INFO", "rid": "gw-c42aac", "event": "checkout.start", "order_id": "O-10272"}
+{"ts": 1789323306718, "level": "INFO", "rid": "gw-c42aac", "event": "payments.call", "payment_ref": "pr-000179", "attempt": 1}
+{"ts": 1789323306731, "level": "WARN", "rid": "gw-c42aac", "event": "payments.response", "payment_ref": "pr-000179", "attempt": 1, "status": 503}
+{"ts": 1789323306732, "level": "INFO", "rid": "gw-c42aac", "event": "payments.call", "payment_ref": "pr-000179", "attempt": 2}
+{"ts": 1789323306745, "level": "WARN", "rid": "gw-c42aac", "event": "payments.response", "payment_ref": "pr-000179", "attempt": 2, "status": 503}
+{"ts": 1789323306746, "level": "INFO", "rid": "gw-c42aac", "event": "payments.call", "payment_ref": "pr-000179", "attempt": 3}
+{"ts": 1789323306752, "level": "WARN", "rid": "gw-c42aac", "event": "payments.response", "payment_ref": "pr-000179", "attempt": 3, "status": 503}
+{"ts": 1789323306753, "level": "INFO", "rid": "gw-c42aac", "event": "payments.call", "payment_ref": "pr-000179", "attempt": 4}
+{"ts": 1789323306762, "level": "WARN", "rid": "gw-c42aac", "event": "payments.response", "payment_ref": "pr-000179", "attempt": 4, "status": 503}
+{"ts": 1789323306763, "level": "INFO", "rid": "gw-c42aac", "event": "payments.call", "payment_ref": "pr-000179", "attempt": 5}
+{"ts": 1789323306772, "level": "WARN", "rid": "gw-c42aac", "event": "payments.response", "payment_ref": "pr-000179", "attempt": 5, "status": 503}
+{"ts": 1789323306773, "level": "INFO", "rid": "gw-c42aac", "event": "payments.call", "payment_ref": "pr-000179", "attempt": 6}
+{"ts": 1789323306779, "level": "WARN", "rid": "gw-c42aac", "event": "payments.response", "payment_ref": "pr-000179", "attempt": 6, "status": 503}
+{"ts": 1789323306783, "level": "ERROR", "rid": "gw-c42aac", "event": "checkout.failed", "order_id": "O-10272", "payment_ref": "pr-000179", "msg": "payments unavailable after 6 attempts"}
+{"ts": 1789323308537, "level": "INFO", "rid": "gw-2e6caa", "event": "order.get", "order_id": "O-10229"}
+{"ts": 1789323310674, "level": "INFO", "rid": "gw-fa49d7", "event": "checkout.start", "order_id": "O-10273"}
+{"ts": 1789323310689, "level": "INFO", "rid": "gw-fa49d7", "event": "payments.call", "payment_ref": "pr-000180", "attempt": 1}
+{"ts": 1789323310720, "level": "INFO", "rid": "gw-fa49d7", "event": "payments.response", "payment_ref": "pr-000180", "attempt": 1, "status": 200}
+{"ts": 1789323310725, "level": "INFO", "rid": "gw-fa49d7", "event": "checkout.done", "order_id": "O-10273"}
+{"ts": 1789323312992, "level": "INFO", "rid": "gw-efd2a7", "event": "order.get", "order_id": "O-10200"}
+{"ts": 1789323315675, "level": "INFO", "rid": "gw-14b674", "event": "checkout.start", "order_id": "O-10267"}
+{"ts": 1789323315686, "level": "INFO", "rid": "gw-14b674", "event": "payments.call", "payment_ref": "pr-000181", "attempt": 1}
+{"ts": 1789323315751, "level": "INFO", "rid": "gw-14b674", "event": "payments.response", "payment_ref": "pr-000181", "attempt": 1, "status": 200}
+{"ts": 1789323315756, "level": "INFO", "rid": "gw-14b674", "event": "checkout.done", "order_id": "O-10267"}
+{"ts": 1789323317298, "level": "INFO", "rid": "gw-9cbbb7", "event": "order.get", "order_id": "O-10207"}
+{"ts": 1789323318317, "level": "INFO", "rid": "gw-fff0ad", "event": "checkout.start", "order_id": "O-10274"}
+{"ts": 1789323318330, "level": "INFO", "rid": "gw-fff0ad", "event": "payments.call", "payment_ref": "pr-000182", "attempt": 1}
+{"ts": 1789323318387, "level": "INFO", "rid": "gw-fff0ad", "event": "payments.response", "payment_ref": "pr-000182", "attempt": 1, "status": 200}
+{"ts": 1789323318392, "level": "INFO", "rid": "gw-fff0ad", "event": "checkout.done", "order_id": "O-10274"}
+{"ts": 1789323320973, "level": "INFO", "rid": "gw-e1a37f", "event": "checkout.start", "order_id": "O-10275"}
+{"ts": 1789323320978, "level": "INFO", "rid": "gw-e1a37f", "event": "payments.call", "payment_ref": "pr-000183", "attempt": 1}
+{"ts": 1789323321021, "level": "INFO", "rid": "gw-e1a37f", "event": "payments.response", "payment_ref": "pr-000183", "attempt": 1, "status": 200}
+{"ts": 1789323321026, "level": "INFO", "rid": "gw-e1a37f", "event": "checkout.done", "order_id": "O-10275"}
+{"ts": 1789323321702, "level": "INFO", "rid": "gw-9e0d6e", "event": "checkout.start", "order_id": "O-10270"}
+{"ts": 1789323321709, "level": "INFO", "rid": "gw-9e0d6e", "event": "payments.call", "payment_ref": "pr-000184", "attempt": 1}
+{"ts": 1789323321767, "level": "INFO", "rid": "gw-9e0d6e", "event": "payments.response", "payment_ref": "pr-000184", "attempt": 1, "status": 200}
+{"ts": 1789323321772, "level": "INFO", "rid": "gw-9e0d6e", "event": "checkout.done", "order_id": "O-10270"}
+{"ts": 1789323322436, "level": "INFO", "rid": "gw-50784f", "event": "checkout.start", "order_id": "O-10276"}
+{"ts": 1789323322451, "level": "INFO", "rid": "gw-50784f", "event": "payments.call", "payment_ref": "pr-000185", "attempt": 1}
+{"ts": 1789323322514, "level": "INFO", "rid": "gw-50784f", "event": "payments.response", "payment_ref": "pr-000185", "attempt": 1, "status": 200}
+{"ts": 1789323322519, "level": "INFO", "rid": "gw-50784f", "event": "checkout.done", "order_id": "O-10276"}
+{"ts": 1789323323939, "level": "INFO", "rid": "gw-7a4601", "event": "order.get", "order_id": "O-10265"}
+{"ts": 1789323326485, "level": "INFO", "rid": "gw-6a247d", "event": "checkout.start", "order_id": "O-10277"}
+{"ts": 1789323326497, "level": "INFO", "rid": "gw-6a247d", "event": "payments.call", "payment_ref": "pr-000186", "attempt": 1}
+{"ts": 1789323326542, "level": "INFO", "rid": "gw-6a247d", "event": "payments.response", "payment_ref": "pr-000186", "attempt": 1, "status": 200}
+{"ts": 1789323326547, "level": "INFO", "rid": "gw-6a247d", "event": "checkout.done", "order_id": "O-10277"}
+{"ts": 1789323328428, "level": "INFO", "rid": "gw-fe23d6", "event": "checkout.start", "order_id": "O-10264"}
+{"ts": 1789323328439, "level": "INFO", "rid": "gw-fe23d6", "event": "payments.call", "payment_ref": "pr-000187", "attempt": 1}
+{"ts": 1789323328522, "level": "INFO", "rid": "gw-fe23d6", "event": "payments.response", "payment_ref": "pr-000187", "attempt": 1, "status": 200}
+{"ts": 1789323328527, "level": "INFO", "rid": "gw-fe23d6", "event": "checkout.done", "order_id": "O-10264"}
+{"ts": 1789323328780, "level": "INFO", "rid": "gw-b1a759", "event": "checkout.start", "order_id": "O-10278"}
+{"ts": 1789323328791, "level": "INFO", "rid": "gw-b1a759", "event": "payments.call", "payment_ref": "pr-000188", "attempt": 1}
+{"ts": 1789323328839, "level": "INFO", "rid": "gw-b1a759", "event": "payments.response", "payment_ref": "pr-000188", "attempt": 1, "status": 200}
+{"ts": 1789323328844, "level": "INFO", "rid": "gw-b1a759", "event": "checkout.done", "order_id": "O-10278"}
+{"ts": 1789323329951, "level": "INFO", "rid": "gw-5865d9", "event": "order.get", "order_id": "O-10257"}
+{"ts": 1789323332774, "level": "INFO", "rid": "gw-2de8d7", "event": "checkout.start", "order_id": "O-10265"}
+{"ts": 1789323332785, "level": "INFO", "rid": "gw-2de8d7", "event": "payments.call", "payment_ref": "pr-000189", "attempt": 1}
+{"ts": 1789323332814, "level": "INFO", "rid": "gw-2de8d7", "event": "payments.response", "payment_ref": "pr-000189", "attempt": 1, "status": 200}
+{"ts": 1789323332819, "level": "INFO", "rid": "gw-2de8d7", "event": "checkout.done", "order_id": "O-10265"}
+{"ts": 1789323333611, "level": "INFO", "rid": "gw-03c1db", "event": "checkout.start", "order_id": "O-10279"}
+{"ts": 1789323333618, "level": "INFO", "rid": "gw-03c1db", "event": "payments.call", "payment_ref": "pr-000190", "attempt": 1}
+{"ts": 1789323333673, "level": "INFO", "rid": "gw-03c1db", "event": "payments.response", "payment_ref": "pr-000190", "attempt": 1, "status": 200}
+{"ts": 1789323333678, "level": "INFO", "rid": "gw-03c1db", "event": "checkout.done", "order_id": "O-10279"}
+{"ts": 1789323334898, "level": "INFO", "rid": "gw-866b9d", "event": "checkout.start", "order_id": "O-10280"}
+{"ts": 1789323334909, "level": "INFO", "rid": "gw-866b9d", "event": "payments.call", "payment_ref": "pr-000191", "attempt": 1}
+{"ts": 1789323334954, "level": "INFO", "rid": "gw-866b9d", "event": "payments.response", "payment_ref": "pr-000191", "attempt": 1, "status": 200}
+{"ts": 1789323334959, "level": "INFO", "rid": "gw-866b9d", "event": "checkout.done", "order_id": "O-10280"}
+{"ts": 1789323336927, "level": "INFO", "rid": "gw-90f65d", "event": "checkout.start", "order_id": "O-10281"}
+{"ts": 1789323336938, "level": "INFO", "rid": "gw-90f65d", "event": "payments.call", "payment_ref": "pr-000192", "attempt": 1}
+{"ts": 1789323336978, "level": "INFO", "rid": "gw-90f65d", "event": "payments.response", "payment_ref": "pr-000192", "attempt": 1, "status": 200}
+{"ts": 1789323336983, "level": "INFO", "rid": "gw-90f65d", "event": "checkout.done", "order_id": "O-10281"}
+{"ts": 1789323339544, "level": "INFO", "rid": "gw-0cc1ae", "event": "checkout.start", "order_id": "O-10282"}
+{"ts": 1789323339551, "level": "INFO", "rid": "gw-0cc1ae", "event": "payments.call", "payment_ref": "pr-000193", "attempt": 1}
+{"ts": 1789323339604, "level": "INFO", "rid": "gw-0cc1ae", "event": "payments.response", "payment_ref": "pr-000193", "attempt": 1, "status": 200}
+{"ts": 1789323339609, "level": "INFO", "rid": "gw-0cc1ae", "event": "checkout.done", "order_id": "O-10282"}
+{"ts": 1789323341962, "level": "INFO", "rid": "gw-02c675", "event": "checkout.start", "order_id": "O-10283"}
+{"ts": 1789323341975, "level": "INFO", "rid": "gw-02c675", "event": "payments.call", "payment_ref": "pr-000194", "attempt": 1}
+{"ts": 1789323342066, "level": "INFO", "rid": "gw-02c675", "event": "payments.response", "payment_ref": "pr-000194", "attempt": 1, "status": 200}
+{"ts": 1789323342071, "level": "INFO", "rid": "gw-02c675", "event": "checkout.done", "order_id": "O-10283"}
+{"ts": 1789323344506, "level": "INFO", "rid": "gw-c90ec3", "event": "checkout.start", "order_id": "O-10284"}
+{"ts": 1789323344515, "level": "INFO", "rid": "gw-c90ec3", "event": "payments.call", "payment_ref": "pr-000195", "attempt": 1}
+{"ts": 1789323344554, "level": "INFO", "rid": "gw-c90ec3", "event": "payments.response", "payment_ref": "pr-000195", "attempt": 1, "status": 200}
+{"ts": 1789323344559, "level": "INFO", "rid": "gw-c90ec3", "event": "checkout.done", "order_id": "O-10284"}
+{"ts": 1789323345474, "level": "INFO", "rid": "gw-2cb424", "event": "checkout.start", "order_id": "O-10285"}
+{"ts": 1789323345481, "level": "INFO", "rid": "gw-2cb424", "event": "payments.call", "payment_ref": "pr-000196", "attempt": 1}
+{"ts": 1789323345514, "level": "INFO", "rid": "gw-2cb424", "event": "payments.response", "payment_ref": "pr-000196", "attempt": 1, "status": 200}
+{"ts": 1789323345519, "level": "INFO", "rid": "gw-2cb424", "event": "checkout.done", "order_id": "O-10285"}
+{"ts": 1789323348026, "level": "INFO", "rid": "gw-8d0432", "event": "order.get", "order_id": "O-10217"}
+{"ts": 1789323349167, "level": "INFO", "rid": "gw-611875", "event": "order.get", "order_id": "O-10246"}
+{"ts": 1789323352723, "level": "INFO", "rid": "gw-9c95bf", "event": "order.get", "order_id": "O-10265"}
+{"ts": 1789323355549, "level": "INFO", "rid": "gw-fbdd7a", "event": "order.get", "order_id": "O-10271"}
+{"ts": 1789323357709, "level": "INFO", "rid": "gw-bb71fc", "event": "checkout.start", "order_id": "O-10286"}
+{"ts": 1789323357715, "level": "INFO", "rid": "gw-bb71fc", "event": "payments.call", "payment_ref": "pr-000197", "attempt": 1}
+{"ts": 1789323357750, "level": "INFO", "rid": "gw-bb71fc", "event": "payments.response", "payment_ref": "pr-000197", "attempt": 1, "status": 200}
+{"ts": 1789323357755, "level": "INFO", "rid": "gw-bb71fc", "event": "checkout.done", "order_id": "O-10286"}
+{"ts": 1789323358470, "level": "INFO", "rid": "gw-3c3216", "event": "checkout.start", "order_id": "O-10287"}
+{"ts": 1789323358476, "level": "INFO", "rid": "gw-3c3216", "event": "payments.call", "payment_ref": "pr-000198", "attempt": 1}
+{"ts": 1789323358509, "level": "INFO", "rid": "gw-3c3216", "event": "payments.response", "payment_ref": "pr-000198", "attempt": 1, "status": 200}
+{"ts": 1789323358514, "level": "INFO", "rid": "gw-3c3216", "event": "checkout.done", "order_id": "O-10287"}
+{"ts": 1789323365417, "level": "INFO", "rid": "gw-ead488", "event": "checkout.start", "order_id": "O-10288"}
+{"ts": 1789323365425, "level": "INFO", "rid": "gw-ead488", "event": "payments.call", "payment_ref": "pr-000199", "attempt": 1}
+{"ts": 1789323365479, "level": "INFO", "rid": "gw-ead488", "event": "payments.response", "payment_ref": "pr-000199", "attempt": 1, "status": 200}
+{"ts": 1789323365484, "level": "INFO", "rid": "gw-ead488", "event": "checkout.done", "order_id": "O-10288"}
+{"ts": 1789323370581, "level": "INFO", "rid": "gw-c7055b", "event": "order.get", "order_id": "O-10233"}
+{"ts": 1789323371599, "level": "INFO", "rid": "gw-2e42b8", "event": "order.get", "order_id": "O-10233"}
+{"ts": 1789323372703, "level": "INFO", "rid": "gw-dee73a", "event": "checkout.start", "order_id": "O-10289"}
+{"ts": 1789323372708, "level": "INFO", "rid": "gw-dee73a", "event": "payments.call", "payment_ref": "pr-000200", "attempt": 1}
+{"ts": 1789323372795, "level": "INFO", "rid": "gw-dee73a", "event": "payments.response", "payment_ref": "pr-000200", "attempt": 1, "status": 200}
+{"ts": 1789323372800, "level": "INFO", "rid": "gw-dee73a", "event": "checkout.done", "order_id": "O-10289"}
+{"ts": 1789323375449, "level": "INFO", "rid": "gw-41477a", "event": "order.get", "order_id": "O-10232"}
+{"ts": 1789323376752, "level": "INFO", "rid": "gw-5b0ec3", "event": "checkout.start", "order_id": "O-10290"}
+{"ts": 1789323376766, "level": "INFO", "rid": "gw-5b0ec3", "event": "payments.call", "payment_ref": "pr-000201", "attempt": 1}
+{"ts": 1789323376844, "level": "INFO", "rid": "gw-5b0ec3", "event": "payments.response", "payment_ref": "pr-000201", "attempt": 1, "status": 200}
+{"ts": 1789323376849, "level": "INFO", "rid": "gw-5b0ec3", "event": "checkout.done", "order_id": "O-10290"}
+{"ts": 1789323378570, "level": "INFO", "rid": "gw-9ff40a", "event": "checkout.start", "order_id": "O-10291"}
+{"ts": 1789323378577, "level": "INFO", "rid": "gw-9ff40a", "event": "payments.call", "payment_ref": "pr-000202", "attempt": 1}
+{"ts": 1789323378645, "level": "INFO", "rid": "gw-9ff40a", "event": "payments.response", "payment_ref": "pr-000202", "attempt": 1, "status": 200}
+{"ts": 1789323378650, "level": "INFO", "rid": "gw-9ff40a", "event": "checkout.done", "order_id": "O-10291"}
+{"ts": 1789323382092, "level": "INFO", "rid": "gw-8bd770", "event": "checkout.start", "order_id": "O-10292"}
+{"ts": 1789323382107, "level": "INFO", "rid": "gw-8bd770", "event": "payments.call", "payment_ref": "pr-000203", "attempt": 1}
+{"ts": 1789323382170, "level": "INFO", "rid": "gw-8bd770", "event": "payments.response", "payment_ref": "pr-000203", "attempt": 1, "status": 200}
+{"ts": 1789323382175, "level": "INFO", "rid": "gw-8bd770", "event": "checkout.done", "order_id": "O-10292"}
+{"ts": 1789323385247, "level": "INFO", "rid": "gw-64c93f", "event": "order.get", "order_id": "O-10217"}
+{"ts": 1789323387808, "level": "INFO", "rid": "gw-09e435", "event": "checkout.start", "order_id": "O-10293"}
+{"ts": 1789323387822, "level": "INFO", "rid": "gw-09e435", "event": "payments.call", "payment_ref": "pr-000204", "attempt": 1}
+{"ts": 1789323387890, "level": "INFO", "rid": "gw-09e435", "event": "payments.response", "payment_ref": "pr-000204", "attempt": 1, "status": 200}
+{"ts": 1789323387895, "level": "INFO", "rid": "gw-09e435", "event": "checkout.done", "order_id": "O-10293"}
+{"ts": 1789323390337, "level": "INFO", "rid": "gw-682d02", "event": "checkout.start", "order_id": "O-10294"}
+{"ts": 1789323390352, "level": "INFO", "rid": "gw-682d02", "event": "payments.call", "payment_ref": "pr-000205", "attempt": 1}
+{"ts": 1789323390385, "level": "INFO", "rid": "gw-682d02", "event": "payments.response", "payment_ref": "pr-000205", "attempt": 1, "status": 200}
+{"ts": 1789323390390, "level": "INFO", "rid": "gw-682d02", "event": "checkout.done", "order_id": "O-10294"}
+{"ts": 1789323391112, "level": "INFO", "rid": "gw-e3a755", "event": "checkout.start", "order_id": "O-10295"}
+{"ts": 1789323391127, "level": "INFO", "rid": "gw-e3a755", "event": "payments.call", "payment_ref": "pr-000206", "attempt": 1}
+{"ts": 1789323391186, "level": "INFO", "rid": "gw-e3a755", "event": "payments.response", "payment_ref": "pr-000206", "attempt": 1, "status": 200}
+{"ts": 1789323391191, "level": "INFO", "rid": "gw-e3a755", "event": "checkout.done", "order_id": "O-10295"}
+{"ts": 1789323397355, "level": "INFO", "rid": "gw-18e5d7", "event": "checkout.start", "order_id": "O-10296"}
+{"ts": 1789323397363, "level": "INFO", "rid": "gw-18e5d7", "event": "payments.call", "payment_ref": "pr-000207", "attempt": 1}
+{"ts": 1789323397403, "level": "INFO", "rid": "gw-18e5d7", "event": "payments.response", "payment_ref": "pr-000207", "attempt": 1, "status": 200}
+{"ts": 1789323397408, "level": "INFO", "rid": "gw-18e5d7", "event": "checkout.done", "order_id": "O-10296"}
+{"ts": 1789323401362, "level": "INFO", "rid": "gw-91d547", "event": "checkout.start", "order_id": "O-10297"}
+{"ts": 1789323401370, "level": "INFO", "rid": "gw-91d547", "event": "payments.call", "payment_ref": "pr-000208", "attempt": 1}
+{"ts": 1789323401461, "level": "INFO", "rid": "gw-91d547", "event": "payments.response", "payment_ref": "pr-000208", "attempt": 1, "status": 200}
+{"ts": 1789323401466, "level": "INFO", "rid": "gw-91d547", "event": "checkout.done", "order_id": "O-10297"}
+{"ts": 1789323403299, "level": "INFO", "rid": "gw-37b981", "event": "checkout.start", "order_id": "O-10298"}
+{"ts": 1789323403310, "level": "INFO", "rid": "gw-37b981", "event": "payments.call", "payment_ref": "pr-000209", "attempt": 1}
+{"ts": 1789323403338, "level": "INFO", "rid": "gw-37b981", "event": "payments.response", "payment_ref": "pr-000209", "attempt": 1, "status": 200}
+{"ts": 1789323403343, "level": "INFO", "rid": "gw-37b981", "event": "checkout.done", "order_id": "O-10298"}
+{"ts": 1789323405076, "level": "INFO", "rid": "gw-7a70a0", "event": "order.get", "order_id": "O-10274"}
+{"ts": 1789323407574, "level": "INFO", "rid": "gw-986ffb", "event": "order.get", "order_id": "O-10204"}
+{"ts": 1789323408545, "level": "INFO", "rid": "gw-3cc1ca", "event": "checkout.start", "order_id": "O-10299"}
+{"ts": 1789323408556, "level": "INFO", "rid": "gw-3cc1ca", "event": "payments.call", "payment_ref": "pr-000210", "attempt": 1}
+{"ts": 1789323408625, "level": "INFO", "rid": "gw-3cc1ca", "event": "payments.response", "payment_ref": "pr-000210", "attempt": 1, "status": 200}
+{"ts": 1789323408630, "level": "INFO", "rid": "gw-3cc1ca", "event": "checkout.done", "order_id": "O-10299"}
+{"ts": 1789323409762, "level": "INFO", "rid": "gw-4eb23b", "event": "checkout.start", "order_id": "O-10300"}
+{"ts": 1789323409771, "level": "INFO", "rid": "gw-4eb23b", "event": "payments.call", "payment_ref": "pr-000211", "attempt": 1}
+{"ts": 1789323409805, "level": "INFO", "rid": "gw-4eb23b", "event": "payments.response", "payment_ref": "pr-000211", "attempt": 1, "status": 200}
+{"ts": 1789323409810, "level": "INFO", "rid": "gw-4eb23b", "event": "checkout.done", "order_id": "O-10300"}
+{"ts": 1789323410485, "level": "INFO", "rid": "gw-48a537", "event": "checkout.start", "order_id": "O-10301"}
+{"ts": 1789323410491, "level": "INFO", "rid": "gw-48a537", "event": "payments.call", "payment_ref": "pr-000212", "attempt": 1}
+{"ts": 1789323410565, "level": "INFO", "rid": "gw-48a537", "event": "payments.response", "payment_ref": "pr-000212", "attempt": 1, "status": 200}
+{"ts": 1789323410570, "level": "INFO", "rid": "gw-48a537", "event": "checkout.done", "order_id": "O-10301"}
+{"ts": 1789323413527, "level": "INFO", "rid": "gw-d035ba", "event": "order.get", "order_id": "O-10225"}
+{"ts": 1789323415803, "level": "INFO", "rid": "gw-687bd6", "event": "checkout.start", "order_id": "O-10302"}
+{"ts": 1789323415817, "level": "INFO", "rid": "gw-687bd6", "event": "payments.call", "payment_ref": "pr-000213", "attempt": 1}
+{"ts": 1789323415866, "level": "INFO", "rid": "gw-687bd6", "event": "payments.response", "payment_ref": "pr-000213", "attempt": 1, "status": 200}
+{"ts": 1789323415871, "level": "INFO", "rid": "gw-687bd6", "event": "checkout.done", "order_id": "O-10302"}
+{"ts": 1789323418506, "level": "INFO", "rid": "gw-f77823", "event": "checkout.start", "order_id": "O-10303"}
+{"ts": 1789323418511, "level": "INFO", "rid": "gw-f77823", "event": "payments.call", "payment_ref": "pr-000214", "attempt": 1}
+{"ts": 1789323418567, "level": "INFO", "rid": "gw-f77823", "event": "payments.response", "payment_ref": "pr-000214", "attempt": 1, "status": 200}
+{"ts": 1789323418572, "level": "INFO", "rid": "gw-f77823", "event": "checkout.done", "order_id": "O-10303"}
+{"ts": 1789323422887, "level": "INFO", "rid": "gw-ae5040", "event": "checkout.start", "order_id": "O-10304"}
+{"ts": 1789323422898, "level": "INFO", "rid": "gw-ae5040", "event": "payments.call", "payment_ref": "pr-000215", "attempt": 1}
+{"ts": 1789323422958, "level": "INFO", "rid": "gw-ae5040", "event": "payments.response", "payment_ref": "pr-000215", "attempt": 1, "status": 200}
+{"ts": 1789323422963, "level": "INFO", "rid": "gw-ae5040", "event": "checkout.done", "order_id": "O-10304"}
+{"ts": 1789323426579, "level": "INFO", "rid": "gw-a6ef0a", "event": "order.get", "order_id": "O-10288"}
+{"ts": 1789323427983, "level": "INFO", "rid": "gw-c08647", "event": "checkout.start", "order_id": "O-10305"}
+{"ts": 1789323427995, "level": "INFO", "rid": "gw-c08647", "event": "payments.call", "payment_ref": "pr-000216", "attempt": 1}
+{"ts": 1789323428024, "level": "INFO", "rid": "gw-c08647", "event": "payments.response", "payment_ref": "pr-000216", "attempt": 1, "status": 200}
+{"ts": 1789323428029, "level": "INFO", "rid": "gw-c08647", "event": "checkout.done", "order_id": "O-10305"}
+{"ts": 1789323429531, "level": "INFO", "rid": "gw-1a2d85", "event": "checkout.start", "order_id": "O-10306"}
+{"ts": 1789323429539, "level": "INFO", "rid": "gw-1a2d85", "event": "payments.call", "payment_ref": "pr-000217", "attempt": 1}
+{"ts": 1789323429581, "level": "INFO", "rid": "gw-1a2d85", "event": "payments.response", "payment_ref": "pr-000217", "attempt": 1, "status": 200}
+{"ts": 1789323429586, "level": "INFO", "rid": "gw-1a2d85", "event": "checkout.done", "order_id": "O-10306"}
+{"ts": 1789323431383, "level": "INFO", "rid": "gw-beba3b", "event": "order.get", "order_id": "O-10266"}
+{"ts": 1789323433375, "level": "INFO", "rid": "gw-54c034", "event": "checkout.start", "order_id": "O-10307"}
+{"ts": 1789323433390, "level": "INFO", "rid": "gw-54c034", "event": "payments.call", "payment_ref": "pr-000218", "attempt": 1}
+{"ts": 1789323433437, "level": "INFO", "rid": "gw-54c034", "event": "payments.response", "payment_ref": "pr-000218", "attempt": 1, "status": 200}
+{"ts": 1789323433442, "level": "INFO", "rid": "gw-54c034", "event": "checkout.done", "order_id": "O-10307"}
+{"ts": 1789323435973, "level": "INFO", "rid": "gw-3a2a1a", "event": "checkout.start", "order_id": "O-10308"}
+{"ts": 1789323435985, "level": "INFO", "rid": "gw-3a2a1a", "event": "payments.call", "payment_ref": "pr-000219", "attempt": 1}
+{"ts": 1789323436020, "level": "INFO", "rid": "gw-3a2a1a", "event": "payments.response", "payment_ref": "pr-000219", "attempt": 1, "status": 200}
+{"ts": 1789323436025, "level": "INFO", "rid": "gw-3a2a1a", "event": "checkout.done", "order_id": "O-10308"}
+{"ts": 1789323438020, "level": "INFO", "rid": "gw-56be7f", "event": "order.get", "order_id": "O-10232"}
+{"ts": 1789323441116, "level": "INFO", "rid": "gw-831d12", "event": "checkout.start", "order_id": "O-10309"}
+{"ts": 1789323441127, "level": "INFO", "rid": "gw-831d12", "event": "payments.call", "payment_ref": "pr-000220", "attempt": 1}
+{"ts": 1789323441155, "level": "INFO", "rid": "gw-831d12", "event": "payments.response", "payment_ref": "pr-000220", "attempt": 1, "status": 200}
+{"ts": 1789323441160, "level": "INFO", "rid": "gw-831d12", "event": "checkout.done", "order_id": "O-10309"}
+{"ts": 1789323442526, "level": "INFO", "rid": "gw-910eac", "event": "order.get", "order_id": "O-10266"}
+{"ts": 1789323444832, "level": "INFO", "rid": "gw-4e1609", "event": "order.get", "order_id": "O-10300"}
+{"ts": 1789323446095, "level": "INFO", "rid": "gw-6d14ff", "event": "checkout.start", "order_id": "O-10310"}
+{"ts": 1789323446105, "level": "INFO", "rid": "gw-6d14ff", "event": "payments.call", "payment_ref": "pr-000221", "attempt": 1}
+{"ts": 1789323446141, "level": "INFO", "rid": "gw-6d14ff", "event": "payments.response", "payment_ref": "pr-000221", "attempt": 1, "status": 200}
+{"ts": 1789323446146, "level": "INFO", "rid": "gw-6d14ff", "event": "checkout.done", "order_id": "O-10310"}
+{"ts": 1789323447878, "level": "INFO", "rid": "gw-eb5f27", "event": "checkout.start", "order_id": "O-10311"}
+{"ts": 1789323447886, "level": "INFO", "rid": "gw-eb5f27", "event": "payments.call", "payment_ref": "pr-000222", "attempt": 1}
+{"ts": 1789323447929, "level": "INFO", "rid": "gw-eb5f27", "event": "payments.response", "payment_ref": "pr-000222", "attempt": 1, "status": 200}
+{"ts": 1789323447934, "level": "INFO", "rid": "gw-eb5f27", "event": "checkout.done", "order_id": "O-10311"}
+{"ts": 1789323450726, "level": "INFO", "rid": "gw-215481", "event": "checkout.start", "order_id": "O-10312"}
+{"ts": 1789323450734, "level": "INFO", "rid": "gw-215481", "event": "payments.call", "payment_ref": "pr-000223", "attempt": 1}
+{"ts": 1789323450769, "level": "INFO", "rid": "gw-215481", "event": "payments.response", "payment_ref": "pr-000223", "attempt": 1, "status": 200}
+{"ts": 1789323450774, "level": "INFO", "rid": "gw-215481", "event": "checkout.done", "order_id": "O-10312"}
+{"ts": 1789323453166, "level": "INFO", "rid": "gw-64e186", "event": "order.get", "order_id": "O-10242"}
+{"ts": 1789323454100, "level": "INFO", "rid": "gw-4ef6c8", "event": "order.get", "order_id": "O-10291"}
+{"ts": 1789323455877, "level": "INFO", "rid": "gw-98dd12", "event": "order.get", "order_id": "O-10224"}
+{"ts": 1789323458043, "level": "INFO", "rid": "gw-d45a13", "event": "checkout.start", "order_id": "O-10313"}
+{"ts": 1789323458054, "level": "INFO", "rid": "gw-d45a13", "event": "payments.call", "payment_ref": "pr-000224", "attempt": 1}
+{"ts": 1789323458134, "level": "INFO", "rid": "gw-d45a13", "event": "payments.response", "payment_ref": "pr-000224", "attempt": 1, "status": 200}
+{"ts": 1789323458139, "level": "INFO", "rid": "gw-d45a13", "event": "checkout.done", "order_id": "O-10313"}
+{"ts": 1789323459324, "level": "INFO", "rid": "gw-a5c3de", "event": "order.get", "order_id": "O-10311"}
+{"ts": 1789323463231, "level": "INFO", "rid": "gw-6de625", "event": "checkout.start", "order_id": "O-10314"}
+{"ts": 1789323463243, "level": "INFO", "rid": "gw-6de625", "event": "payments.call", "payment_ref": "pr-000225", "attempt": 1}
+{"ts": 1789323463314, "level": "INFO", "rid": "gw-6de625", "event": "payments.response", "payment_ref": "pr-000225", "attempt": 1, "status": 200}
+{"ts": 1789323463319, "level": "INFO", "rid": "gw-6de625", "event": "checkout.done", "order_id": "O-10314"}
+{"ts": 1789323466333, "level": "INFO", "rid": "gw-056fb9", "event": "checkout.start", "order_id": "O-10315"}
+{"ts": 1789323466340, "level": "INFO", "rid": "gw-056fb9", "event": "payments.call", "payment_ref": "pr-000226", "attempt": 1}
+{"ts": 1789323466373, "level": "INFO", "rid": "gw-056fb9", "event": "payments.response", "payment_ref": "pr-000226", "attempt": 1, "status": 200}
+{"ts": 1789323466378, "level": "INFO", "rid": "gw-056fb9", "event": "checkout.done", "order_id": "O-10315"}
+{"ts": 1789323470656, "level": "INFO", "rid": "gw-75d47c", "event": "checkout.start", "order_id": "O-10316"}
+{"ts": 1789323470671, "level": "INFO", "rid": "gw-75d47c", "event": "payments.call", "payment_ref": "pr-000227", "attempt": 1}
+{"ts": 1789323470721, "level": "INFO", "rid": "gw-75d47c", "event": "payments.response", "payment_ref": "pr-000227", "attempt": 1, "status": 200}
+{"ts": 1789323470726, "level": "INFO", "rid": "gw-75d47c", "event": "checkout.done", "order_id": "O-10316"}
+{"ts": 1789323472470, "level": "INFO", "rid": "gw-75548f", "event": "checkout.start", "order_id": "O-10317"}
+{"ts": 1789323472481, "level": "INFO", "rid": "gw-75548f", "event": "payments.call", "payment_ref": "pr-000228", "attempt": 1}
+{"ts": 1789323472533, "level": "INFO", "rid": "gw-75548f", "event": "payments.response", "payment_ref": "pr-000228", "attempt": 1, "status": 200}
+{"ts": 1789323472538, "level": "INFO", "rid": "gw-75548f", "event": "checkout.done", "order_id": "O-10317"}
+{"ts": 1789323474855, "level": "INFO", "rid": "gw-241071", "event": "order.get", "order_id": "O-10264"}
+{"ts": 1789323477456, "level": "INFO", "rid": "gw-d0719c", "event": "checkout.start", "order_id": "O-10318"}
+{"ts": 1789323477464, "level": "INFO", "rid": "gw-d0719c", "event": "payments.call", "payment_ref": "pr-000229", "attempt": 1}
+{"ts": 1789323477509, "level": "INFO", "rid": "gw-d0719c", "event": "payments.response", "payment_ref": "pr-000229", "attempt": 1, "status": 200}
+{"ts": 1789323477514, "level": "INFO", "rid": "gw-d0719c", "event": "checkout.done", "order_id": "O-10318"}
+{"ts": 1789323478202, "level": "INFO", "rid": "gw-eee3ae", "event": "checkout.start", "order_id": "O-10319"}
+{"ts": 1789323478208, "level": "INFO", "rid": "gw-eee3ae", "event": "payments.call", "payment_ref": "pr-000230", "attempt": 1}
+{"ts": 1789323478285, "level": "INFO", "rid": "gw-eee3ae", "event": "payments.response", "payment_ref": "pr-000230", "attempt": 1, "status": 200}
+{"ts": 1789323478290, "level": "INFO", "rid": "gw-eee3ae", "event": "checkout.done", "order_id": "O-10319"}
+{"ts": 1789323482533, "level": "INFO", "rid": "gw-6d9cd7", "event": "checkout.start", "order_id": "O-10320"}
+{"ts": 1789323482545, "level": "INFO", "rid": "gw-6d9cd7", "event": "payments.call", "payment_ref": "pr-000231", "attempt": 1}
+{"ts": 1789323482571, "level": "INFO", "rid": "gw-6d9cd7", "event": "payments.response", "payment_ref": "pr-000231", "attempt": 1, "status": 200}
+{"ts": 1789323482576, "level": "INFO", "rid": "gw-6d9cd7", "event": "checkout.done", "order_id": "O-10320"}
+{"ts": 1789323484030, "level": "INFO", "rid": "gw-1bea17", "event": "order.get", "order_id": "O-10295"}
+{"ts": 1789323485575, "level": "INFO", "rid": "gw-6f3788", "event": "checkout.start", "order_id": "O-10321"}
+{"ts": 1789323485580, "level": "INFO", "rid": "gw-6f3788", "event": "payments.call", "payment_ref": "pr-000232", "attempt": 1}
+{"ts": 1789323485665, "level": "INFO", "rid": "gw-6f3788", "event": "payments.response", "payment_ref": "pr-000232", "attempt": 1, "status": 200}
+{"ts": 1789323485670, "level": "INFO", "rid": "gw-6f3788", "event": "checkout.done", "order_id": "O-10321"}
+{"ts": 1789323486666, "level": "INFO", "rid": "gw-e3aa4e", "event": "checkout.start", "order_id": "O-10322"}
+{"ts": 1789323486679, "level": "INFO", "rid": "gw-e3aa4e", "event": "payments.call", "payment_ref": "pr-000233", "attempt": 1}
+{"ts": 1789323486736, "level": "INFO", "rid": "gw-e3aa4e", "event": "payments.response", "payment_ref": "pr-000233", "attempt": 1, "status": 200}
+{"ts": 1789323486741, "level": "INFO", "rid": "gw-e3aa4e", "event": "checkout.done", "order_id": "O-10322"}
+{"ts": 1789323488072, "level": "INFO", "rid": "gw-399989", "event": "checkout.start", "order_id": "O-10323"}
+{"ts": 1789323488077, "level": "INFO", "rid": "gw-399989", "event": "payments.call", "payment_ref": "pr-000234", "attempt": 1}
+{"ts": 1789323488135, "level": "INFO", "rid": "gw-399989", "event": "payments.response", "payment_ref": "pr-000234", "attempt": 1, "status": 200}
+{"ts": 1789323488140, "level": "INFO", "rid": "gw-399989", "event": "checkout.done", "order_id": "O-10323"}
+{"ts": 1789323490725, "level": "INFO", "rid": "gw-d2a687", "event": "checkout.start", "order_id": "O-10324"}
+{"ts": 1789323490734, "level": "INFO", "rid": "gw-d2a687", "event": "payments.call", "payment_ref": "pr-000235", "attempt": 1}
+{"ts": 1789323490796, "level": "INFO", "rid": "gw-d2a687", "event": "payments.response", "payment_ref": "pr-000235", "attempt": 1, "status": 200}
+{"ts": 1789323490801, "level": "INFO", "rid": "gw-d2a687", "event": "checkout.done", "order_id": "O-10324"}
+{"ts": 1789323492080, "level": "INFO", "rid": "gw-a53ce2", "event": "checkout.start", "order_id": "O-10325"}
+{"ts": 1789323492093, "level": "INFO", "rid": "gw-a53ce2", "event": "payments.call", "payment_ref": "pr-000236", "attempt": 1}
+{"ts": 1789323492141, "level": "INFO", "rid": "gw-a53ce2", "event": "payments.response", "payment_ref": "pr-000236", "attempt": 1, "status": 200}
+{"ts": 1789323492146, "level": "INFO", "rid": "gw-a53ce2", "event": "checkout.done", "order_id": "O-10325"}
+{"ts": 1789323493835, "level": "INFO", "rid": "gw-c4b4e3", "event": "checkout.start", "order_id": "O-10326"}
+{"ts": 1789323493843, "level": "INFO", "rid": "gw-c4b4e3", "event": "payments.call", "payment_ref": "pr-000237", "attempt": 1}
+{"ts": 1789323493925, "level": "INFO", "rid": "gw-c4b4e3", "event": "payments.response", "payment_ref": "pr-000237", "attempt": 1, "status": 200}
+{"ts": 1789323493930, "level": "INFO", "rid": "gw-c4b4e3", "event": "checkout.done", "order_id": "O-10326"}
+{"ts": 1789323495445, "level": "INFO", "rid": "gw-cf463d", "event": "order.get", "order_id": "O-10279"}
+{"ts": 1789323500061, "level": "INFO", "rid": "gw-b8e585", "event": "order.get", "order_id": "O-10218"}
+{"ts": 1789323500916, "level": "INFO", "rid": "gw-279ede", "event": "order.get", "order_id": "O-10258"}
+{"ts": 1789323502253, "level": "INFO", "rid": "gw-f66372", "event": "checkout.start", "order_id": "O-10327"}
+{"ts": 1789323502266, "level": "INFO", "rid": "gw-f66372", "event": "payments.call", "payment_ref": "pr-000238", "attempt": 1}
+{"ts": 1789323502327, "level": "INFO", "rid": "gw-f66372", "event": "payments.response", "payment_ref": "pr-000238", "attempt": 1, "status": 200}
+{"ts": 1789323502332, "level": "INFO", "rid": "gw-f66372", "event": "checkout.done", "order_id": "O-10327"}
+{"ts": 1789323503627, "level": "INFO", "rid": "gw-3c0081", "event": "checkout.start", "order_id": "O-10328"}
+{"ts": 1789323503638, "level": "INFO", "rid": "gw-3c0081", "event": "payments.call", "payment_ref": "pr-000239", "attempt": 1}
+{"ts": 1789323503670, "level": "INFO", "rid": "gw-3c0081", "event": "payments.response", "payment_ref": "pr-000239", "attempt": 1, "status": 200}
+{"ts": 1789323503675, "level": "INFO", "rid": "gw-3c0081", "event": "checkout.done", "order_id": "O-10328"}
+{"ts": 1789323507073, "level": "INFO", "rid": "gw-170f6a", "event": "checkout.start", "order_id": "O-10329"}
+{"ts": 1789323507087, "level": "INFO", "rid": "gw-170f6a", "event": "payments.call", "payment_ref": "pr-000240", "attempt": 1}
+{"ts": 1789323507137, "level": "INFO", "rid": "gw-170f6a", "event": "payments.response", "payment_ref": "pr-000240", "attempt": 1, "status": 200}
+{"ts": 1789323507142, "level": "INFO", "rid": "gw-170f6a", "event": "checkout.done", "order_id": "O-10329"}
+{"ts": 1789323509154, "level": "INFO", "rid": "gw-5a703f", "event": "checkout.start", "order_id": "O-10330"}
+{"ts": 1789323509164, "level": "INFO", "rid": "gw-5a703f", "event": "payments.call", "payment_ref": "pr-000241", "attempt": 1}
+{"ts": 1789323509244, "level": "INFO", "rid": "gw-5a703f", "event": "payments.response", "payment_ref": "pr-000241", "attempt": 1, "status": 200}
+{"ts": 1789323509249, "level": "INFO", "rid": "gw-5a703f", "event": "checkout.done", "order_id": "O-10330"}
+{"ts": 1789323511960, "level": "INFO", "rid": "gw-77f203", "event": "order.get", "order_id": "O-10308"}
+{"ts": 1789323512678, "level": "INFO", "rid": "gw-5df1bf", "event": "checkout.start", "order_id": "O-10331"}
+{"ts": 1789323512690, "level": "INFO", "rid": "gw-5df1bf", "event": "payments.call", "payment_ref": "pr-000242", "attempt": 1}
+{"ts": 1789323512738, "level": "INFO", "rid": "gw-5df1bf", "event": "payments.response", "payment_ref": "pr-000242", "attempt": 1, "status": 200}
+{"ts": 1789323512743, "level": "INFO", "rid": "gw-5df1bf", "event": "checkout.done", "order_id": "O-10331"}
+{"ts": 1789323513993, "level": "INFO", "rid": "gw-ba8ba9", "event": "order.get", "order_id": "O-10329"}
+{"ts": 1789323519204, "level": "INFO", "rid": "gw-f863db", "event": "order.get", "order_id": "O-10299"}
+{"ts": 1789323524781, "level": "INFO", "rid": "gw-40f89d", "event": "order.get", "order_id": "O-10230"}
+{"ts": 1789323526795, "level": "INFO", "rid": "gw-264f12", "event": "order.get", "order_id": "O-10263"}
+{"ts": 1789323527647, "level": "INFO", "rid": "gw-8c1184", "event": "order.get", "order_id": "O-10272"}
+{"ts": 1789323529971, "level": "INFO", "rid": "gw-17aa5b", "event": "checkout.start", "order_id": "O-10332"}
+{"ts": 1789323529976, "level": "INFO", "rid": "gw-17aa5b", "event": "payments.call", "payment_ref": "pr-000243", "attempt": 1}
+{"ts": 1789323530030, "level": "INFO", "rid": "gw-17aa5b", "event": "payments.response", "payment_ref": "pr-000243", "attempt": 1, "status": 200}
+{"ts": 1789323530035, "level": "INFO", "rid": "gw-17aa5b", "event": "checkout.done", "order_id": "O-10332"}
+{"ts": 1789323531959, "level": "INFO", "rid": "gw-2ee657", "event": "order.get", "order_id": "O-10244"}
+{"ts": 1789323534291, "level": "INFO", "rid": "gw-aa86e4", "event": "order.get", "order_id": "O-10323"}
+{"ts": 1789323537955, "level": "INFO", "rid": "gw-de6a50", "event": "checkout.start", "order_id": "O-10333"}
+{"ts": 1789323537965, "level": "INFO", "rid": "gw-de6a50", "event": "payments.call", "payment_ref": "pr-000244", "attempt": 1}
+{"ts": 1789323538000, "level": "INFO", "rid": "gw-de6a50", "event": "payments.response", "payment_ref": "pr-000244", "attempt": 1, "status": 200}
+{"ts": 1789323538005, "level": "INFO", "rid": "gw-de6a50", "event": "checkout.done", "order_id": "O-10333"}
+{"ts": 1789323541112, "level": "INFO", "rid": "gw-d4eb46", "event": "checkout.start", "order_id": "O-10334"}
+{"ts": 1789323541122, "level": "INFO", "rid": "gw-d4eb46", "event": "payments.call", "payment_ref": "pr-000245", "attempt": 1}
+{"ts": 1789323541150, "level": "INFO", "rid": "gw-d4eb46", "event": "payments.response", "payment_ref": "pr-000245", "attempt": 1, "status": 200}
+{"ts": 1789323541155, "level": "INFO", "rid": "gw-d4eb46", "event": "checkout.done", "order_id": "O-10334"}
+{"ts": 1789323543364, "level": "INFO", "rid": "gw-0c78d8", "event": "checkout.start", "order_id": "O-10335"}
+{"ts": 1789323543379, "level": "INFO", "rid": "gw-0c78d8", "event": "payments.call", "payment_ref": "pr-000246", "attempt": 1}
+{"ts": 1789323543423, "level": "INFO", "rid": "gw-0c78d8", "event": "payments.response", "payment_ref": "pr-000246", "attempt": 1, "status": 200}
+{"ts": 1789323543428, "level": "INFO", "rid": "gw-0c78d8", "event": "checkout.done", "order_id": "O-10335"}
+{"ts": 1789323544324, "level": "INFO", "rid": "gw-deb42e", "event": "order.get", "order_id": "O-10221"}
+{"ts": 1789323545547, "level": "INFO", "rid": "gw-eb51f5", "event": "checkout.start", "order_id": "O-10336"}
+{"ts": 1789323545562, "level": "INFO", "rid": "gw-eb51f5", "event": "payments.call", "payment_ref": "pr-000247", "attempt": 1}
+{"ts": 1789323545602, "level": "INFO", "rid": "gw-eb51f5", "event": "payments.response", "payment_ref": "pr-000247", "attempt": 1, "status": 200}
+{"ts": 1789323545607, "level": "INFO", "rid": "gw-eb51f5", "event": "checkout.done", "order_id": "O-10336"}
+{"ts": 1789323546815, "level": "INFO", "rid": "gw-2510bd", "event": "order.get", "order_id": "O-10311"}
+{"ts": 1789323548600, "level": "INFO", "rid": "gw-805f0b", "event": "checkout.start", "order_id": "O-10337"}
+{"ts": 1789323548605, "level": "INFO", "rid": "gw-805f0b", "event": "payments.call", "payment_ref": "pr-000248", "attempt": 1}
+{"ts": 1789323548668, "level": "INFO", "rid": "gw-805f0b", "event": "payments.response", "payment_ref": "pr-000248", "attempt": 1, "status": 200}
+{"ts": 1789323548673, "level": "INFO", "rid": "gw-805f0b", "event": "checkout.done", "order_id": "O-10337"}
+{"ts": 1789323551271, "level": "INFO", "rid": "gw-f9a50b", "event": "checkout.start", "order_id": "O-10338"}
+{"ts": 1789323551286, "level": "INFO", "rid": "gw-f9a50b", "event": "payments.call", "payment_ref": "pr-000249", "attempt": 1}
+{"ts": 1789323551353, "level": "INFO", "rid": "gw-f9a50b", "event": "payments.response", "payment_ref": "pr-000249", "attempt": 1, "status": 200}
+{"ts": 1789323551358, "level": "INFO", "rid": "gw-f9a50b", "event": "checkout.done", "order_id": "O-10338"}
+{"ts": 1789323552788, "level": "INFO", "rid": "gw-da7049", "event": "checkout.start", "order_id": "O-10339"}
+{"ts": 1789323552797, "level": "INFO", "rid": "gw-da7049", "event": "payments.call", "payment_ref": "pr-000250", "attempt": 1}
+{"ts": 1789323552840, "level": "INFO", "rid": "gw-da7049", "event": "payments.response", "payment_ref": "pr-000250", "attempt": 1, "status": 200}
+{"ts": 1789323552845, "level": "INFO", "rid": "gw-da7049", "event": "checkout.done", "order_id": "O-10339"}
+{"ts": 1789323553491, "level": "INFO", "rid": "gw-0321d1", "event": "checkout.start", "order_id": "O-10340"}
+{"ts": 1789323553505, "level": "INFO", "rid": "gw-0321d1", "event": "payments.call", "payment_ref": "pr-000251", "attempt": 1}
+{"ts": 1789323553569, "level": "INFO", "rid": "gw-0321d1", "event": "payments.response", "payment_ref": "pr-000251", "attempt": 1, "status": 200}
+{"ts": 1789323553574, "level": "INFO", "rid": "gw-0321d1", "event": "checkout.done", "order_id": "O-10340"}
+{"ts": 1789323555025, "level": "INFO", "rid": "gw-b647f4", "event": "order.get", "order_id": "O-10226"}
+{"ts": 1789323563581, "level": "INFO", "rid": "gw-9b779f", "event": "checkout.start", "order_id": "O-10341"}
+{"ts": 1789323563596, "level": "INFO", "rid": "gw-9b779f", "event": "payments.call", "payment_ref": "pr-000252", "attempt": 1}
+{"ts": 1789323563669, "level": "INFO", "rid": "gw-9b779f", "event": "payments.response", "payment_ref": "pr-000252", "attempt": 1, "status": 200}
+{"ts": 1789323563674, "level": "INFO", "rid": "gw-9b779f", "event": "checkout.done", "order_id": "O-10341"}
+{"ts": 1789323566285, "level": "INFO", "rid": "gw-b279b5", "event": "checkout.start", "order_id": "O-10342"}
+{"ts": 1789323566300, "level": "INFO", "rid": "gw-b279b5", "event": "payments.call", "payment_ref": "pr-000253", "attempt": 1}
+{"ts": 1789323566346, "level": "INFO", "rid": "gw-b279b5", "event": "payments.response", "payment_ref": "pr-000253", "attempt": 1, "status": 200}
+{"ts": 1789323566351, "level": "INFO", "rid": "gw-b279b5", "event": "checkout.done", "order_id": "O-10342"}
+{"ts": 1789323568555, "level": "INFO", "rid": "gw-ca3195", "event": "order.get", "order_id": "O-10339"}
+{"ts": 1789323570075, "level": "INFO", "rid": "gw-d5dfa0", "event": "order.get", "order_id": "O-10228"}
+{"ts": 1789323571103, "level": "INFO", "rid": "gw-d230df", "event": "order.get", "order_id": "O-10301"}
+{"ts": 1789323573039, "level": "INFO", "rid": "gw-0fb751", "event": "order.get", "order_id": "O-10227"}
+{"ts": 1789323575358, "level": "INFO", "rid": "gw-337d75", "event": "checkout.start", "order_id": "O-10343"}
+{"ts": 1789323575372, "level": "INFO", "rid": "gw-337d75", "event": "payments.call", "payment_ref": "pr-000254", "attempt": 1}
+{"ts": 1789323575415, "level": "INFO", "rid": "gw-337d75", "event": "payments.response", "payment_ref": "pr-000254", "attempt": 1, "status": 200}
+{"ts": 1789323575420, "level": "INFO", "rid": "gw-337d75", "event": "checkout.done", "order_id": "O-10343"}
+{"ts": 1789323578184, "level": "INFO", "rid": "gw-bf57c9", "event": "order.get", "order_id": "O-10262"}
+{"ts": 1789323579696, "level": "INFO", "rid": "gw-e23f7e", "event": "checkout.start", "order_id": "O-10344"}
+{"ts": 1789323579710, "level": "INFO", "rid": "gw-e23f7e", "event": "payments.call", "payment_ref": "pr-000255", "attempt": 1}
+{"ts": 1789323579792, "level": "INFO", "rid": "gw-e23f7e", "event": "payments.response", "payment_ref": "pr-000255", "attempt": 1, "status": 200}
+{"ts": 1789323579797, "level": "INFO", "rid": "gw-e23f7e", "event": "checkout.done", "order_id": "O-10344"}
+{"ts": 1789323582549, "level": "INFO", "rid": "gw-2deeaf", "event": "checkout.start", "order_id": "O-10345"}
+{"ts": 1789323582556, "level": "INFO", "rid": "gw-2deeaf", "event": "payments.call", "payment_ref": "pr-000256", "attempt": 1}
+{"ts": 1789323582582, "level": "INFO", "rid": "gw-2deeaf", "event": "payments.response", "payment_ref": "pr-000256", "attempt": 1, "status": 200}
+{"ts": 1789323582587, "level": "INFO", "rid": "gw-2deeaf", "event": "checkout.done", "order_id": "O-10345"}
+{"ts": 1789323585543, "level": "INFO", "rid": "gw-0fe20d", "event": "checkout.start", "order_id": "O-10346"}
+{"ts": 1789323585557, "level": "INFO", "rid": "gw-0fe20d", "event": "payments.call", "payment_ref": "pr-000257", "attempt": 1}
+{"ts": 1789323585628, "level": "INFO", "rid": "gw-0fe20d", "event": "payments.response", "payment_ref": "pr-000257", "attempt": 1, "status": 200}
+{"ts": 1789323585633, "level": "INFO", "rid": "gw-0fe20d", "event": "checkout.done", "order_id": "O-10346"}
+{"ts": 1789323588369, "level": "INFO", "rid": "gw-adc232", "event": "checkout.start", "order_id": "O-10347"}
+{"ts": 1789323588379, "level": "INFO", "rid": "gw-adc232", "event": "payments.call", "payment_ref": "pr-000258", "attempt": 1}
+{"ts": 1789323588454, "level": "INFO", "rid": "gw-adc232", "event": "payments.response", "payment_ref": "pr-000258", "attempt": 1, "status": 200}
+{"ts": 1789323588459, "level": "INFO", "rid": "gw-adc232", "event": "checkout.done", "order_id": "O-10347"}
+{"ts": 1789323590899, "level": "INFO", "rid": "gw-f83f0c", "event": "checkout.start", "order_id": "O-10348"}
+{"ts": 1789323590912, "level": "INFO", "rid": "gw-f83f0c", "event": "payments.call", "payment_ref": "pr-000259", "attempt": 1}
+{"ts": 1789323590995, "level": "INFO", "rid": "gw-f83f0c", "event": "payments.response", "payment_ref": "pr-000259", "attempt": 1, "status": 200}
+{"ts": 1789323591000, "level": "INFO", "rid": "gw-f83f0c", "event": "checkout.done", "order_id": "O-10348"}
+{"ts": 1789323591752, "level": "INFO", "rid": "gw-a35c8a", "event": "order.get", "order_id": "O-10315"}
+{"ts": 1789323594742, "level": "INFO", "rid": "gw-30597f", "event": "order.get", "order_id": "O-10233"}
+{"ts": 1789323597206, "level": "INFO", "rid": "gw-43e922", "event": "checkout.start", "order_id": "O-10349"}
+{"ts": 1789323597217, "level": "INFO", "rid": "gw-43e922", "event": "payments.call", "payment_ref": "pr-000260", "attempt": 1}
+{"ts": 1789323597252, "level": "INFO", "rid": "gw-43e922", "event": "payments.response", "payment_ref": "pr-000260", "attempt": 1, "status": 200}
+{"ts": 1789323597257, "level": "INFO", "rid": "gw-43e922", "event": "checkout.done", "order_id": "O-10349"}
+{"ts": 1789323597931, "level": "INFO", "rid": "gw-46fef3", "event": "checkout.start", "order_id": "O-10350"}
+{"ts": 1789323597944, "level": "INFO", "rid": "gw-46fef3", "event": "payments.call", "payment_ref": "pr-000261", "attempt": 1}
+{"ts": 1789323598022, "level": "INFO", "rid": "gw-46fef3", "event": "payments.response", "payment_ref": "pr-000261", "attempt": 1, "status": 200}
+{"ts": 1789323598027, "level": "INFO", "rid": "gw-46fef3", "event": "checkout.done", "order_id": "O-10350"}
