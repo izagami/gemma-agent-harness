@@ -263,7 +263,7 @@ def lint(keys, path, text, root=None):
             out.append(("sq-isolation", "you issue BEGIN yourself, but sqlite3.connect() without isolation_level=None also "
                         "opens/commits transactions on its own; connect with isolation_level=None."))
         # cycle 68 q_db_repo: "... WHERE c.name = ?" executed with no parameters in both runs (find_customer 0/120)
-        for m in (re.finditer(r"\.execute(?:many)?\(\s*(?:[rRuU]?)(\"\"\"|'''|\"|')(.*?)\1\s*(\)|,)", text, re.S) if os.environ.get("KNOW2") == "1" else ()):
+        for m in (re.finditer(r"\.execute(?:many)?\(\s*(?:[rRuU]?)(\"\"\"|'''|\"|')(.*?)\1\s*(\)|,)", text, re.S)):     # adopted into LINT 10-25 (cycle 72: no prompt cost, 0 FP); the KNOW2 facts were not adopted
             sql = re.sub(r"'[^']*'", "''", m.group(2))      # ? inside SQL string literals is not a placeholder
             n = sql.count("?") + len(re.findall(r"(?<![:\w]):[A-Za-z_]\w*", sql))
             if n and m.group(3) == ")":
