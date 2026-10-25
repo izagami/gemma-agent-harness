@@ -2580,6 +2580,14 @@ def run_task(task_text, workdir, profile, log):
                          "script. " + ("Its API (how to use it):\n" + know.skill_index(know.vbc_api(), "vbcompat.py")
                                        if os.environ.get("SKILLS") == "1" else "Its API:\n" + know.vbc_api()))
                 log({"vbcompat": True})
+            if os.environ.get("KITTEST") == "1" and (("vba" in keys and os.environ.get("VBC") == "1")
+                                                     or (os.environ.get("KIT") == "1" and {"browser", "sqlite"} & set(keys))):
+                # cycle 78 h_vba_kintai: steps 4-19 (40% of the time) went into a spec test of vbcompat's own functions
+                # (date_serial, weekday) and fixing that test; kintai.py itself was first written at step 20
+                kmsg += ("\n\n[harness] The helper library above is already tested - never write tests for it and never "
+                         "re-check its functions. Write YOUR program first, then test it the way the task will be checked: "
+                         "run it on the provided input files and compare its output with the expected output.")
+                log({"kittest": True})
             if os.environ.get("KIT") == "1":
                 # KIT: tested helper modules for the other domains, same idea as vbcompat (call, do not re-derive):
                 # pwkit (Playwright waits on state, read-after-open, collect pages, submit once) and sqlkit (all-or-
