@@ -980,6 +980,18 @@ def run_tool(box, workdir, st, name, args):
     if name in ("write_file", "edit_file") and base.safe_path(args.get("path", "")) in getattr(st, "protected", set()):
         return (f"error: {args['path']} is a provided input file and the task does not ask you to change it, so it is read-only. "
                 "Put test data in /tmp (e.g. /tmp/test_input) and point your program at it while testing.")
+    FIX73 = os.environ.get("FIX73", "1") == "1"      # cycle 73 fixes (on by default; FIX73=0 for an A/B base)
+    if FIX73 and name == "edit_file" and re.search(r"\[\d+ chars, elided", str(args.get("old_text", ""))):
+        # cycle 73 h_browser_approve: ~15 of 80 steps were edit_file calls whose old_text was the history placeholder
+        return ("error: old_text is the placeholder '[... chars, elided ...]' from your history, not text in the file, so "
+                "it can never match. read_file the lines you want to change and copy them exactly as old_text "
+                "(or write_file the whole file).")
+    if (FIX73 and name in ("write_file", "edit_file") and os.path.basename(str(args.get("path", ""))) in ("pwkit.py", "sqlkit.py", "vbcompat.py")
+            and (os.environ.get("KIT") == "1" or os.environ.get("VBC") == "1")):
+        # cycle 73: after its own wrong calls failed, the model started rewriting pwkit.py (10 steps)
+        return (f"error: {os.path.basename(str(args['path']))} is the harness's TESTED helper library - do not change it. "
+                "When a call to it fails, the call is wrong: read the function's docstring/signature "
+                f"(grep -n 'def NAME' {args['path']}) and fix YOUR code.")
     if name in ("write_file", "edit_file") and re.search(r"\[\d+ chars, elided", str(args.get("content", "")) + str(args.get("new_text", ""))):
         # v8u price_cache: the model copied the elision placeholder of an old call and wrote it into its test
         return ("error: you copied the placeholder '[... chars, elided ...]' of an older call. Nothing was written. "
@@ -1109,7 +1121,13 @@ def run_tool(box, workdir, st, name, args):
             out += ("\n[harness] Same files, same command, same result as the last time you ran it. If this result shows "
                     "the task is done, call finish now. Otherwise change one specific thing that this output shows is wrong.")
         return out
-    return base.run_tool(box, workdir, name, args)
+    out = base.run_tool(box, workdir, name, args)
+    if name == "bash" and os.environ.get("FIX73", "1") == "1" and re.search(r"address already in use|Errno 98", out, re.I):
+        # cycle 73 h_browser_approve: ~15 steps restarting the app on a port its own earlier background run still held
+        out += ("\n[harness] That port is still held by a server YOU started in the background in an earlier step (it keeps "
+                "running between commands). Do not fight it: either reuse that running server, or start a new one on a "
+                "fresh free port (e.g. --port 8901, then 8902 ...) and point your script at it (APP_URL=http://127.0.0.1:8901).")
+    return out
 
 
 LNUM = re.compile(r"^ *\d+\| ?")

@@ -170,7 +170,9 @@ def login(page, url, user, password, user_sel, pass_sel, submit_sel, after_url_p
 
 # ---------------------------------------------------------------- waiting
 def _loc(scope, selector):
-    return scope.locator(selector)
+    # a Locator works wherever a selector does (cycle 73: find_row(page, page.locator("tr"), no) -> "Locator is not
+    # JSON serializable" and 10 steps lost)
+    return selector if not isinstance(selector, str) else scope.locator(selector)
 
 
 def _wait_state(scope, selector, state):

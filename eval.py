@@ -69,7 +69,7 @@ def main():
             # the variant env and the code version, so a watchdog can tell variants of one profile apart and see which
             # jobs started before a mid-cycle fix (10-24)
             log({"profile": prof, "feats": sorted(agent_v5.feats(prof)),
-                 "env": {k: os.environ[k] for k in sorted(os.environ) if re.fullmatch(r"(THINK|CONTENT|EV|AGENT_TEMP|EDIT\d*|MIDGATE|FEATS_OFF|FINISH_NUDGE|KNOW|LINT|VBC|KIT|VISION|PWKIT|KNOW2)(_[A-Z_]+)?", k)},
+                 "env": {k: os.environ[k] for k in sorted(os.environ) if re.fullmatch(r"(THINK|CONTENT|EV|AGENT_TEMP|EDIT\d*|MIDGATE|FEATS_OFF|FINISH_NUDGE|KNOW|LINT|VBC|KIT|VISION|PWKIT|KNOW2|FIX73)(_[A-Z_]+)?", k)},
                  "code": hashlib.sha1(open(agent_v5.__file__, "rb").read()).hexdigest()[:8]})
         try:
             if prof.startswith("g"):
