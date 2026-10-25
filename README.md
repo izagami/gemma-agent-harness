@@ -87,6 +87,29 @@ and what it has, `login()` that returns only after the login page is gone, `fill
 natural misuse accepted) took the 4 browser tasks from 0/12 to 6/12 and 0/12 to 5/12 passes in two runs (score
 0.06 → 0.56 and 0.05 → 0.68), with the first full pass on a held-out task (h_browser_inventory).
 
+### Where it stands (2026-10-26)
+
+| Measurement | Result |
+|---|---|
+| `tasks_qg` (25 tasks), best config, 2 runs, B70 power cap 180 W | 23/50 passes (46 %), mean 0.78 — was 7–8/25, mean 0.62–0.68 on 10-24 at 120 W |
+| `tasks_h` (7 held-out tasks), 4 runs, 180 W | mean 0.54 (0.29 before the harness work, 0.445 at 120 W) |
+| `tasks_v8` (12 held-out Python tasks with no helper library), 2 runs | 1/24 — the gains are where tested libraries exist |
+| Power cap 120 W → 180 W, same config (14 library tasks × 4) | 10/56 → 14/56 passes, mean 0.50 → 0.59 (+36 % steps within the deadline), confirmed twice |
+
+Same 14 library tasks (browser, SQLite, VBA), harness vs a plain tool loop (profile `v5`, native thinking on):
+
+| | plain loop | this harness |
+|---|---|---|
+| Gemma 4 26B-A4B (AWQ INT4, vLLM) | 0/28, mean 0.28 | 28/112, mean 0.59 (0.68 with one job per card) |
+| Qwen3.8-Flash-Next (IQ2_XS, XeStrata) | 1/14, mean 0.23 | 8/19, mean 0.67 (one job per card) |
+
+The harness built against Gemma's failures carries over to another model unchanged.
+
+Tried and not adopted (each run twice or reversed on the repeat): helper APIs announced as an index read on demand
+(`SKILLS`), "do not test the library" advice (`KITTEST`), time-left milestones (`TIMEAWARE`), extra SQLite facts
+(`KNOW2`), the model's native thinking mode. Pattern: an instruction derived from one task's failure helps that task
+and hurts others; tested libraries and more steps help everywhere.
+
 ## Security notes
 
 - Treat the model as untrusted: it only runs commands inside the sandbox container, which has no network.
