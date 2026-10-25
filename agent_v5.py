@@ -191,7 +191,7 @@ def judge_last(body):
     req = urllib.request.Request(base.API, json.dumps(b).encode(),
                                  {"Content-Type": "application/json", "Authorization": "Bearer " + base.API_KEY})
     with urllib.request.urlopen(req, timeout=120) as r:
-        txt = json.load(r)["choices"][0]["message"]["content"]
+        txt = json.load(r)["choices"][0]["message"]["content"] or ""   # 10-25: null content (all in reasoning) crashed the typed think
     m = re.search(r'"r"\s*:\s*"([a-z ]+)"', txt)
     return m.group(1) if m else "nothing new"
 
@@ -391,7 +391,7 @@ def typed_think6(b, workdir=None):
     req = urllib.request.Request(base.API, json.dumps(b).encode(),
                                  {"Content-Type": "application/json", "Authorization": "Bearer " + base.API_KEY})
     with urllib.request.urlopen(req, timeout=300) as r:
-        txt = json.load(r)["choices"][0]["message"]["content"]
+        txt = json.load(r)["choices"][0]["message"]["content"] or ""   # 10-25: null content (all in reasoning) crashed the typed think
     f = {k: re.search(r'"%s"\s*:\s*"((?:[^"\\]|\\.)*)' % k, txt) for k in schema["properties"]}
     # strict=False: a raw newline/tab inside a field broke the whole think (cycle 42 vba_sales "Invalid control character")
     f = {k: json.loads('"' + v.group(1) + '"', strict=False) if v else "" for k, v in f.items()}
@@ -440,7 +440,7 @@ def typed_think(body, workdir=None):
     req = urllib.request.Request(base.API, json.dumps(b).encode(),
                                  {"Content-Type": "application/json", "Authorization": "Bearer " + base.API_KEY})
     with urllib.request.urlopen(req, timeout=300) as r:
-        txt = json.load(r)["choices"][0]["message"]["content"]
+        txt = json.load(r)["choices"][0]["message"]["content"] or ""   # 10-25: null content (all in reasoning) crashed the typed think
     # the grammar allows any whitespace; a run of blank lines can reach max_tokens and leave the JSON unclosed (cycle 11:
     # 8 of 233 typed thinks), so the two fields are read with a pattern, not json.loads
     keys = (("failing", "assumption", "next") if stuck else ("last_result", "learned", "next") if v2 else ("known", "next")) \

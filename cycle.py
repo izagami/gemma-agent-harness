@@ -42,7 +42,7 @@ def main():
     q = queue.Queue()
     for r in range(reps):
         for t in tasks:
-            for prof in [base] + cands:
+            for prof in [base] + ([] if os.environ.get("SINGLE") == "1" else cands):   # SINGLE=1: base only (10-25 Qwen run on one card)
                 q.put((prof, t, r))
     res, lock, t0 = {}, threading.Lock(), time.time()
     live = set()
