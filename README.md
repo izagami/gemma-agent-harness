@@ -105,9 +105,13 @@ Same 14 library tasks (browser, SQLite, VBA), harness vs a plain tool loop (prof
 
 The harness built against Gemma's failures carries over to another model unchanged.
 
+Removed: restoring the last test-passing state at the end (end_guard). With the guard off, the runs where it would
+have fired were often full passes (tasks_qg: bizdays, db_repo, lru_ttl 1.0, db_report 0.90) - the model's own test was
+wrong, not the code. Three runs in the same direction (+0.042, +0.020 on tasks_v8g, +0.021 on tasks_qg).
+
 Tried and not adopted (each run twice or reversed on the repeat): helper APIs announced as an index read on demand
 (`SKILLS`), "do not test the library" advice (`KITTEST`), time-left milestones (`TIMEAWARE`), extra SQLite facts
-(`KNOW2`), the model's native thinking mode. Pattern: an instruction derived from one task's failure helps that task
+(`KNOW2`), the model's native thinking mode, the untouched seed as an end-of-run fallback (`ENDSEED`). Pattern: an instruction derived from one task's failure helps that task
 and hurts others; tested libraries and more steps help everywhere.
 
 ## Security notes

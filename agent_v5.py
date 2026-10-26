@@ -1500,7 +1500,7 @@ def end_guard(st, box, log):
                 fh.write(st.seed_bytes[p])
     if not getattr(st, "best", None):
         return
-    if os.environ.get("NOENDGUARD") == "1":
+    if os.environ.get("NOENDGUARD", "1") == "1":       # ADOPTED 10-26 (cycles 92-94): default ON, NOENDGUARD=0 restores the old guard
         # A/B (10-26): cycle 90 showed a state failing the tests can still beat the restored one on the hidden check;
         # keep the end state, only log whether the guard would have restored
         code, _, _ = box.sh(END_CHECK, timeout=120)
