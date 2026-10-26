@@ -431,6 +431,48 @@ def parse_int(s):
     return -int(digits) if neg and digits else int(digits or 0)
 
 
+# 10-26 (cycle 98): the model invents arguments (wait_visible(..., timeout=5000), text_of(..., nth=2)) and crashes on
+# TypeError before anything is checked. Every public helper accepts timeout= (ms, for that call), nth= (use the n-th
+# match of the selector) and ignores other unknown keywords with a note on stderr instead of failing.
+import functools as _functools
+import inspect as _inspect
+import sys as _sys
+
+
+def _lenient(fn):
+    sig = _inspect.signature(fn)
+    names = set(sig.parameters)
+    takes_kw = any(p.kind == p.VAR_KEYWORD for p in sig.parameters.values())
+
+    @_functools.wraps(fn)
+    def wrapper(*args, **kw):
+        global TIMEOUT
+        tmo = kw.pop("timeout", None) if "timeout" not in names else None
+        nth = kw.pop("nth", None) if "nth" not in names else None
+        if not takes_kw:
+            for k in [k for k in kw if k not in names]:
+                print(f"pwkit: {fn.__name__}() has no argument {k!r} - ignored", file=_sys.stderr)
+                kw.pop(k)
+        if nth is not None:
+            args = list(args)
+            for i, a in enumerate(args[1:], 1):          # the first selector argument -> its n-th match
+                if isinstance(a, str) and i < len(args):
+                    args[i] = _loc(args[0], a).nth(int(nth))
+                    break
+        old = TIMEOUT
+        if tmo is not None:
+            TIMEOUT = int(tmo) if float(tmo) > 100 else int(float(tmo) * 1000)   # 5000 ms or 5 s
+        try:
+            return fn(*args, **kw)
+        finally:
+            TIMEOUT = old
+    return wrapper
+
+
+for _n, _f in list(globals().items()):
+    if callable(_f) and not _n.startswith("_") and getattr(_f, "__module__", None) == __name__ and _inspect.isfunction(_f):
+        globals()[_n] = _lenient(_f)
+
 # 10-26 (cycles 95/96): task scripts often define their own login / fill_form / text, and `from pwkit import *` then
 # clobbered them or was clobbered (login() takes 1 positional argument but 7 were given; KeyError from the wrong
 # fill_form). The star import exports only distinctive names; the old names stay for qualified use (pwkit.login).
