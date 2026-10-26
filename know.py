@@ -335,7 +335,7 @@ def lint(keys, path, text, root=None):
     if "browser" in keys and "pwkit" in text:
         # cycle 51 h_browser_approve: pwkit functions called as page methods, open_browser() inside sync_playwright()
         m = re.search(r"\b(?:page|frame|scope|form\w*)\.(wait_text|wait_text_change|wait_attr|wait_for_attr|wait_count|wait_options|"
-                      r"wait_visible|wait_hidden|read_rows|open_and_read|collect_pages|submit_once|click_and_wait_change|fill_form|fill_fields|select_label|search_and_wait|find_row|modal_submit|text_of)\(", text)
+                      r"wait_visible|wait_hidden|read_rows|open_and_read|collect_pages|submit_once|click_and_wait_change|fill_form|select_label|search_and_wait|find_row|modal_submit)\(", text)
         if m:
             out.append(("br-kit-call", f"`.{m.group(1)}(` is not a Playwright method: pwkit functions take the page/frame as "
                         f"the FIRST ARGUMENT, e.g. {m.group(1).replace('wait_for_attr', 'wait_attr')}(page, selector, ...)."))
