@@ -44,7 +44,8 @@ Reading
                                               (table not aria-busy, its data-query == query if it has one, every row
                                               contains the query); returns the rows Locator. The old result stays on
                                               screen while the new one loads - never read right after typing
-    find_row(scope, rows_sel, key, col=0)     the row whose cell col is exactly key (not R-12 for R-125), or None
+    find_row(scope, rows_sel, key, col=0)     the row whose cell col is exactly key (not R-12 for R-125), or None;
+                                              find_row(rows_locator, key) works too
 Acting
     modal_submit(page, values, submit_sel, dialog_sel='[role="dialog"]', done_sel=None)
                                               for a form that opens in a dialog after a click: waits for the dialog,
@@ -304,9 +305,15 @@ def search_and_wait(scope, input_sel, query, rows_sel="tbody tr", table_sel=None
     return _loc(scope, rows_sel)
 
 
-def find_row(scope, rows_sel, key, col=0):
-    """the row Locator whose cell number col (td/th) is exactly key, else None"""
-    rows = _loc(scope, rows_sel)
+def find_row(scope, rows_sel, key=None, col=0):
+    """the row Locator whose cell number col (td/th) is exactly key, else None.
+    Also find_row(rows_locator, key) (cycle 95: called that way twice -> missing 'key')"""
+    if key is None:
+        if isinstance(rows_sel, str) and not hasattr(scope, "goto") and hasattr(scope, "evaluate_all"):
+            rows_sel, key, scope = scope, rows_sel, None       # (rows_locator, key)
+        else:
+            raise TypeError("find_row(page, rows_selector, key) or find_row(rows_locator, key): the key is missing")
+    rows = _loc(scope, rows_sel) if scope is not None else rows_sel
     cells = rows.evaluate_all("(rs, col) => rs.map(r => { const c = r.querySelectorAll('td,th')[col]; "
                               "return c ? c.textContent.trim() : null; })", col)
     for i, t in enumerate(cells):
