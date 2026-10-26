@@ -6,7 +6,7 @@ selector or the page is wrong - the error then says which URL the page is on and
 `scope` below is a Page or a FrameLocator/Frame (forms inside an <iframe>: scope = page.frame_locator("iframe[...]")).
 
 Discover
-    list_elements(page, scope_selector="body")  print every element with id / data-testid / name / aria-label / role
+    inspect(page, scope_selector="body")  print every element with id / data-testid / name / aria-label / role
                                           (+ tag, type, text) - run it once before choosing selectors; old ids may be gone
     sel_testid(name) / sel_label(text)    '[data-testid="name"]' / '[aria-label="text"]'
 Session
@@ -15,7 +15,7 @@ Session
                                           pw, browser, page = open_browser()
                                           try: ... finally: close_browser(pw, browser)
 All helpers are plain functions taking the page/frame first: wait_attr(page, sel, ...), never page.wait_attr(...)
-    login_and_wait(page, url, user, password, user_sel, pass_sel, submit_sel, after_url_part=None)
+    login(page, url, user, password, user_sel, pass_sel, submit_sel, after_url_part=None)
                                           returns only when the login page is gone (raises with the page's error
                                           message if the login failed) - only then page.goto() another page
 Waiting
@@ -31,7 +31,7 @@ Waiting
                                               "next page", tabs, filters, search - anything that replaces content
                                               (a tab that is already selected: clicks and returns at once)
 Reading
-    text_of(scope, selector)                  exact text_content() ('' if missing)
+    text(scope, selector)                     exact text_content() ('' if missing)
     read_rows(scope, row_selector, cell_selector="td")  every row's cell texts in ONE call: list of lists
     open_and_read(page, click_locator, wait_sel, expect_text, read_sels)
                                               click (e.g. a row's 詳細), wait until wait_sel shows expect_text (the item
@@ -49,13 +49,13 @@ Reading
 Acting
     modal_submit(page, values, submit_sel, dialog_sel='[role="dialog"]', done_sel=None)
                                               for a form that opens in a dialog after a click: waits for the dialog,
-                                              fill_fields(values) inside it, clicks submit_sel ONCE (a confirm() is accepted
+                                              fill_form(values) inside it, clicks submit_sel ONCE (a confirm() is accepted
                                               by open_browser's handler), waits until the dialog is gone. Click the row's
                                               button only after the previous dialog is gone (an open overlay eats clicks)
     submit_once(scope, page, submit_sel, done_sel, error_sel=None)
                                               clicks ONCE and waits until done_sel is visible or error_sel has text;
                                               returns ("ok", text) / ("error", text). Never clicks again (no double records)
-    fill_fields(scope, {selector: value, ...})  text inputs are filled; a <select> gets the option whose label (or value)
+    fill_form(scope, {selector: value, ...})  text inputs are filled; a <select> gets the option whose label (or value)
                                               is the value; a checkbox/radio is checked when the value is true
     select_label(scope, selector, label)
 Output
@@ -114,7 +114,7 @@ _INSPECT_JS = """root => {
 }"""
 
 
-def list_elements(page, scope_selector="body", frame=None):
+def inspect(page, scope_selector="body", frame=None):
     """print the elements you can select (id / data-testid / name / aria-label / role / buttons / inputs / iframes).
     For an iframe pass frame=page.frame(name=...) or the Frame object."""
     target = frame or page
@@ -143,7 +143,7 @@ def close_browser(pw, browser, *_):
         pw.stop()
 
 
-def login_and_wait(page, url, user, password, user_sel, pass_sel, submit_sel, after_url_part=None):
+def login(page, url, user, password, user_sel, pass_sel, submit_sel, after_url_part=None):
     page.goto(url)
     page.fill(user_sel, user)
     page.fill(pass_sel, password)
@@ -208,7 +208,7 @@ def _poll(cond, what, scope=None):
                        + (_where(scope) if scope is not None else ""))
 
 
-def text_of(scope, selector):
+def text(scope, selector):
     loc = _loc(scope, selector)
     if loc.count() == 0:
         return ""
@@ -217,11 +217,11 @@ def text_of(scope, selector):
 
 def wait_text(scope, selector, expected):
     expected = str(expected).strip()
-    return _poll(lambda: (text_of(scope, selector) == expected, text_of(scope, selector)), f"{selector} == {expected!r}", scope)
+    return _poll(lambda: (text(scope, selector) == expected, text(scope, selector)), f"{selector} == {expected!r}", scope)
 
 
 def wait_text_change(scope, selector, old):
-    return _poll(lambda: ((t := text_of(scope, selector)) != old, t), f"{selector} to change from {old!r}", scope)
+    return _poll(lambda: ((t := text(scope, selector)) != old, t), f"{selector} to change from {old!r}", scope)
 
 
 def wait_count(scope, selector, n):
@@ -326,7 +326,7 @@ def modal_submit(page, values, submit_sel, dialog_sel='[role="dialog"]', done_se
     """dialog form: wait for it, fill it, click submit ONCE, wait until it is gone; returns the dialog's last text"""
     dlg = page.locator(dialog_sel).first
     _wait_state(page, dialog_sel, "visible")
-    fill_fields(dlg, values)
+    fill_form(dlg, values)
     last = (dlg.text_content() or "").strip()
     dlg.locator(submit_sel).first.click()
 
@@ -364,7 +364,7 @@ def collect_pages(page, read_page, next_sel, watch_sel, scope=None, max_pages=10
 
 
 # ---------------------------------------------------------------- acting
-def fill_fields(scope, values):
+def fill_form(scope, values):
     # cycle 68 q_browser_fix: fill() on a <select> waits for an editable element until the timeout
     for sel, v in values.items():
         el = _loc(scope, sel).first
@@ -390,7 +390,7 @@ def select_label(scope, selector, label):
 def submit_once(scope, page, submit_sel, done_sel, error_sel=None):
     """click ONCE; wait until done_sel is visible (-> ("ok", its text)) or error_sel shows a message (-> ("error", text)).
     Never clicks again: a second click can register the same record twice."""
-    err_before = text_of(scope, error_sel) if error_sel else ""
+    err_before = text(scope, error_sel) if error_sel else ""
     _loc(scope, submit_sel).first.click()
 
     def c():
@@ -398,7 +398,7 @@ def submit_once(scope, page, submit_sel, done_sel, error_sel=None):
         if d.count() and d.first.is_visible():
             return True, ("ok", (d.first.text_content() or "").strip())
         if error_sel:
-            t = text_of(scope, error_sel)
+            t = text(scope, error_sel)
             if t and t != err_before and not t.endswith("…") and "中" not in t[-3:]:
                 return True, ("error", t)
         return False, None
@@ -473,8 +473,4 @@ for _n, _f in list(globals().items()):
     if callable(_f) and not _n.startswith("_") and getattr(_f, "__module__", None) == __name__ and _inspect.isfunction(_f):
         globals()[_n] = _lenient(_f)
 
-# 10-26 (cycles 95/96): task scripts often define their own login / fill_form / text, and `from pwkit import *` then
-# clobbered them or was clobbered (login() takes 1 positional argument but 7 were given; KeyError from the wrong
-# fill_form). The star import exports only distinctive names; the old names stay for qualified use (pwkit.login).
-login, fill_form, text, inspect = login_and_wait, fill_fields, text_of, list_elements
-__all__ = [n for n in list(globals()) if not n.startswith("_") and n not in ("os", "re", "time", "login", "fill_form", "text", "inspect")]
+__all__ = [n for n in list(globals()) if not n.startswith("_") and n not in ("os", "re", "time", "functools", "inspect", "sys")]

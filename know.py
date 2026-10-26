@@ -366,10 +366,10 @@ def lint(keys, path, text, root=None):
     return out
 
 
-_PWKIT_NAMES = {"list_elements", "sel_testid", "sel_label", "open_browser", "close_browser", "login_and_wait", "wait_visible",
-                "wait_hidden", "wait_text", "wait_text_change", "wait_count", "wait_attr", "wait_options",
-                "click_and_wait_change", "text_of", "read_rows", "open_and_read", "collect_pages", "submit_once",
-                "fill_fields", "select_label", "write_csv", "parse_int", "search_and_wait", "find_row", "modal_submit"}
+_PWKIT_NAMES = {"inspect", "sel_testid", "sel_label", "open_browser", "close_browser", "login", "wait_visible", "wait_hidden",
+                "wait_text", "wait_text_change", "wait_count", "wait_attr", "wait_options", "click_and_wait_change", "text",
+                "read_rows", "open_and_read", "collect_pages", "submit_once", "fill_form", "select_label", "write_csv",
+                "parse_int", "search_and_wait", "find_row", "modal_submit"}
 
 
 def vbc_api():
