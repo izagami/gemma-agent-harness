@@ -433,7 +433,7 @@ def parse_int(s):
 
 # 10-26 (cycle 98): the model invents arguments (wait_visible(..., timeout=5000), text_of(..., nth=2)) and crashes on
 # TypeError before anything is checked. Every public helper accepts timeout= (ms, for that call), nth= (use the n-th
-# match of the selector) and ignores other unknown keywords with a note on stderr instead of failing.
+# match of the selector); other unknown keywords raise a TypeError that lists the real signature.
 import functools as _functools
 import inspect as _inspect
 import sys as _sys
@@ -450,9 +450,12 @@ def _lenient(fn):
         tmo = kw.pop("timeout", None) if "timeout" not in names else None
         nth = kw.pop("nth", None) if "nth" not in names else None
         if not takes_kw:
-            for k in [k for k in kw if k not in names]:
-                print(f"pwkit: {fn.__name__}() has no argument {k!r} - ignored", file=_sys.stderr)
-                kw.pop(k)
+            bad = [k for k in kw if k not in names]
+            if bad:
+                # cycle 100: silently ignoring unknown keywords hid mistakes (export 2/4 vs 4/4) - fail loudly instead,
+                # with the valid arguments so the fix is one edit
+                raise TypeError(f"pwkit.{fn.__name__}() has no argument {', '.join(map(repr, bad))}. Its arguments: "
+                                f"{fn.__name__}{sig} (timeout= and nth= are also accepted)")
         if nth is not None:
             args = list(args)
             for i, a in enumerate(args[1:], 1):          # the first selector argument -> its n-th match
