@@ -39,7 +39,7 @@ Reading
     collect_pages(page, read_page, next_sel, watch_sel)
                                               read_page() on every page; clicks next_sel and waits for watch_sel to change;
                                               stops when next is missing, hidden or disabled. Returns the concatenated list
-    search_and_wait(scope, input_sel, query, rows_sel, table_sel=None)
+    search_and_wait(scope, input_sel, query, rows_sel="tbody tr", table_sel=None)
                                               types query into a search box and waits until the result is for THIS query
                                               (table not aria-busy, its data-query == query if it has one, every row
                                               contains the query); returns the rows Locator. The old result stays on
@@ -275,7 +275,7 @@ def read_rows(scope, row_selector, cell_selector="td"):
     return loc.evaluate_all(_ROWS_JS, cell_selector)
 
 
-def search_and_wait(scope, input_sel, query, rows_sel, table_sel=None):
+def search_and_wait(scope, input_sel, query, rows_sel="tbody tr", table_sel=None):
     """fill the search box, then wait until the shown result belongs to this query (cycle 70 h_browser_approve: scripts
     read the previous query's rows, or clicked before the table reloaded)"""
     query = str(query)

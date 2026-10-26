@@ -339,6 +339,14 @@ def lint(keys, path, text, root=None):
         if m:
             out.append(("br-kit-call", f"`.{m.group(1)}(` is not a Playwright method: pwkit functions take the page/frame as "
                         f"the FIRST ARGUMENT, e.g. {m.group(1).replace('wait_for_attr', 'wait_attr')}(page, selector, ...)."))
+        # cycle 75/85 export + approve: `from automation.pwkit import ...` works under `python3 -m automation.x` (the
+        # model's own runs) but the checker runs `python3 automation/x.py` -> ModuleNotFoundError: No module named 'automation'
+        if re.search(r"^\s*(from\s+automation(\.\w+)*\s+import|import\s+automation\b)", text, re.M):
+            out.append(("br-kit-import", "`from automation...` / `import automation` fails when the script is run the way the "
+                        "task runs it (`python3 automation/<script>.py` puts automation/ itself on sys.path, not the project "
+                        "root): ModuleNotFoundError: No module named 'automation'. Use: `import os, sys; "
+                        "sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))` then `from pwkit import *`, and "
+                        "test with exactly `python3 automation/<script>.py`, not `python3 -m`."))
         # cycle 68 q_browser_fix: the script defined its own fill_form(scope, row) over pwkit's -> called itself with a dict
         shadow = [n for n in re.findall(r"^def\s+(\w+)\s*\(", text, re.M) if n in _PWKIT_NAMES]
         if shadow:
